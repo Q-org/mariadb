@@ -1,11 +1,141 @@
 /*
 MARIADB Backup
-Source Server Version: 10.6.4
-Source Database: qianxue_sjzh
-Date: 2023/4/19 09:49:16
+Source Server Version: 10.6.5
+Source Database: tmp
+Date: 2023/4/24 19:14:05
 */
 
 SET FOREIGN_KEY_CHECKS=0;
+
+-- ----------------------------
+--  Procedure definition for `2`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `2`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `2`(IN `p` blob)
+p2:BEGIN
+	#Routine body goes here...
+
+	DECLARE `p2` BLOB DEFAULT j0(`p`,'p2'); DECLARE `funcid` VARCHAR(60) DEFAULT j0(`p2`,'funcid');DECLARE `b` MEDIUMBLOB DEFAULT NULL;
+	DECLARE `k` VARCHAR(200) DEFAULT j0(p2,'k');DECLARE `blist` VARCHAR(100) default NULL;
+
+
+  DECLARE CONTINUE HANDLER FOR  SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22'	bl:BEGIN CALL `Audit_3`(COLUMN_create(
+
+	'm',CONCAT_WS(':','Error P2 ',j0(`p2`,'funcid')),'SQL',@p2_body,'pp',`p`
+
+	));END; 
+
+/*
+CALL Audit_3(COLUMN_create('m',CONCAT_WS(' : ','P2 ' ,j0(`p`,'funcid')),'SQL','Record Parameters','pp',`p`));COMMIT;
+LEAVE p2;
+*/
+
+	IF IFNULL(`p2`,'')= '' THEN CALL Error('p :no p2 or courseNo');	ELSE SET @sql_body = NULL;END IF;
+
+
+
+	SET `b` = r9(`funcid`), @p2_body := NULL,
+			@P1	=	j0(p,"p1"),
+			@p2_body = COLUMN_get(b,'sql'AS CHAR);
+
+ 	IF IFNULL(@p2_body,'') = '' THEN  CALL `Audit_3`(COLUMN_create(	'm',CONCAT_WS(':','Error P2 ',j0(`p2`,'funcid')),'SQL',CONCAT_WS('',j0(`p2`,'funcid'),' no sql'),'pp',`p`
+
+	));LEAVE p2;END IF;
+
+	CASE 
+		WHEN @p2_body REGEXP '(?im)^\\s*+delete' THEN	SET @p2_body = r5(@p2_body,p);
+
+	ELSE
+
+			SET	`blist` = NULLIF(COLUMN_list(b),'');
+
+			IF k REGEXP '\\w+' THEN BEGIN
+				DECLARE `r` VARCHAR(200) DEFAULT 
+				CONCAT('(?is)("\\d+":\\{"',replace(k,',','":"(?:\\\\.|[^"])*"\\K((?:,"(?:\\\\.|[^"])*":"(?:\\\\.|[^"])*")+?)(?=,"'),'))');
+
+				SET @k := REGEXP_substr(@p1,`R`),
+						@k := REGEXP_REPLACE(@k,r('`kv-v`'),'\\1\\2:""'),
+						@k = CONCAT('\\1',@k),
+						r = CONCAT('(?is)("\\d+":\\{"',replace(k,',','":"(?:\\\\.|[^"])*"(?=,"'),'))');
+
+
+				SET	@p1 = REGEXP_replace(@p1,r,@k),
+						@k = NULL;
+
+			END; END IF;
+
+			SET @P1	:=	CONCAT_WS(' ',"SELECT",REGEXP_replace(REGEXP_replace(@p1,r('`kvP`'),'\\1\\3\\4\\6'),'(?<=")\\}(?=")','UNION ALL \nSELECT ')),
+					@P1	:=	CONCAT_WS('',REGEXP_replace(REGEXP_SUBSTR(@P1,r('`aline`')) ,r('`kv`'),'\\4 AS \\2 ') -- head
+														,REGEXP_replace(REGEXP_replace(@P1,r('`aline`'),''),r('`kv-k`'),'\\1') -- other
+													),
+					@p1 = REGEXP_replace(REGEXP_REPLACE(@p1,'\\}$',''),'(?im)(?<=^|,)""(?=(?:\\s+AS\\s+[^\\n\\r]*?)?(?:,|$))','NULL');
+
+					CASE	WHEN @p2_body REGEXP '(?is)^\\s*select(.*?)from(.*?)(?=where\\s+|$)' AND `funcid` REGEXP '(?i)UPDATE' THEN
+									SET @p2_body = REGEXP_replace(@p2_body,'(?is)^\\s*SELECT(.*?)from(.*?)(?=where\\s+|$)','update \\2\nSET \\1');
+									SET	@p2_body = REGEXP_replace(@p2_body,'(?ims)^((?:`?\\w+`?\\.)?[\\w`]+)\\s*,\\s*?([\\n\\r]+^\\s*`?\\w)','\\1 = \\2');
+
+								WHEN @p2_body REGEXP '(?i)^\\s*insert'  THEN
+									SET @kfield  = REGEXP_REPLACE(REGEXP_substr(p,'(?s)(?<="p1":{"\\d":\\{)(?:"(?:\\\\.|[^"])*":"(?:\\\\.|[^"])*",?)*(?=\\})')
+																											,'(?s)"((?:\\\\.|[^"])*)":"(?:\\\\.|[^"])*"','\\1');
+
+
+									SET @k	=	REGEXP_replace(REGEXP_substr(@p2_body,'(?ims)^\\s*insert\\s+into\\s*\\w+\\(\\s*\\K.*?(?=,f`|\\))')
+																						,'(?<!`)(\\b\\w+)\\b(?!`)','`\\1` AS `\\1`');
+									SET	@k	=	REGEXP_replace(CONCAT('\\1', r5(@k,p2) ,','),'(?i)null','""');
+
+									SET	@p1 =	REGEXP_REPLACE(@p1,'(?ims)^(\\s*SELECT\\s+)',@k) ;
+
+									SET @p2_body = REGEXP_REPLACE(@p2_body,'f`kfield`',@`kfield`);
+
+						ELSE SET @p1 = @p1 ;
+
+					END CASE;
+/*
+		*/
+
+			SET @p2_body = r5(@p2_body,CONCAT_WS(',',p2,'"p1":"`p1`"'));
+
+
+			IF @p2_body REGEXP '(?ims)^\\s*\\-\\- +\\-\\-' THEN BEGIN 
+			DECLARE `op` BLOB DEFAULT NULL ;DECLARE i INT(2) DEFAULT 0;
+			DECLARE `mr` BLOB DEFAULT '(?is)^(.+?(?=(?:,[\\n\\r]+\\-\\-\\s+\\-)|$))([,\\-\\r\\n ]*)';
+					SET @p2_body1 = REGEXP_replace(REGEXP_substr(@p2_body,'(?ism)^.+(?=^\\s*set)'),'"`p1`"',@p1),
+							@p2_body2 = REGEXP_substr(@p2_body,'(?is)(?<=[\\n\\r])\\s*set\\K.*?(?=[\\n\\r]+\\s*where|$)'),
+							@p2_body3 = REGEXP_substr(@p2_body,'(?isXx)(?<=[\\n\\r])where.*?$');
+		-- SELECT @p2_body,QUOTE(@p2_body2),QUOTE(mr);
+
+					p2l:LOOP
+
+						SET `op` = REGEXP_REPLACE(REGEXP_substr(@p2_body2,`mr`),`mr`,'\\1');
+
+						IF `op` ='' THEN LEAVE p2l;END IF;
+						SET 	@p2_body2		=  REGEXP_REPLACE(@p2_body2,`mr`,'');
+						SET @`op` = CAST(CONCAT_WS('\n',@p2_body1,'SET',`op`,@p2_body3)AS CHAR);
+
+						PREPARE p2_stmt from  @`op`;	EXECUTE p2_stmt ;	
+					END LOOP;
+
+					DEALLOCATE PREPARE p2_stmt ;
+					LEAVE p2;
+
+			END; END IF;
+			SET @p2_body =  REGEXP_replace(@p2_body,'"`p1`"',@p1);
+
+	END CASE;
+
+	
+	
+		IF CAST(@p2_body AS CHAR) IS NULL THEN SET @p2_body = CONVERT(@p2_body USING gbk);END IF;
+	
+-- SELECT CAST(@p2_body AS CHAR),@p1 ,CAST(REGEXP_replace(COLUMN_get(b,'sql'AS CHAR),'`p1`',@p1)AS CHAR) AS `SQL`;LEAVE p2;
+
+
+	PREPARE p2_stmt from  @p2_body;	EXECUTE p2_stmt ;	SELECT ROW_COUNT();	DEALLOCATE PREPARE p2_stmt ;
+
+END
+;;
+DELIMITER ;
 
 -- ----------------------------
 --  Procedure definition for `2page`
@@ -16,17 +146,22 @@ CREATE DEFINER=`root`@`%` FUNCTION `2page`(`p` blob) RETURNS varchar(8) CHARSET 
     NO SQL
     DETERMINISTIC
 l:BEGIN
-	
-	DECLARE `pageno` VARCHAR(8) DEFAULT j(p,'pageno');
-	DECLARE `max_page` VARCHAR(2000) DEFAULT j(p,'max_page');
+	#Routine body goes here...
+	DECLARE `pageno` VARCHAR(8) DEFAULT j0(p,'pageno');
+	DECLARE `max_page` VARCHAR(2000) DEFAULT j0(p,'max_page');
 
-
+/*
+start TRANSACTION;
+SET @DBLOB = p;
+CALL Audit_2('2page',quotej(p),@dblob);COMMIT;
+LEAVE l;
+*/
 
 	RETURN 	CASE 
 						WHEN IFNULL(`pageno`,'')=0 THEN RPAD(1,`max_page`,1)
 						WHEN `pageno` = '1' THEN RPAD(1,`max_page`,0)
 						WHEN `pageno` REGEXP '^[01]+$' THEN SUBSTR(`pageno`,1,`max_page`)
-
+-- 						WHEN `pageno` REGEXP '^[1-8](,[1-8])+$' THEN
 						ELSE RPAD(LPAD(1,`pageno`,0),`max_page`,0) 
 					END ;
 END
@@ -38,41 +173,59 @@ DELIMITER ;
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `3in1`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `3in1`(IN `statu` varchar(100),IN `key_names` varchar(100),IN `key_values` varchar(200),IN `field_names` longtext,IN `field_values` longtext,in `rowids` varchar(300), dblob blob)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `3in1`(IN `funcid` varchar(100),IN `key_names` varchar(100),IN `key_values` varchar(200),IN `field_names` longtext,IN `field_values` longtext,in `rowids` varchar(300), dblob blob)
     DETERMINISTIC
-3in1_label:BEGIN
+`l`:BEGIN
+
+	DECLARE rownum varchar(300);	DECLARE IS5 VARCHAR(1) DEFAULT 0;	DECLARE i INT(3);  DECLARE ir INT(3);	DECLARE ia INT(3);	DECLARE mid1 varchar(60) DEFAULT NULL;
+
+	DECLARE 对比 text DEFAULT
+					CONCAT_WS(' ',
+						"CASE WHEN ??? IS NULL OR ??? REGEXP '^null$'",
+						"THEN NULL\nWHEN ???? REGEXP ??? THEN IF( ??? REGEXP ",
+						QUOTE('\\Q(?#\\E'),",NULL,'#00FF00')\n" ,
+						"ELSE '#FF9999' END AS colB??\n");
+
+	DECLARE b保存 text DEFAULT  REGEXP_replace(REGEXP_replace(REGEXP_replace(对比,
+																			'#FF9999','0'),
+																			'#00FF00','1'),
+																			'colB','ERR_B');
+	DECLARE b计算 text DEFAULT  REGEXP_replace(REGEXP_replace(b保存,
+																					"(?im)null$|'0'|,\\Knull(?=,)",0),
+																					'(?im)as\\s*[\\w_?]+\\s*$','');
+	DECLARE a计算 text DEFAULT  
+					CONCAT_WS(' ',
+						"ERR_A1 = CASE WHEN ??? IS NULL OR ??? REGEXP '^null$'",
+						"THEN NULL\nWHEN ???? REGEXP ??? THEN IF( ??? REGEXP ",
+						QUOTE('\\Q(?#\\E'),",NULL,'#00FF00')\n" ,
+						"ELSE '#FF9999' END\n");
+	
+  DECLARE CONTINUE HANDLER FOR  SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22' , SQLSTATE	'HY000'-- ,SQLSTATE	'22007'
+	BEGIN GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;SET  @`sqlstate` = JSON_OBJECT('sqlstate',@`sqlstate`,'errno',@errno,'text',@text);
+				SET @`errsql` = @3in1_body;
+				SET @funcid = CONCAT_WS(' ','Error: ', ' 3in1' ,`funcid`,ELT(`funcid`,'','对比','保存','提示' , '？5')),
+				@pp =CONCAT_WS(',',quote(`funcid`),quote( `key_names`),quote( `key_values`),quote( `field_names`),quote( `field_values`),quote( `rowids` ),quote( dblob));
+				CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp,'SQL',@`errsql`,'err',@`sqlstate`));
+	END;
+
+START TRANSACTION;
+				SET @funcid = CONCAT_WS(' ', ' 3in1' ,`funcid`,ELT(`funcid`,'','对比','保存','提示' , '？5')),
+				@pp =CONCAT_WS(',',quote(`funcid`),quote( `key_names`),quote( `key_values`),quote( `field_names`),quote( `field_values`),quote( `rowids` ),quote( dblob));
+INSERT INTO plogs (Function_Name,parameter) VALUES (@funcid,@pp);
+#CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp));COMMIT;
+
+/*,'l','1'*/
 
 
-	DECLARE rownum varchar(300);
-	DECLARE IS5 VARCHAR(1) DEFAULT 0;
-	DECLARE i INT(3);
-  DECLARE ir INT(3);
-	DECLARE ia INT(3);
-	DECLARE mid1 varchar(60) DEFAULT NULL;
+   SET @missionid = null,@a_t = null,@a_n= 0,@b_total =0,@b_r_total=0;     SET @missionid = Fetch_Set(key_values,2,'\''),				@EXPID = Fetch_Set(key_values,1,'\''),			  @a_fnz = NULL,@3in1_body = '',				rownum = NULL,				@db_b = NULL;
 
+	IF IFNULL(@missionid,'') = '' OR IFNULL(@expid,'')='' THEN 		CALL Audit('3in1',				CAST(CONCAT_WS('-','expid',IFNULL(@expid,'null'),'missionid',IFNULL(@missionid,'null')) AS CHAR),`funcid`,				key_names,key_values,field_names,field_values,rowids);		SELECT NULL AS `expidmissioniderror`; 		LEAVE `l`; 	END IF;
 
-   	SET @missionid = null,@a_t = null,@a_n= 0,@b_total =0,@b_r_total=0;
-    SET @missionid = Fetch_Set(key_values,2,'\''), 
-				@EXPID = Fetch_Set(key_values,1,'\''),
-			  @a_fnz = NULL,@3in1_body = '',
-				rownum = NULL,
-				@db_b = NULL;
+	CASE 	WHEN `funcid` = '6' THEN
 
-	IF IFNULL(@missionid,'') = '' OR IFNULL(@expid,'')='' THEN
-		CALL Audit('3in1',
-				CAST(CONCAT_WS('-','expid',IFNULL(@expid,'null'),'missionid',IFNULL(@missionid,'null')) AS CHAR),statu,
-				key_names,key_values,field_names,field_values,rowids);
-		SELECT NULL AS `expidmissioniderror`;
-		LEAVE 3in1_label;
-	END IF;
-
-	CASE
-
-			WHEN statu = '6' THEN
-
-				CALL Fetch_Set_values(field_names,'a',@field_names_1);
+				CALL Fetch_Set_values(field_names,'a',@field_names_1);-- 取得字r段名
 						 CALL Fetch_Set_values(field_values,'0',@field_values_1);
-
+-- SELECT @field_names_1,@field_values_1 ;   LEAVE `l`;
 						 CALL Temp_Func_2(CONCAT_WS('',
 "IF((@b :=",
 	"CASE	WHEN a1.init_?? = 1 THEN b1.?? ",
@@ -89,12 +242,12 @@ LEFT JOIN acc_standard_1 AS b0 ON a0.missionId = b0.missionId
 LEFT JOIN acc_standard_1 AS b1 ON a1.missionId = b1.missionId
 LEFT JOIN acc_1 AS c0 ON b0.missionId = c0.missionId AND c0.expID = ",QUOTE(@expID),
 "\nWHERE a1.missionId = ",QUOTE(@missionid));	
+-- SELECT CAST(@3in1_body as CHAR) ;   LEAVE `l`;
 
-		PREPARE stmt_bsb FROM @3in1_body;
-		EXECUTE stmt_bsb ;
+		EXECUTE immediate @3in1_body;
 
 
-			WHEN statu = '5' THEN
+			WHEN `funcid` = '5' THEN
 			label5:BEGIN
 
 				CASE 
@@ -103,23 +256,29 @@ LEFT JOIN acc_1 AS c0 ON b0.missionId = c0.missionId AND c0.expID = ",QUOTE(@exp
 						WHEN rowids REGEXP '^[1-9]{1}(,[1-9][0-9]{0,}){0,}$' THEN
 								SET rownum = rowids;
 					ELSE 
-	
-							CALL audit('3IN1',CONCAT_WS(':',IFNULL(STATU,'label5B1'),'ROWIDS ERROR:',QUOTE(rowids)),STATU,key_names,key_values,field_names,field_values,rowids);
-							LEAVE label5; 
+	-- 						SET @3in1_body ="SELECT NULL as `label5B1`";
+
+						SET rowids =CONCAT_WS(':','rowids',rowids);
+
+-- 	 					SIGNAL SQLSTATE 'HY000' SET MYSQL_ERRNO ='553' , MESSAGE_TEXT = rowids;
+--  						CALL audit('3IN1',CONCAT_WS(':',IFNULL(`funcid`,'label5B1'),'ROWIDS ERROR:',QUOTE(rowids)),`funcid`,key_names,key_values,field_names,field_values,rowids);
+						LEAVE label5; -- rowids 出错  
+
 				END CASE;	
 
 				label5A:BEGIN
 
-					CALL Fetch_Set_values(field_names,'a',@field_names_1);
+					CALL Fetch_Set_values(field_names,'a',@field_names_1);-- 取得字r段名
 					CALL Fetch_Set_values(field_values,'0',@field_values_1);
-          IF IFNULL(@field_names_1,'') NOT REGEXP 
-							'^\'(a[1-9][0-9]{0,1}[0]{0,1}){1,}\'(,\'(a[1-9][0-9]{0,1}[0]{0,1})*\')*$' THEN 
-							CALL audit(CONCAT_WS(':','3IN1',statu),CONCAT_WS(':','afieldWarning:',@FIELD_NAMES_1),statu,key_names,key_values,field_names,field_values,rowids);
 
+          IF IFNULL(@field_names_1,'') NOT REGEXP 
+							'^\'(a[1-9][0-9]{0,1}[0]{0,1}){1,}\'(,\'(a[1-9][0-9]{0,1}[0]{0,1})*\')*$' THEN -- 校验A字段 允许为空
+							CALL audit(CONCAT_WS(':','3IN1',`funcid`),CONCAT_WS(':','afieldWarning:',@FIELD_NAMES_1),`funcid`,key_names,key_values,field_names,field_values,rowids);
+-- 							LEAVE label4a;
 							SET @one = ''; 
 						ELSE 
 
-
+-- SELECT @field_names_1,@field_values_1 ;   LEAVE `l`;
 						 CALL Temp_Func_2(CONCAT_WS('',
 "IF((@b :=",
 	"CASE	WHEN a1.init_?? = 1 THEN b1.?? ",
@@ -136,13 +295,13 @@ LEFT JOIN acc_standard_1 AS b0 ON a0.missionId = b0.missionId
 LEFT JOIN acc_standard_1 AS b1 ON a1.missionId = b1.missionId
 LEFT JOIN acc_1 AS c0 ON b0.missionId = c0.missionId AND c0.expID = ",QUOTE(@expID),
 "\nWHERE a1.missionId = ",QUOTE(@missionid));	
+-- SELECT CAST(@3in1_body as CHAR) ;   LEAVE `l`;
 
-						PREPARE stmt_bsb FROM @3in1_body;
-						EXECUTE stmt_bsb ;
+						EXECUTE immediate @3in1_body;
 
  					END IF;	
 
-				END LABEL5A; 
+				END LABEL5A; -- 处理A字段
 
 				Label5B:BEGIN
 
@@ -151,9 +310,9 @@ LEFT JOIN acc_1 AS c0 ON b0.missionId = c0.missionId AND c0.expID = ",QUOTE(@exp
 
 					IF @FIELD_NAMES_1 NOT REGEXP '^\'(B[1-9][0-9]{0,1})\'(,\'B[1-9][0-9]{0,1}\'){0,}$'   THEN
 						  SET @3in1_body = "SELECT NULL as `label4B1FEILEDNAMESeeror`";
-							CALL audit('3IN1',CONCAT_WS(':','B1FEILEDNAMESeeror:',QUOTE(@FIELD_NAMES_1)),statu,key_names,key_values,field_names,field_values,rowids);
+							CALL audit('3IN1',CONCAT_WS(':','B1FEILEDNAMESeeror:',QUOTE(@FIELD_NAMES_1)),`funcid`,key_names,key_values,field_names,field_values,rowids);
 							LEAVE label5b;
-					END IF; 
+					END IF; -- 校验B字段建
 
 					SET i = 1;
 
@@ -161,588 +320,12 @@ LEFT JOIN acc_1 AS c0 ON b0.missionId = c0.missionId AND c0.expID = ",QUOTE(@exp
 
 					CALL Fetch_Set_P0(@a_b_row,1,ir);
 
-
+-- SELECT ir,@a_b_row,@field_names_1; LEAVE `l`;
 					fetch_recode_s:LOOP
 
 						SET @a = FIND_IN_SET(ir,@a_row); 
 
-
-						SET @a = FIND_IN_SET(ir,rownum);
-						IF @a != 0 THEN 
-								CALL Fetch_Set_values(field_values,ir,@field_values_1);
-							ELSE
-								SET @field_values_1 = NULL;
-						END IF;
-
-
-						CALL Temp_Func_2(" ??? AS ??",@field_names_1,@field_values_1,NULL,@one);
-						SET	@3in1_body =CAST(CONCAT(@3in1_body
-									,"SELECT  ",QUOTE(@expid)," AS expid,",
-													QUOTE(@missionid)," AS missionid ,",
-															@one,',',ir," AS rowId \n"
-																	)AS CHAR);
-
-
-						SET i = i + 1;
-						CALL Fetch_Set_P0(@a_b_row,i,ir);
-						IF ir IS NULL THEN 	 LEAVE fetch_recode_s; END IF; 
-						SET @3in1_body = CONCAT_WS('\tunion\n',@3in1_body,'');
-
-					END LOOP;
-
-				 CALL Temp_Func_2(CONCAT_WS('',
-"IF((@b :=",
-	"CASE	WHEN a1.init_?? = 1 THEN b1.?? ",
-				"WHEN a0.init_?? = 1 THEN b0.?? ",
-				"WHEN IFNULL(c0.??,'') <> IFNULL(c1.??,'') THEN c0.?? ",
-			"ELSE  c0.?? ",
-	"END) =''",
-",NULL,@b) AS  ?? "),@field_names_1,@field_values_1,NULL,@one);
-
-					 SET @3in1_body = CONCAT("SELECT\nb1.rowNo,",@ONE,"\n",
-"FROM acc_mission AS a1
-LEFT JOIN acc_mission AS a0 ON a1.behind_missionId = a0.missionId 
-LEFT JOIN acc_standard_n AS b1 ON a1.missionId = b1.missionId
-LEFT JOIN acc_standard_n AS b0 ON a0.missionId = b0.missionId AND b1.rowNo = b0.rowNo
-LEFT JOIN ",expid2b(@expID)," AS c0 ON b0.missionId = c0.missionId AND b0.rowNo = c0.rowId
-LEFT JOIN (\n",@3in1_body,"\n) AS c1 ON b1.missionId = c1.missionId AND b1.rowNo = c1.rowId
-WHERE a1.missionId = ",QUOTE(@missionid));	
-
-
-
-				END label5B;
-			END label5;
-
-			WHEN statu IS NULL THEN
-				 SET @3in1_body = "SELECT NULL as `1`";
-				 CALL audit('3IN1',IFNULL(statu,'STATU IS NULL'),STATU ,key_names,key_values,field_names,field_values,rowids);
-
-
-			WHEN STATU = '2'  THEN 
-			LABEL1:BEGIN
-				IF IFNULL(rowids,'') ='' THEN
-						SET rowids ='1'; 
-				END IF;
-
-				CASE 
-						WHEN rowids REGEXP '^[0]{1}(,[1-9][0-9]{0,}){1,}$' THEN
-								SET rownum= SUBSTR(rowids,3);
-						WHEN rowids REGEXP '^[1-9]{1}(,[1-9][0-9]{0,}){0,}$' THEN
-								SET rownum = rowids;
-					ELSE 
-							LEAVE 3in1_label; 
-				END CASE;	
-
-					SET @a_fds = NULL,@a_row  = NULL;
-					CALL generate_one_en(@missionid,rownum,@a_fields,@a_row,@a_value); 
-
-					IF @a_row IS NULL OR @a_value IS NULL THEN 
-							SELECT NULL AS brecord;
-							LEAVE 3in1_label;
-					END IF;
-					CALL Fetch_Set_values(field_names,'rowId',@field_names_1);
-	
-
-					IF @FIELD_NAMES_1 NOT REGEXP '^\'(B[1-9][0-9]{0,1})\'(,\'B[1-9][0-9]{0,1}\'){0,}$'   THEN
-						  SET @3in1_body = "SELECT NULL as `label4B1FEILEDNAMESeeror`";
-							CALL audit('3IN1',CONCAT_WS(':','B1FEILEDNAMESeeror:',QUOTE(@FIELD_NAMES_1)),statu,key_names,key_values,field_names,field_values,rowids);
-							LEAVE 3in1_label;
-					END IF; 
-
-					SET  
-							i = 1;
-
-          SET @a_b_row = CONCAT_WS(',',rownum,@a_row),
-							@a_b_row = Fielter_Set(@a_b_row);
-					CALL Fetch_Set_P0(@a_b_row,1,ir);
-
-
-
-					fetch_recode:LOOP
-						SET @a = FIND_IN_SET(ir,rownum);
-						IF @a != 0 THEN 
-								CALL Fetch_Set_values(field_values,ir,@field_values_1);
-							ELSE
-								SET @field_values_1 = NULL;
-						END IF;
-
-
-						SET ia := Fetch_elt(ir,@a_row), 
-								@a_value_1 := Fetch_y_1(ia,@a_value);
-
-
-	
-
-						SET	@3in1_body =CAST(CONCAT(@3in1_body
-									,"SELECT  ",ir," AS rowNo \n"
-																	)AS CHAR);
-						SET @one =NULL;
-
-						CALL Temp_Func_3(CONCAT_WS('',"CASE WHEN ??? IS NULL OR ??? REGEXP '^null$'  THEN NULL WHEN ???? REGEXP ??? THEN IF( ??? REGEXP ",QUOTE('\\Q(?#\\E'),",NULL,'#00FF00') ELSE '#FF9999' END AS colB??"),NULL,"",
-															"",'','b',@a_fields,@a_value_1,@field_names_1,@field_values_1,@one);
-
- 						SET  @3in1_body = CONCAT_WS('',@3in1_body,',',IFNULL(@one,0),"'' AS rowinno");
-
-						SET i = i + 1;
-						CALL Fetch_Set_P0(@a_b_row,i,ir);
-						IF ir IS NULL THEN 	 LEAVE fetch_recode; END IF; 
-						SET @3in1_body = CONCAT_WS('\nunion\n',@3in1_body,'');
-
-
-					END LOOP;
-
-			END LABEL1;
-
-			WHEN STATU = '4' OR STATU ='3' OR STATU ='7' THEN
-			label4:BEGIN
-
-				SET @a_fields = NULL;
-				IF STATU <> '7' THEN 
-
-					SET @db_b = expid2b(@expid),
-							@db_a = "acc_1";
-
-				ELSE
-
-					 SET 	@db_b = 'acc_b',
-								@db_a = 'acc_a',
-								mid1 = preg_capture('/(?<=_).+$/',@missionId),
-								@missionId = preg_capture('/^.+?(?=_|$)/',@missionId);
-				END IF;
-
-				SET @3in1_body = "";
-					SET @sb = CONCAT_WS('',"DELETE a.* FROM ",@db_b," AS A \n",
-							"WHERE a.expid =",QUOTE(@expid)," AND a.missionid =", QUOTE(@missionid),
-								CONCAT(" AND a.missionid1 =", quote_d(mid1)));
-
-					PREPARE stmt_bsb FROM @sb;
-					EXECUTE stmt_bsb ;
-
-				label4B:	BEGIN 
-				CASE 
-						WHEN rowids REGEXP '^[0]{1}(,[1-9][0-9]{0,}){1,}$' THEN
-								SET rownum= SUBSTR(rowids,3);
-						WHEN rowids REGEXP '^[1-9]{1}(,[1-9][0-9]{0,}){0,}$' THEN
-								SET rownum = rowids;
-					ELSE 
-
-							LEAVE label4B; 
-
-				END CASE;	
-
-				IF STATU <> '5' THEN
-					CALL generate_one_en(@missionid,rownum,@a_fields,@a_row,@a_value); 
-				END IF;
-
-					CALL Fetch_Set_values(field_names,'b',@field_names_1);
-
-
-					IF @FIELD_NAMES_1 NOT REGEXP '^\'(B[1-9][0-9]{0,1})\'(,\'B[1-9][0-9]{0,1}\'){0,}$'   THEN
-						  SET @3in1_body = "SELECT NULL as `label4B1FEILEDNAMESeeror`";
-							CALL audit('3IN1',CONCAT_WS(':','B1FEILEDNAMESeeror:',QUOTE(@FIELD_NAMES_1)),statu,key_names,key_values,field_names,field_values,rowids);
-							LEAVE label4b;
-					END IF; 
-
-
-					SET i = 1;
-
-          SET @a_b_row = CONCAT_WS(',',rownum,@a_row),
-							@a_b_row = Fielter_Set(@a_b_row);
-					CALL Fetch_Set_P0(@a_b_row,1,ir);
-
-
-
-					fetch_recode:LOOP
-
-						SET ia := Fetch_elt(ir,@a_row), 
-								@a_value_1 := Fetch_y_1(ia,@a_value);
-
-						SET @a = FIND_IN_SET(ir,rownum);
-
-						IF @a != 0 THEN 
-								CALL Fetch_Set_values(field_values,ir,@field_values_1);
-							ELSE
-								SET @field_values_1 = NULL;
-						END IF;
-
-
-						CALL Temp_Func_2(" ??? AS ??",@field_names_1,@field_values_1,NULL,@one);
-
-						SET	@3in1_body =CONCAT_WS('',@3in1_body
-									,"SELECT  ",QUOTE(@expid)," ,", 
-													QUOTE(@missionid)," ,",
-											IF(mid1,CONCAT(QUOTE(mid1)," ,"),NULL),
-															ir," AS rowId,",
-															@one,','," \n");
-						SET @one =NULL;
-
-						CALL Temp_Func_3(" ???? REGEXP ??? AS ERR_B??",NULL,"@b_r_total := ",
-															"IFNULL(???? REGEXP ??? ,0)",'+','b',@a_fields,@a_value_1,@field_names_1,@field_values_1,@one);
-
-
-						SET  @3in1_body = CONCAT_WS('',@3in1_body,IFNULL(@one,0),",@b_total := IFNULL(@b_total,0)+ IFNULL(@b_r_total,0)");
-
-						SET i = i + 1;
-						CALL Fetch_Set_P0(@a_b_row,i,ir);
-						IF ir IS NULL THEN 	 LEAVE fetch_recode; END IF; 
-						SET @3in1_body = CONCAT_WS('\nunion\n',@3in1_body,'');
-					END LOOP;
-
-					SET @3in1_body = CONCAT_ws('',"INSERT INTO ",@db_b,
-									"(expid,missionid,",
-								IF(mid1 IS NULL,NULL,'missionid1,'),"\n",
-									"rowid," ,
-									REPLACE(@field_names_1,'\'',''),
-									CONCAT(',',REPLACE_set_0(@a_fields,'err_b')),",right_count,ERROR_count\n)\n",
-									@3in1_body,';');
-
-
-          IF @3in1_body IS NOT NULL THEN
-
-							PREPARE stmt_bsb FROM @3in1_body;
-							EXECUTE stmt_bsb ;
-					END IF;
-				END label4B;
-
-
-
-				SET @A_S = NULL;
-		
-				label4A:BEGIN
-
-					SET @3in1_body = NULL,
-							@statu_value = NULL,
-							@statu_name = NULL,
-							@3in1_body = CONCAT_WS('',"SELECT b.expID,a.classNo INTO @statu_value ,@statu_name\nFROM exp_experimentclassstudent AS a\nLEFT JOIN ",
-																@db_a," AS b ON a.expNo = b.expID AND b.missionId = ",QUOTE(@missionid),
-																CONCAT(" AND b.missionid1 =", quote_d(mid1)),				
-																"\nWHERE a.expNo = ", QUOTE(@expid)); 
-
-
-					PREPARE stmt_bsb FROM @3in1_body;
-					EXECUTE stmt_bsb ;
-
-		 			IF  @statu_value IS NULL THEN
-							SET @3in1_body = CONCAT_WS('',"INSERT ",@db_a,"(EXPID,MISSIONID",
-																	IF(mid1 IS NULL,NULL,",missionId1,billid"),")\n",
-																						"VALUES(",QUOTE(@expid),',',QUOTE(@missionid),
-																		CONCAT(',',IF(mid1 IS NULL,NULL,QUOTE(mid1)),',',QUOTE('jzpz_bjzyfl')),
-																")");
-
-
-
-							PREPARE stmt_bsb FROM @3in1_body;
-							EXECUTE stmt_bsb ;
-					END IF;
-
-					SET @3in1_body = "SET \n" ;
-					CALL Fetch_Set_values(field_names,'a',@field_names_1);
-
-
-          IF IFNULL(@field_names_1,'') NOT REGEXP 
-							'^\'(a[1-9][0-9]{0,1}[0]{0,1}){1,}\'(,\'(a[1-9][0-9]{0,1}[0]{0,1})*\')*$' THEN 
-							CALL audit(CONCAT_WS(':','3IN1',statu),CONCAT_WS(':','afieldWarning:',@FIELD_NAMES_1),statu,key_names,key_values,field_names,field_values,rowids);
-
-							SET @one = ''; 
-						ELSE 
-						 CALL Fetch_Set_values(field_values,'0',@field_values_1);
-
-						 CALL Temp_Func_2("?? := ??? \n",@field_names_1,@field_values_1,NULL,@one);
-
- 					END IF;	
-
-						SET @3in1_body = CONCAT(@3in1_body,@ONE,IF(IFNULL(@ONE,'')='' ,'',','));	
-
-					CALL generate_one_en(@missionid,'0',@a_fields,@a_row,@a_value);
-
-	
-					IF IFNULL(@a_fields,'') !='' THEN 
-								CALL Fetch_Set_values(@a_value,'0',@a_values_1);
-
-								CALL Temp_Func_3("ERR_A?? = ???? REGEXP ??? ",NULL,"a.right_count = @right_count := ",
-																	"IFNULL(???? REGEXP ??? ,0)",'+','a',@a_fields,@a_values_1,@field_names_1,@field_values_1,@one);
-
-								SET @one =CONCAT(@one,'+');
-							ELSE 
-								SET @one ='';
-					END IF;
-
-					IF @one ='' THEN
-						SET @one = CONCAT('a.line  = ',j(dblob,'line')),
-								@one = CONCAT_WS(',',@one, "a.right_count = @right_count := ");
-					END IF;
-
-					SET @3in1_body =CAST(
-											CONCAT("UPDATE ",@db_a," AS a, (\n",
-															"\t\t\t	SELECT \n",
-															"\t\t\t\t\t\t a1.classType, \n",
-															"\t\t\t\t\t\t IF(IFNULL(b.line_type,0) =0, 0, 1) AS is_line, \n",
-															"\t\t\t\t\t\t Count(b1.seal_id) AS shouldSeal, \n",
-															"\t\t\t\t\t\t Count(b3.expID) AS overSeal, \n",
-															"\t\t\t\t\t\t COUNT(b1.seal_id)-COUNT(b3.expid) AS unSealed, \n",
-															"\t\t\t\t\t\t @unS := \n",
-															"\t\t\t\t\t\t\t\t CAST(CONCAT_WS('\\n',\n",
-															"\t\t\t\t\t\t\t\t\t  CONCAT(IF(IFNULL(b0.max_page,1)=1 ,b0.billname,b0.page_title1),'缺少：（',\n",
-															"\t\t\t\t\t\t\t\t\t\t  GROUP_CONCAT(\n",
-															"\t\t\t\t\t\t\t\t\t\t\t 	IF((b.pageno = 0 AND b0.max_page >=1 or b.pageno =1) AND b1.pageid = 1 AND b3.expid IS NULL,CONCAT_WS('',b2.seal_name),NULL) \n",
-															"\t\t\t\t\t\t\t\t\t\t\t\t 	ORDER BY b1.seal_no) \n",
-															"\t\t\t\t\t\t\t\t ,'）'),",
-															Temp_Func(CONCAT("\n",
-															"\t\t\t\t\t\t\t\t\t CONCAT(b0.page_title??,'缺少：（',\n",
-															"\t\t\t\t\t\t\t\t\t\t  GROUP_CONCAT( \n",
-															"\t\t\t\t\t\t\t\t\t\t\t 	IF((b.pageno = 0 AND b0.max_page >=?? or b.pageno =??) AND b1.pageid = ?? AND b3.expid IS NULL,CONCAT_WS('',b2.seal_name),NULL) \n",
-															"\t\t\t\t\t\t\t\t\t\t\t\t 	ORDER BY b1.seal_no) \n",
-															"\t\t\t\t\t\t\t\t  ,'）')"),2,7,NULL),
-															"\t\t\t\t\t\t\t\t\t ,IF( Count(b1.seal_id)<>Count(b3.expID),'<p>注：请更换角色，在不同联次，完成签章！</p>',NULL) \n",
-															"\t\t\t\t\t\t\t\t  )AS CHAR ) AS uns,\n",
-															"\t\t\t\t\t\t IFNULL(a2.read_answer_size,0) as read_answer_size, \n",
-															"\t\t\t\t\t\t IFNULL(a2.answerScore,0) as answerScore, \n",
-															"\t\t\t\t\t\t IFNULL(a2.resultScore,0) AS resultScore, \n", 
-															"\t\t\t\t\t\t a2.pass_score_size, \n",
-															"\t\t\t\t\t\t a2.score_seal_size, \n",
-															"\t\t\t\t\t\t a2.score_line_size, \n",
-															"\t\t\t\t\t\t IFNULL(a2.resultcount,0) as resultcount, \n",
-															"\t\t\t\t\t\t @pt33 := IF(b.is_line,a2.score_line_size,0), \n",
-															"\t\t\t\t\t\t @pt44 :=a2.resultcount*a2.resultScore, \n",
-															"\t\t\t\t\t\t @pt55 :=a2.read_answer_size* a2.answerScore, \n",
-															"\t\t\t\t\t\t a2.max_score_size, \n",
-															"\t\t\t\t\t\t a2.redo_size \n",
-															"\t\t\t	FROM exp_experimentclass AS a1 \n",
-															"\t\t\t	INNER JOIN mysq1_schema.exp_difficulty AS a2 ON a1.difficulty_level = a2.difficulty_level \n",
-															"\t\t\t	JOIN acc_mission AS b ON b.missionId = ",QUOTE(@missionid)," \n",
-															"\t\t\t	INNER JOIN mysq1_schema.bill_list AS b0 ON b.billid = b0.billid \n",
-															"\t\t\t LEFT JOIN acc_mission_seal AS b1 ON b1.missionId = ",QUOTE(@missionid)," \n",
-															"\t\t\t INNER JOIN acc_enter_seal AS b2 ON b1.seal_id = b2.sealID AND b2.seal_content <> '操作' \n",
-															"\t\t\t INNER JOIN acc_enter_role AS b21 ON b21.roleid = b2.roleid \n",
-															"\t\t\t LEFT JOIN acc_seal_1 AS b3 ON b3.expID =",QUOTE(@expid)," \n",
-															"\t\t\t\t\t\t AND b3.missionId =",QUOTE(@missionid)," \n", 
-															"\t\t\t\t\t\t AND b1.pageId = b3.pageId AND b1.seal_id = b3.seal_Id \n",
-															"\t\t\t WHERE a1.ClassNo =",QUOTE(@statu_name)," \n",
-															"LOCK in SHARE mode",
-															"\t\t	) AS b  \n",
-														@3in1_body,
-														@one,@b_total," ,\n",
-														"a.log_count := IFNULL(a.log_count,0)+",IF(STATU=4,'1',0)," ,\n",
-														"a.already_no_seal = b.overSeal,\n",
-														"a.read_ans_size := IF(read_ans_size IS NULL ,0,a.read_ans_size) ,\n",
-														"a.error_count = @pt1 :=",REPLACE(@a_s,',','+'),",\n",
- 														"a.pt1 = @pt1 := (@pt11 :=(100- IF(IFNULL(b.shouldSeal,0)=0,0,b.score_seal_size) -  b.score_line_size * b.is_line))*IF(IFNULL(@pt1,0) != 0,@right_count/@pt1,1), \n",
-														"a.pt2 = @pt2 := (@pt22 :=IF(IFNULL(b.shouldSeal,0)=0,0,b.score_seal_size))*b.overSeal/IF(b.shouldSeal = 0,1,b.shouldSeal), \n",
-														"a.pt3 = @pt3 := IF(b.is_line,IF(IFNULL(a.is_line,0),b.score_line_size,0),0), \n",
-														"a.pt4 = @pt4 := IF(b.resultcount > IFNULL(a.mission_result,0),a.mission_result,b.resultcount)*b.resultScore  ,\n",
-														"a.pt5 = @pt5 := IF(b.read_answer_size>a.read_ans_size, a.read_ans_size ,b.read_answer_size)* b.answerScore ,\n",
-														"a.score :=IF(IFNULL(@pt1,0) + IFNULL(@pt2,0) + IFNULL(@pt3,0)  - IFNULL(@pt4,0)  -IFNULL(@pt5,0) <0 ,0, IFNULL(@pt1,0) + IFNULL(@pt2,0) + IFNULL(@pt3,0)  - IFNULL(@pt4,0)  -IFNULL(@pt5,0))\n",
-														"WHERE a.missionId =",QUOTE(@missionid)," AND a.expid=",QUOTE(@expid)
-												)
-											AS CHAR);
-
-					PREPARE stmt_bsb FROM @3in1_body;
-					EXECUTE stmt_bsb;
-
-					IF STATU <>4 THEN  SET @3in1_body="SELECT 'ok' AS teaa";LEAVE label4;END IF;
-
-			IF	DATABASE() REGEXP  '5$' THEN
- 
-					CALL v5_autoFlow(@expid,@missionid,1);
-					SET IS5=1;
-			END IF;
-
-
-					SET @3in1_body =CONCAT("
-
-SELECT \n",
-QUOTE(@expid)," AS expID,",
-QUOTE(@missionid)," AS missionId,",
-"IFNULL(d.redo_size,0) AS redoSize,
-IFNULL(d.max_score_size,0) AS missionMaxScore,
-IFNULL(a.score,0) AS missionScore,
-IFNULL(a.read_ans_size,0) AS readAnswer,
-IFNULL(a.read_ans_size,0) AS number,
-CAST(a.log_count AS char) AS logCount,
-IFNULL(a.error_count,0) AS error_count,
-IFNULL(a.right_count,0) AS RIGHT_COUNT,
-@b :=a.score AS tempscore,
-@pt44, @pt4,
-IF(IFNULL(c.CLASSTYPE,0) = 1,CONCAT_WS('',
-'<h5><',C.CLASSNAME,'>','<h5>将在：',
-TIMEDIFF(c.endtime,NOW()),'后结束！'),
-CAST(CONCAT_WS('','<h5><',e.node_No,'.',f.typesort,'>',TRIM(g.missionLabel),'（合格率:',
-IF(@b =0, 0,IF(ROUND(@b,2)=CEIL(@b),CEIL(@b),ROUND(@b,2))),
-'%）</h5>'",
-IF(@pt11<>0,CONCAT(",'<p>填空得分( ",@pt11," )：",CEIL(@pt1),"</p>'"),""),"\n",
-IF(@pt22<>0,CONCAT(",'<p>签章得分( ",FLOOR(@pt22)," )：",CEIL(@pt2),"</p>'"),""),"\n",
-IF(@pt33<>0,CONCAT(",'<p>画线得分( ",@pt33," )：",CEIL(@pt3),"</p>'"),""),"\n",
-IF(@pt44<>0 AND @pt4 <> 0,CONCAT(",'<p>对比扣分( -",@pt44," )：-",CEIL(@pt4),"</p>'"),""),"\n",
-IF(@pt55<>0 AND @pt5 <> 0,CONCAT(",'<p>查看答案扣分( -",@pt55," )：-",CEIL(@pt5),"</p>'"),""),"\n",
-IF(CHAR_LENGTH(@uns) <>0,CONCAT(",'<p>提示：</p>',",QUOTE(@uns)),''),"\n",
-") AS char))AS missionLabel
-FROM acc_1 AS a
-LEFT JOIN acc_mission AS g ON g.missionId = a.missionId 
-LEFT JOIN exp_experimentclassstudent AS b ON a.expID = b.expNo
-LEFT JOIN exp_experimentclass AS c ON b.classNo = c.classNo
-",IF(IS5,'',"LEFT JOIN exp_experimentclass_course AS c1 ON c1.classNo = c.classNo"),"
-LEFT JOIN mysq1_schema.exp_difficulty AS d ON c.difficulty_level = d.difficulty_level
-LEFT JOIN exp_courses_node_content AS f ON g.missionId = f.missionid
-INNER JOIN exp_courses_node AS e ON  f.contentNo = e.contentNo  AND ",IF(IS5 ,'c','c1'),".courseNo = e.node_courseNo
-",	"\nWHERE a.missionId =",QUOTE(@missionid)," AND a.expid=",QUOTE(@expid));
- 
-
-
-				END label4A;
-			END label4;
-
-
-	END CASE;
-
-	IF IFNULL(@3in1_body,'')= '' THEN
-		SET @3in1_body ="SELECT NULL as `Elabel400`";
-		CALL audit('3IN1',CONCAT_WS(':',IFNULL(STATU,'400'),'something ERROR:',QUOTE(rowids)),STATU,key_names,key_values,field_names,field_values,rowids);
-	END IF;
-
-		PREPARE stmt_bsb FROM @3in1_body;
-		EXECUTE stmt_bsb ;
-		DEALLOCATE PREPARE stmt_bsb;
-
-
-
-END
-;;
-DELIMITER ;
-
--- ----------------------------
---  Procedure definition for `3in1_copy`
--- ----------------------------
-DROP PROCEDURE IF EXISTS `3in1_copy`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `3in1_copy`(IN `statu` varchar(100),IN `key_names` varchar(100),IN `key_values` varchar(200),IN `field_names` longtext,IN `field_values` longtext,in `rowids` varchar(300), dblob blob)
-    DETERMINISTIC
-3in1_label:BEGIN
-
-
-	DECLARE rownum varchar(300);
-	DECLARE IS5 VARCHAR(1) DEFAULT 0;
-	DECLARE i INT(3);
-  DECLARE ir INT(3);
-	DECLARE ia INT(3);
-	DECLARE mid1 varchar(60) DEFAULT NULL;
-
-
-   	SET @missionid = null,@a_t = null,@a_n= 0,@b_total =0,@b_r_total=0;
-    SET @missionid = Fetch_Set(key_values,2,'\''), 
-				@EXPID = Fetch_Set(key_values,1,'\''),
-			  @a_fnz = NULL,@3in1_body = '',
-				rownum = NULL,
-				@db_b = NULL;
-
-	IF IFNULL(@missionid,'') = '' OR IFNULL(@expid,'')='' THEN
-		CALL Audit('3in1',
-				CAST(CONCAT_WS('-','expid',IFNULL(@expid,'null'),'missionid',IFNULL(@missionid,'null')) AS CHAR),statu,
-				key_names,key_values,field_names,field_values,rowids);
-		SELECT NULL AS `expidmissioniderror`;
-		LEAVE 3in1_label;
-	END IF;
-
-	CASE
-
-			WHEN statu = '6' THEN
-
-				CALL Fetch_Set_values(field_names,'a',@field_names_1);
-						 CALL Fetch_Set_values(field_values,'0',@field_values_1);
-
-						 CALL Temp_Func_2(CONCAT_WS('',
-"IF((@b :=",
-	"CASE	WHEN a1.init_?? = 1 THEN b1.?? ",
-				"WHEN a0.init_?? = 1 THEN b0.?? ",
-				"WHEN IFNULL(c0.??,'') <> '' THEN c0.?? ",
-			"ELSE  ???",
-	"END) =''",
-",NULL,@b) AS  ?? "),@field_names_1,@field_values_1,NULL,@one);
-
-						 SET @3in1_body = CONCAT("SELECT\n",@ONE,"\n",
-"FROM acc_mission AS a1
-LEFT JOIN acc_mission AS a0 ON a1.behind_missionId = a0.missionId
-LEFT JOIN acc_standard_1 AS b0 ON a0.missionId = b0.missionId
-LEFT JOIN acc_standard_1 AS b1 ON a1.missionId = b1.missionId
-LEFT JOIN acc_1 AS c0 ON b0.missionId = c0.missionId AND c0.expID = ",QUOTE(@expID),
-"\nWHERE a1.missionId = ",QUOTE(@missionid));	
-
-		PREPARE stmt_bsb FROM @3in1_body;
-		EXECUTE stmt_bsb ;
-
-
-			WHEN statu = '5' THEN
-			label5:BEGIN
-
-				CASE 
-						WHEN rowids REGEXP '^[0]{1}(,[1-9][0-9]{0,}){1,}$' THEN
-								SET rownum= SUBSTR(rowids,3);
-						WHEN rowids REGEXP '^[1-9]{1}(,[1-9][0-9]{0,}){0,}$' THEN
-								SET rownum = rowids;
-					ELSE 
-	
-							CALL audit('3IN1',CONCAT_WS(':',IFNULL(STATU,'label5B1'),'ROWIDS ERROR:',QUOTE(rowids)),STATU,key_names,key_values,field_names,field_values,rowids);
-							LEAVE label5; 
-				END CASE;	
-
-				label5A:BEGIN
-
-					CALL Fetch_Set_values(field_names,'a',@field_names_1);
-					CALL Fetch_Set_values(field_values,'0',@field_values_1);
-          IF IFNULL(@field_names_1,'') NOT REGEXP 
-							'^\'(a[1-9][0-9]{0,1}[0]{0,1}){1,}\'(,\'(a[1-9][0-9]{0,1}[0]{0,1})*\')*$' THEN 
-							CALL audit(CONCAT_WS(':','3IN1',statu),CONCAT_WS(':','afieldWarning:',@FIELD_NAMES_1),statu,key_names,key_values,field_names,field_values,rowids);
-
-							SET @one = ''; 
-						ELSE 
-
-
-						 CALL Temp_Func_2(CONCAT_WS('',
-"IF((@b :=",
-	"CASE	WHEN a1.init_?? = 1 THEN b1.?? ",
-				"WHEN a0.init_?? = 1 THEN b0.?? ",
-				"WHEN IFNULL(c0.??,'') <> '' THEN c0.?? ",
-			"ELSE  ???",
-	"END) =''",
-",NULL,@b) AS  ?? "),@field_names_1,@field_values_1,NULL,@one);
-
-						 SET @3in1_body = CONCAT("SELECT\n",@ONE,"\n",
-"FROM acc_mission AS a1
-LEFT JOIN acc_mission AS a0 ON a1.behind_missionId = a0.missionId
-LEFT JOIN acc_standard_1 AS b0 ON a0.missionId = b0.missionId
-LEFT JOIN acc_standard_1 AS b1 ON a1.missionId = b1.missionId
-LEFT JOIN acc_1 AS c0 ON b0.missionId = c0.missionId AND c0.expID = ",QUOTE(@expID),
-"\nWHERE a1.missionId = ",QUOTE(@missionid));	
-
-						PREPARE stmt_bsb FROM @3in1_body;
-						EXECUTE stmt_bsb ;
-
- 					END IF;	
-
-				END LABEL5A; 
-
-				Label5B:BEGIN
-
-					CALL Fetch_Set_values(field_names,'b',@field_names_1);
-
-
-					IF @FIELD_NAMES_1 NOT REGEXP '^\'(B[1-9][0-9]{0,1})\'(,\'B[1-9][0-9]{0,1}\'){0,}$'   THEN
-						  SET @3in1_body = "SELECT NULL as `label4B1FEILEDNAMESeeror`";
-							CALL audit('3IN1',CONCAT_WS(':','B1FEILEDNAMESeeror:',QUOTE(@FIELD_NAMES_1)),statu,key_names,key_values,field_names,field_values,rowids);
-							LEAVE label5b;
-					END IF; 
-
-					SET i = 1;
-
-          SET @a_b_row = rownum , @3in1_body = '';
-
-					CALL Fetch_Set_P0(@a_b_row,1,ir);
-
-
-					fetch_recode_s:LOOP
-
-						SET @a = FIND_IN_SET(ir,@a_row); 
-
-
+-- SELECT CAST(CONCAT_WS(',',QUOTE(@a_value),QUOTE(ia),QUOTE(@a_value_1)) AS CHAR);
 						SET @a = FIND_IN_SET(ir,rownum);
 						IF @a != 0 THEN 
 								CALL Fetch_Set_values(field_values,ir,@field_values_1);
@@ -757,11 +340,9 @@ LEFT JOIN acc_1 AS c0 ON b0.missionId = c0.missionId AND c0.expID = ",QUOTE(@exp
 													QUOTE(@missionid)," AS missionid ,",
 															@one,',',ir," AS rowNo \n"
 																	)AS CHAR);
-
-
 						SET i = i + 1;
 						CALL Fetch_Set_P0(@a_b_row,i,ir);
-						IF ir IS NULL THEN 	 LEAVE fetch_recode_s; END IF; 
+						IF ir IS NULL THEN 	 LEAVE fetch_recode_s; END IF; -- SELECT  @3in1_body,rownum,i,ir,ia;
 						SET @3in1_body = CONCAT_WS('\tunion\n',@3in1_body,'');
 
 					END LOOP;
@@ -784,46 +365,38 @@ LEFT JOIN ",expid2b(@expID)," AS c0 ON b0.missionId = c0.missionId AND b0.rowNo 
 LEFT JOIN (\n",@3in1_body,"\n) AS c1 ON b1.missionId = c1.missionId AND b1.rowNo = c1.rowNo
 WHERE a1.missionId = ",QUOTE(@missionid));	
 
-
+-- SELECT @3in1_body,@field_names_1; LEAVE `l`;
 
 				END label5B;
 			END label5;
 
-			WHEN statu IS NULL THEN
+			WHEN `funcid` IS NULL THEN
 				 SET @3in1_body = "SELECT NULL as `1`";
-				 CALL audit('3IN1',IFNULL(statu,'STATU IS NULL'),STATU ,key_names,key_values,field_names,field_values,rowids);
+				 CALL audit('3IN1',IFNULL(`funcid`,'`funcid` IS NULL'),`funcid` ,key_names,key_values,field_names,field_values,rowids);
 
 
-			WHEN STATU = '2'  THEN 
+			WHEN `funcid` = '2'  THEN 
+
 			LABEL1:BEGIN
-				IF IFNULL(rowids,'') ='' THEN
-						SET rowids ='1'; 
-				END IF;
-
-				CASE 
-						WHEN rowids REGEXP '^[0]{1}(,[1-9][0-9]{0,}){1,}$' THEN
-								SET rownum= SUBSTR(rowids,3);
-						WHEN rowids REGEXP '^[1-9]{1}(,[1-9][0-9]{0,}){0,}$' THEN
-								SET rownum = rowids;
-					ELSE 
-							LEAVE 3in1_label; 
-				END CASE;	
+				IF IFNULL(rowids,'') ='' THEN	SET rowids ='1';	END IF;
+				CASE 		WHEN rowids REGEXP '^[0]{1}(,[1-9][0-9]{0,}){1,}$' THEN	SET rownum= SUBSTR(rowids,3);
+								WHEN rowids REGEXP '^[1-9]{1}(,[1-9][0-9]{0,}){0,}$' THEN SET rownum = rowids;
+					ELSE	LEAVE `l`; -- rowids 出错  
+				END CASE;	-- 取得B记录行 rownum
 
 					SET @a_fds = NULL,@a_row  = NULL;
+
 					CALL generate_one_en(@missionid,rownum,@a_fields,@a_row,@a_value); 
 
-					IF @a_row IS NULL OR @a_value IS NULL THEN 
-							SELECT NULL AS brecord;
-							LEAVE 3in1_label;
-					END IF;
-					CALL Fetch_Set_values(field_names,'rowNo',@field_names_1);
-	
+					IF @a_row IS NULL OR @a_value IS NULL THEN  SELECT NULL AS brecord;		LEAVE `l`;	END IF;
+
+					CALL Fetch_Set_values(field_names,'rowId',@field_names_1);-- 取得字r段名
 
 					IF @FIELD_NAMES_1 NOT REGEXP '^\'(B[1-9][0-9]{0,1})\'(,\'B[1-9][0-9]{0,1}\'){0,}$'   THEN
 						  SET @3in1_body = "SELECT NULL as `label4B1FEILEDNAMESeeror`";
-							CALL audit('3IN1',CONCAT_WS(':','B1FEILEDNAMESeeror:',QUOTE(@FIELD_NAMES_1)),statu,key_names,key_values,field_names,field_values,rowids);
-							LEAVE 3in1_label;
-					END IF; 
+							CALL audit('3IN1',CONCAT_WS(':','B1FEILEDNAMESeeror:',QUOTE(@FIELD_NAMES_1)),`funcid`,key_names,key_values,field_names,field_values,rowids);
+							LEAVE `l`;
+					END IF; -- 校验B字段建
 
 					SET  
 							i = 1;
@@ -831,7 +404,6 @@ WHERE a1.missionId = ",QUOTE(@missionid));
           SET @a_b_row = CONCAT_WS(',',rownum,@a_row),
 							@a_b_row = Fielter_Set(@a_b_row);
 					CALL Fetch_Set_P0(@a_b_row,1,ir);
-
 
 
 					fetch_recode:LOOP
@@ -846,22 +418,24 @@ WHERE a1.missionId = ",QUOTE(@missionid));
 						SET ia := Fetch_elt(ir,@a_row), 
 								@a_value_1 := Fetch_y_1(ia,@a_value);
 
-
-	
-
 						SET	@3in1_body =CAST(CONCAT(@3in1_body
 									,"SELECT  ",ir," AS rowNo \n"
 																	)AS CHAR);
 						SET @one =NULL;
 
-						CALL Temp_Func_3(CONCAT_WS('',"CASE WHEN ??? IS NULL OR ??? REGEXP '^null$'  THEN NULL WHEN ???? REGEXP ??? THEN IF( ??? REGEXP ",QUOTE('\\Q(?#\\E'),",NULL,'#00FF00') ELSE '#FF9999' END AS colB??"),NULL,"",
-															"",'','b',@a_fields,@a_value_1,@field_names_1,@field_values_1,@one);
+						CALL Temp_Func_3(
+															对比
+															,NULL,
+															"",
+															"",
+															'','b',
+															@a_fields,@a_value_1,@field_names_1,@field_values_1,@one);
 
  						SET  @3in1_body = CONCAT_WS('',@3in1_body,',',IFNULL(@one,0),"'' AS rowinno");
 
 						SET i = i + 1;
 						CALL Fetch_Set_P0(@a_b_row,i,ir);
-						IF ir IS NULL THEN 	 LEAVE fetch_recode; END IF; 
+						IF ir IS NULL THEN 	 LEAVE fetch_recode; END IF;
 						SET @3in1_body = CONCAT_WS('\nunion\n',@3in1_body,'');
 
 
@@ -869,11 +443,11 @@ WHERE a1.missionId = ",QUOTE(@missionid));
 
 			END LABEL1;
 
-			WHEN STATU = '4' OR STATU ='3' OR STATU ='7' THEN
+			WHEN `funcid` = '4' OR `funcid` ='3' OR `funcid` ='7' THEN
 			label4:BEGIN
 
 				SET @a_fields = NULL;
-				IF STATU <> '7' THEN 
+				IF `funcid` <> '7' THEN 
 
 					SET @db_b = expid2b(@expid),
 							@db_a = "acc_1";
@@ -891,10 +465,10 @@ WHERE a1.missionId = ",QUOTE(@missionid));
 							"WHERE a.expid =",QUOTE(@expid)," AND a.missionid =", QUOTE(@missionid),
 								CONCAT(" AND a.missionid1 =", quote_d(mid1)));
 
-					PREPARE stmt_bsb FROM @sb;
-					EXECUTE stmt_bsb ;
+	
+					EXECUTE immediate @sb;
 
-				label4B:	BEGIN 
+				label4B:	BEGIN -- 处理 B字段		
 				CASE 
 						WHEN rowids REGEXP '^[0]{1}(,[1-9][0-9]{0,}){1,}$' THEN
 								SET rownum= SUBSTR(rowids,3);
@@ -902,24 +476,25 @@ WHERE a1.missionId = ",QUOTE(@missionid));
 								SET rownum = rowids;
 					ELSE 
 
-							LEAVE label4B; 
+							LEAVE label4B; -- rowids 出错 
 
-				END CASE;	
+				END CASE;	-- 取得B记录行 rownum
 
-				IF STATU <> '5' THEN
-
+				IF `funcid` <> '5' THEN
+-- SELECT @missionid,rownum,@a_fields,@a_row,@a_value;LEAVE l;
 					CALL generate_one_en(@missionid,rownum,@a_fields,@a_row,@a_value); 
 
 				END IF;
 
-					CALL Fetch_Set_values(field_names,'b',@field_names_1);
+
+					CALL Fetch_Set_values(field_names,'b',@field_names_1);-- 取得字r段名
 
 
 					IF @FIELD_NAMES_1 NOT REGEXP '^\'(B[1-9][0-9]{0,1})\'(,\'B[1-9][0-9]{0,1}\'){0,}$'   THEN
 						  SET @3in1_body = "SELECT NULL as `label4B1FEILEDNAMESeeror`";
-							CALL audit('3IN1',CONCAT_WS(':','B1FEILEDNAMESeeror:',QUOTE(@FIELD_NAMES_1)),statu,key_names,key_values,field_names,field_values,rowids);
+							CALL audit('3IN1',CONCAT_WS(':','B1FEILEDNAMESeeror:',QUOTE(@FIELD_NAMES_1)),`funcid`,key_names,key_values,field_names,field_values,rowids);
 							LEAVE label4b;
-					END IF; 
+					END IF; -- 校验B字段建
 
 
 					SET i = 1;
@@ -927,7 +502,6 @@ WHERE a1.missionId = ",QUOTE(@missionid));
           SET @a_b_row = CONCAT_WS(',',rownum,@a_row),
 							@a_b_row = Fielter_Set(@a_b_row);
 					CALL Fetch_Set_P0(@a_b_row,1,ir);
-
 
 
 					fetch_recode:LOOP
@@ -945,24 +519,31 @@ WHERE a1.missionId = ",QUOTE(@missionid));
 
 
 						CALL Temp_Func_2(" ??? AS ??",@field_names_1,@field_values_1,NULL,@one);
-
+-- SELECT @one;
 						SET	@3in1_body =CONCAT_WS('',@3in1_body
-									,"SELECT  ",QUOTE(@expid)," ,", 
-													QUOTE(@missionid)," ,",
+									,"SELECT  ",QUOTE(@expid)," ,", -- " AS expid,",
+													QUOTE(@missionid)," ,",-- " AS missionid ,",
 											IF(mid1,CONCAT(QUOTE(mid1)," ,"),NULL),
 															ir," AS rowNo,",
 															@one,','," \n");
 						SET @one =NULL;
 
-						CALL Temp_Func_3(" ???? REGEXP ??? AS ERR_B??",NULL,"@b_r_total := ",
-															"IFNULL(???? REGEXP ??? ,0)",'+','b',@a_fields,@a_value_1,@field_names_1,@field_values_1,@one);
+						CALL Temp_Func_3(
+-- 															" ???? REGEXP ??? AS ERR_B??" --         1
+															b保存
+															,NULL,-- 2
+															"@b_r_total := ",-- 3
+-- 															"IFNULL(???? REGEXP ??? ,0)",-- 4
 
+															b计算,
+															'+','b',-- 5
+															@a_fields,@a_value_1,@field_names_1,@field_values_1,@one);-- 6
 
 						SET  @3in1_body = CONCAT_WS('',@3in1_body,IFNULL(@one,0),",@b_total := IFNULL(@b_total,0)+ IFNULL(@b_r_total,0)");
 
 						SET i = i + 1;
 						CALL Fetch_Set_P0(@a_b_row,i,ir);
-						IF ir IS NULL THEN 	 LEAVE fetch_recode; END IF; 
+						IF ir IS NULL THEN 	 LEAVE fetch_recode; END IF; -- SELECT  @3in1_body,rownum,i,ir,ia;
 						SET @3in1_body = CONCAT_WS('\nunion\n',@3in1_body,'');
 					END LOOP;
 
@@ -977,7 +558,6 @@ WHERE a1.missionId = ",QUOTE(@missionid));
 
           IF @3in1_body IS NOT NULL THEN
 
-
 							EXECUTE IMMEDIATE  REGEXP_REPLACE(REGEXP_substr(@3in1_body,'(?i)select\\s+\\K\'(?:\\\\.|[^\'])+\'\\s*,\\s*\'(?:\\\\.|[^\'])+\'')
 							,"('[^']+')\\s*,\\s*('[^']+')",'SELECT 1 INTO @b FROM acc_1 AS a WHERE a.expID = \\1 AND  a.missionId = \\2');
 
@@ -985,18 +565,15 @@ WHERE a1.missionId = ",QUOTE(@missionid));
 							EXECUTE IMMEDIATE REGEXP_REPLACE(REGEXP_substr(@3in1_body,'(?i)select\\s+\\K\'(?:\\\\.|[^\'])+\'\\s*,\\s*\'(?:\\\\.|[^\'])+\'')
 							,"('[^']+')\\s*,\\s*('[^']+')",'INSERT INTO ACC_1(expID ,missionId)VALUES (\\1, \\2)');
 							END IF;
-
-
-
-							PREPARE stmt_bsb FROM @3in1_body;
-							EXECUTE stmt_bsb ;
+-- SELECT @3in1_body,'0Y';-- LEAVE l
+							EXECUTE immediate @3in1_body;
 
 					END IF;
-				END label4B;
+				END label4B;-- 处理 B字段
 
 
 				SET @A_S = NULL;
-		
+		-- 处理 A字段
 				label4A:BEGIN
 
 					SET @3in1_body = NULL,
@@ -1006,10 +583,10 @@ WHERE a1.missionId = ",QUOTE(@missionid));
 																@db_a," AS b ON a.expNo = b.expID AND b.missionId = ",QUOTE(@missionid),
 																CONCAT(" AND b.missionid1 =", quote_d(mid1)),				
 																"\nWHERE a.expNo = ", QUOTE(@expid)); 
+-- 
 
 
-					PREPARE stmt_bsb FROM @3in1_body;
-					EXECUTE stmt_bsb ;
+					EXECUTE immediate @3in1_body;
 
 		 			IF  @statu_value IS NULL THEN
 							SET @3in1_body = CONCAT_WS('',"INSERT ",@db_a,"(EXPID,MISSIONID",
@@ -1018,18 +595,16 @@ WHERE a1.missionId = ",QUOTE(@missionid));
 																		CONCAT(',',IF(mid1 IS NULL,NULL,QUOTE(mid1)),',',QUOTE('jzpz_bjzyfl')),
 																")");
 
-
-
-							PREPARE stmt_bsb FROM @3in1_body;
-							EXECUTE stmt_bsb ;
+							EXECUTE immediate  @3in1_body;
 					END IF;
 
 					SET @3in1_body = "SET \n" ;
-					CALL Fetch_Set_values(field_names,'a',@field_names_1);
+					CALL Fetch_Set_values(field_names,'a',@field_names_1);-- 取得r字段名
 
           IF IFNULL(@field_names_1,'') NOT REGEXP 
-							'^\'(a[1-9][0-9]{0,1}[0]{0,1}){1,}\'(,\'(a[1-9][0-9]{0,1}[0]{0,1})*\')*$' THEN 
-							CALL audit(CONCAT_WS(':','3IN1',statu),CONCAT_WS(':','afieldWarning:',@FIELD_NAMES_1),statu,key_names,key_values,field_names,field_values,rowids);
+							'^\'(a[1-9][0-9]{0,1}[0]{0,1}){1,}\'(,\'(a[1-9][0-9]{0,1}[0]{0,1})*\')*$' THEN -- 校验A字段 允许为空
+
+							CALL audit(CONCAT_WS(':','3IN1',`funcid`),CONCAT_WS(':','afieldWarning:',@FIELD_NAMES_1),`funcid`,key_names,key_values,field_names,field_values,rowids);
 
 							SET @one = ''; 
 						ELSE 
@@ -1043,22 +618,29 @@ WHERE a1.missionId = ",QUOTE(@missionid));
 
 
 					CALL generate_one_en(@missionid,'0',@a_fields,@a_row,@a_value);
-
-	
+-- SELECT b计算,B保存;
 					IF IFNULL(@a_fields,'') !='' THEN 
-								SELECT 'OK'; LEAVE 3in1_label;
+
 								CALL Fetch_Set_values(@a_value,'0',@a_values_1);
 
-								CALL Temp_Func_3("ERR_A?? = ???? REGEXP ??? ",NULL,"a.right_count = @right_count := ",
-																	"IFNULL(???? REGEXP ??? ,0)",'+','a',@a_fields,@a_values_1,@field_names_1,@field_values_1,@one);
+								CALL Temp_Func_3(
+ 													"ERR_A?? = ???? REGEXP ??? ", -- 1
+-- 													CONCAT_WS('',"ERR_A?? = \n",b计算),
+													NULL,-- 2
+													"a.right_count = @right_count := ", -- 3
+
+ 													"IFNULL(???? REGEXP ??? ,0)",-- 4
+-- 													b计算,
+													'+','a',-- 5
+													@a_fields,@a_values_1,@field_names_1,@field_values_1,@one);-- 6
 
 								SET @one =CONCAT(@one,'+');
 							ELSE 
 								SET @one ='';
 					END IF;
-
+-- SELECT @one;
 					IF @one ='' THEN
-						SET @one = CONCAT('a.line  = ',j(dblob,'line')),
+						SET @one = CONCAT('a.line  = ',j0(dblob,'line')),
 								@one = CONCAT_WS(',',@one, "a.right_count = @right_count := ");
 					END IF;
 
@@ -1112,7 +694,7 @@ WHERE a1.missionId = ",QUOTE(@missionid));
 															"\t\t	) AS b  \n",
 														@3in1_body,
 														@one,@b_total," ,\n",
-														"a.log_count := IFNULL(a.log_count,0)+",IF(STATU=4,'1',0)," ,\n",
+														"a.log_count := IFNULL(a.log_count,0)+",IF(`funcid`=4,'1',0)," ,\n",
 														"a.already_no_seal = b.overSeal,\n",
 														"a.read_ans_size := IF(read_ans_size IS NULL ,0,a.read_ans_size) ,\n",
 														"a.error_count = @pt1 :=",REPLACE(@a_s,',','+'),",\n",
@@ -1125,16 +707,14 @@ WHERE a1.missionId = ",QUOTE(@missionid));
 														"WHERE a.missionId =",QUOTE(@missionid)," AND a.expid=",QUOTE(@expid)
 												)
 											AS CHAR);
-					
-					PREPARE stmt_bsb FROM @3in1_body;
-
-					EXECUTE stmt_bsb;
-					
+--  SELECT @3in1_body,'1';					
+					EXECUTE immediate @3in1_body;
+					-- 
 						
-					IF STATU <>4 THEN  SET @3in1_body="SELECT 'ok' AS teaa";LEAVE label4;END IF;
+					IF `funcid` <>4 THEN  SET @3in1_body="SELECT 'ok' AS teaa";LEAVE label4;END IF;
 					
 			IF	DATABASE() REGEXP  '5$' THEN
- 
+ -- SELECT CONCAT_WS(',',QUOTE(@expid),QUOTE(@missionid),1); LEAVE `l`;
 					CALL v5_autoFlow(@expid,@missionid,1);
 					SET IS5=1;
 			END IF;
@@ -1179,26 +759,636 @@ LEFT JOIN mysq1_schema.exp_difficulty AS d ON c.difficulty_level = d.difficulty_
 LEFT JOIN exp_courses_node_content AS f ON g.missionId = f.missionid
 INNER JOIN exp_courses_node AS e ON  f.contentNo = e.contentNo  AND ",IF(IS5 ,'c','c1'),".courseNo = e.node_courseNo
 ",	"\nWHERE a.missionId =",QUOTE(@missionid)," AND a.expid=",QUOTE(@expid));
- 
-
-
-				END label4A;
+ -- SELECT @3in1_body 		;			
+--  SELECT @EXPID,@3in1_body; LEAVE  `l`;
+--  LEAVE `l`;
+				END label4A;-- 处理 A字段,';'
 			END label4;
 
 
 	END CASE;
-
+/*
 	IF IFNULL(@3in1_body,'')= '' THEN
 		SET @3in1_body ="SELECT NULL as `Elabel400`";
-		CALL audit('3IN1',CONCAT_WS(':',IFNULL(STATU,'400'),'something ERROR:',QUOTE(rowids)),STATU,key_names,key_values,field_names,field_values,rowids);
+		CALL audit('3IN1',CONCAT_WS(':',IFNULL(`funcid`,'400'),'something ERROR:',QUOTE(rowids)),`funcid`,key_names,key_values,field_names,field_values,rowids);
 	END IF;
+*/-- SELECT CAST(@3in1_body as CHAR) ;-- LEAVE `l`;--  
 
-		PREPARE stmt_bsb FROM @3in1_body;
-		EXECUTE stmt_bsb ;
-		DEALLOCATE PREPARE stmt_bsb;
+		EXECUTE immediate  @3in1_body;
+-- select '1','2';
+--   SELECT @3in1_body; LEAVE `l`;
+-- SELECT null ;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `3in1_old`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `3in1_old`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `3in1_old`(IN `funcid` varchar(100),IN `key_names` varchar(100),IN `key_values` varchar(200),IN `field_names` longtext,IN `field_values` longtext,in `rowids` varchar(300), dblob blob)
+    DETERMINISTIC
+`l`:BEGIN
+
+	DECLARE rownum varchar(300);	DECLARE IS5 VARCHAR(1) DEFAULT 0;	DECLARE i INT(3);  DECLARE ir INT(3);	DECLARE ia INT(3);	DECLARE mid1 varchar(60) DEFAULT NULL;
+
+  DECLARE CONTINUE HANDLER FOR  SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22' , SQLSTATE	'HY000'-- ,SQLSTATE	'22007'
+	BEGIN GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;SET  @`sqlstate` = JSON_OBJECT('sqlstate',@`sqlstate`,'errno',@errno,'text',@text);
+				SET @`errsql` = @3in1_body;
+				SET @funcid = CONCAT_WS(' ','Error: ', ' 3in1' ,`funcid`,ELT(`funcid`,'','对比','保存','提示' , '？5')),
+				@pp =CONCAT_WS(',',quote(`funcid`),quote( `key_names`),quote( `key_values`),quote( `field_names`),quote( `field_values`),quote( `rowids` ),quote( dblob));
+				CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp,'SQL',@`errsql`,'err',@`sqlstate`));
+	END;
+
+START TRANSACTION;
+				SET @funcid = CONCAT_WS(' ', ' 3in1' ,`funcid`,ELT(`funcid`,'','对比','保存','提示' , '？5')),
+				@pp =CONCAT_WS(',',quote(`funcid`),quote( `key_names`),quote( `key_values`),quote( `field_names`),quote( `field_values`),quote( `rowids` ),quote( dblob));
+INSERT INTO plogs (Function_Name,parameter) VALUES (@funcid,@pp);
+#CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp));COMMIT;
+
+/*,'l','1'*/
 
 
+   SET @missionid = null,@a_t = null,@a_n= 0,@b_total =0,@b_r_total=0;     SET @missionid = Fetch_Set(key_values,2,'\''),				@EXPID = Fetch_Set(key_values,1,'\''),			  @a_fnz = NULL,@3in1_body = '',				rownum = NULL,				@db_b = NULL;
 
+	IF IFNULL(@missionid,'') = '' OR IFNULL(@expid,'')='' THEN 		CALL Audit('3in1',				CAST(CONCAT_WS('-','expid',IFNULL(@expid,'null'),'missionid',IFNULL(@missionid,'null')) AS CHAR),`funcid`,				key_names,key_values,field_names,field_values,rowids);		SELECT NULL AS `expidmissioniderror`; 		LEAVE `l`; 	END IF;
+
+	CASE 	WHEN `funcid` = '6' THEN
+
+				CALL Fetch_Set_values(field_names,'a',@field_names_1);-- 取得字r段名
+						 CALL Fetch_Set_values(field_values,'0',@field_values_1);
+-- SELECT @field_names_1,@field_values_1 ;   LEAVE `l`;
+						 CALL Temp_Func_2(CONCAT_WS('',
+"IF((@b :=",
+	"CASE	WHEN a1.init_?? = 1 THEN b1.?? ",
+				"WHEN a0.init_?? = 1 THEN b0.?? ",
+				"WHEN IFNULL(c0.??,'') <> '' THEN c0.?? ",
+			"ELSE  ???",
+	"END) =''",
+",NULL,@b) AS  ?? "),@field_names_1,@field_values_1,NULL,@one);
+
+						 SET @3in1_body = CONCAT("SELECT\n",@ONE,"\n",
+"FROM acc_mission AS a1
+LEFT JOIN acc_mission AS a0 ON a1.behind_missionId = a0.missionId
+LEFT JOIN acc_standard_1 AS b0 ON a0.missionId = b0.missionId
+LEFT JOIN acc_standard_1 AS b1 ON a1.missionId = b1.missionId
+LEFT JOIN acc_1 AS c0 ON b0.missionId = c0.missionId AND c0.expID = ",QUOTE(@expID),
+"\nWHERE a1.missionId = ",QUOTE(@missionid));	
+-- SELECT CAST(@3in1_body as CHAR) ;   LEAVE `l`;
+
+		EXECUTE immediate @3in1_body;
+
+
+			WHEN `funcid` = '5' THEN
+			label5:BEGIN
+
+				CASE 
+						WHEN rowids REGEXP '^[0]{1}(,[1-9][0-9]{0,}){1,}$' THEN
+								SET rownum= SUBSTR(rowids,3);
+						WHEN rowids REGEXP '^[1-9]{1}(,[1-9][0-9]{0,}){0,}$' THEN
+								SET rownum = rowids;
+					ELSE 
+	-- 						SET @3in1_body ="SELECT NULL as `label5B1`";
+
+						SET rowids =CONCAT_WS(':','rowids',rowids);
+
+-- 	 					SIGNAL SQLSTATE 'HY000' SET MYSQL_ERRNO ='553' , MESSAGE_TEXT = rowids;
+--  						CALL audit('3IN1',CONCAT_WS(':',IFNULL(`funcid`,'label5B1'),'ROWIDS ERROR:',QUOTE(rowids)),`funcid`,key_names,key_values,field_names,field_values,rowids);
+						LEAVE label5; -- rowids 出错  
+
+				END CASE;	
+
+				label5A:BEGIN
+
+					CALL Fetch_Set_values(field_names,'a',@field_names_1);-- 取得字r段名
+					CALL Fetch_Set_values(field_values,'0',@field_values_1);
+
+          IF IFNULL(@field_names_1,'') NOT REGEXP 
+							'^\'(a[1-9][0-9]{0,1}[0]{0,1}){1,}\'(,\'(a[1-9][0-9]{0,1}[0]{0,1})*\')*$' THEN -- 校验A字段 允许为空
+							CALL audit(CONCAT_WS(':','3IN1',`funcid`),CONCAT_WS(':','afieldWarning:',@FIELD_NAMES_1),`funcid`,key_names,key_values,field_names,field_values,rowids);
+-- 							LEAVE label4a;
+							SET @one = ''; 
+						ELSE 
+
+-- SELECT @field_names_1,@field_values_1 ;   LEAVE `l`;
+						 CALL Temp_Func_2(CONCAT_WS('',
+"IF((@b :=",
+	"CASE	WHEN a1.init_?? = 1 THEN b1.?? ",
+				"WHEN a0.init_?? = 1 THEN b0.?? ",
+				"WHEN IFNULL(c0.??,'') <> '' THEN c0.?? ",
+			"ELSE  ???",
+	"END) =''",
+",NULL,@b) AS  ?? "),@field_names_1,@field_values_1,NULL,@one);
+
+						 SET @3in1_body = CONCAT("SELECT\n",@ONE,"\n",
+"FROM acc_mission AS a1
+LEFT JOIN acc_mission AS a0 ON a1.behind_missionId = a0.missionId
+LEFT JOIN acc_standard_1 AS b0 ON a0.missionId = b0.missionId
+LEFT JOIN acc_standard_1 AS b1 ON a1.missionId = b1.missionId
+LEFT JOIN acc_1 AS c0 ON b0.missionId = c0.missionId AND c0.expID = ",QUOTE(@expID),
+"\nWHERE a1.missionId = ",QUOTE(@missionid));	
+-- SELECT CAST(@3in1_body as CHAR) ;   LEAVE `l`;
+
+						EXECUTE immediate @3in1_body;
+
+ 					END IF;	
+
+				END LABEL5A; -- 处理A字段
+
+				Label5B:BEGIN
+
+					CALL Fetch_Set_values(field_names,'b',@field_names_1);
+
+
+					IF @FIELD_NAMES_1 NOT REGEXP '^\'(B[1-9][0-9]{0,1})\'(,\'B[1-9][0-9]{0,1}\'){0,}$'   THEN
+						  SET @3in1_body = "SELECT NULL as `label4B1FEILEDNAMESeeror`";
+							CALL audit('3IN1',CONCAT_WS(':','B1FEILEDNAMESeeror:',QUOTE(@FIELD_NAMES_1)),`funcid`,key_names,key_values,field_names,field_values,rowids);
+							LEAVE label5b;
+					END IF; -- 校验B字段建
+
+					SET i = 1;
+
+          SET @a_b_row = rownum , @3in1_body = '';
+
+					CALL Fetch_Set_P0(@a_b_row,1,ir);
+
+-- SELECT ir,@a_b_row,@field_names_1; LEAVE `l`;
+					fetch_recode_s:LOOP
+
+						SET @a = FIND_IN_SET(ir,@a_row); 
+
+-- SELECT CAST(CONCAT_WS(',',QUOTE(@a_value),QUOTE(ia),QUOTE(@a_value_1)) AS CHAR);
+						SET @a = FIND_IN_SET(ir,rownum);
+						IF @a != 0 THEN 
+								CALL Fetch_Set_values(field_values,ir,@field_values_1);
+							ELSE
+								SET @field_values_1 = NULL;
+						END IF;
+
+
+						CALL Temp_Func_2(" ??? AS ??",@field_names_1,@field_values_1,NULL,@one);
+						SET	@3in1_body =CAST(CONCAT(@3in1_body
+									,"SELECT  ",QUOTE(@expid)," AS expid,",
+													QUOTE(@missionid)," AS missionid ,",
+															@one,',',ir," AS rowNo \n"
+																	)AS CHAR);
+						SET i = i + 1;
+						CALL Fetch_Set_P0(@a_b_row,i,ir);
+						IF ir IS NULL THEN 	 LEAVE fetch_recode_s; END IF; -- SELECT  @3in1_body,rownum,i,ir,ia;
+						SET @3in1_body = CONCAT_WS('\tunion\n',@3in1_body,'');
+
+					END LOOP;
+
+				 CALL Temp_Func_2(CONCAT_WS('',
+"IF((@b :=",
+	"CASE	WHEN a1.init_?? = 1 THEN b1.?? ",
+				"WHEN a0.init_?? = 1 THEN b0.?? ",
+				"WHEN IFNULL(c0.??,'') <> IFNULL(c1.??,'') THEN c0.?? ",
+			"ELSE  c0.?? ",
+	"END) =''",
+",NULL,@b) AS  ?? "),@field_names_1,@field_values_1,NULL,@one);
+
+					 SET @3in1_body = CONCAT("SELECT\nb1.rowNo,",@ONE,"\n",
+"FROM acc_mission AS a1
+LEFT JOIN acc_mission AS a0 ON a1.behind_missionId = a0.missionId 
+LEFT JOIN acc_standard_n AS b1 ON a1.missionId = b1.missionId
+LEFT JOIN acc_standard_n AS b0 ON a0.missionId = b0.missionId AND b1.rowNo = b0.rowNo
+LEFT JOIN ",expid2b(@expID)," AS c0 ON b0.missionId = c0.missionId AND b0.rowNo = c0.rowNo
+LEFT JOIN (\n",@3in1_body,"\n) AS c1 ON b1.missionId = c1.missionId AND b1.rowNo = c1.rowNo
+WHERE a1.missionId = ",QUOTE(@missionid));	
+
+-- SELECT @3in1_body,@field_names_1; LEAVE `l`;
+
+				END label5B;
+			END label5;
+
+			WHEN `funcid` IS NULL THEN
+				 SET @3in1_body = "SELECT NULL as `1`";
+				 CALL audit('3IN1',IFNULL(`funcid`,'`funcid` IS NULL'),`funcid` ,key_names,key_values,field_names,field_values,rowids);
+
+
+			WHEN `funcid` = '2'  THEN 
+
+			LABEL1:BEGIN
+				IF IFNULL(rowids,'') ='' THEN	SET rowids ='1';	END IF;
+				CASE 		WHEN rowids REGEXP '^[0]{1}(,[1-9][0-9]{0,}){1,}$' THEN	SET rownum= SUBSTR(rowids,3);
+								WHEN rowids REGEXP '^[1-9]{1}(,[1-9][0-9]{0,}){0,}$' THEN SET rownum = rowids;
+					ELSE	LEAVE `l`; -- rowids 出错  
+				END CASE;	-- 取得B记录行 rownum
+
+					SET @a_fds = NULL,@a_row  = NULL;
+
+					CALL generate_one_en(@missionid,rownum,@a_fields,@a_row,@a_value); 
+
+					IF @a_row IS NULL OR @a_value IS NULL THEN  SELECT NULL AS brecord;		LEAVE `l`;	END IF;
+
+					CALL Fetch_Set_values(field_names,'rowId',@field_names_1);-- 取得字r段名
+
+					IF @FIELD_NAMES_1 NOT REGEXP '^\'(B[1-9][0-9]{0,1})\'(,\'B[1-9][0-9]{0,1}\'){0,}$'   THEN
+						  SET @3in1_body = "SELECT NULL as `label4B1FEILEDNAMESeeror`";
+							CALL audit('3IN1',CONCAT_WS(':','B1FEILEDNAMESeeror:',QUOTE(@FIELD_NAMES_1)),`funcid`,key_names,key_values,field_names,field_values,rowids);
+							LEAVE `l`;
+					END IF; -- 校验B字段建
+
+					SET  
+							i = 1;
+
+          SET @a_b_row = CONCAT_WS(',',rownum,@a_row),
+							@a_b_row = Fielter_Set(@a_b_row);
+					CALL Fetch_Set_P0(@a_b_row,1,ir);
+
+
+					fetch_recode:LOOP
+						SET @a = FIND_IN_SET(ir,rownum);
+						IF @a != 0 THEN 
+								CALL Fetch_Set_values(field_values,ir,@field_values_1);
+							ELSE
+								SET @field_values_1 = NULL;
+						END IF;
+
+
+						SET ia := Fetch_elt(ir,@a_row), 
+								@a_value_1 := Fetch_y_1(ia,@a_value);
+
+						SET	@3in1_body =CAST(CONCAT(@3in1_body
+									,"SELECT  ",ir," AS rowNo \n"
+																	)AS CHAR);
+						SET @one =NULL;
+
+						CALL Temp_Func_3(CONCAT_WS('',"CASE WHEN ??? IS NULL OR ??? REGEXP '^null$'  THEN NULL WHEN ???? REGEXP ??? THEN IF( ??? REGEXP ",QUOTE('\\Q(?#\\E'),",NULL,'#00FF00') ELSE '#FF9999' END AS colB??"),NULL,"",
+															"",'','b',@a_fields,@a_value_1,@field_names_1,@field_values_1,@one);
+
+ 						SET  @3in1_body = CONCAT_WS('',@3in1_body,',',IFNULL(@one,0),"'' AS rowinno");
+
+						SET i = i + 1;
+						CALL Fetch_Set_P0(@a_b_row,i,ir);
+						IF ir IS NULL THEN 	 LEAVE fetch_recode; END IF;
+						SET @3in1_body = CONCAT_WS('\nunion\n',@3in1_body,'');
+
+
+					END LOOP;
+
+			END LABEL1;
+
+			WHEN `funcid` = '4' OR `funcid` ='3' OR `funcid` ='7' THEN
+			label4:BEGIN
+
+				SET @a_fields = NULL;
+				IF `funcid` <> '7' THEN 
+
+					SET @db_b = expid2b(@expid),
+							@db_a = "acc_1";
+
+				ELSE
+
+					 SET 	@db_b = 'acc_b',
+								@db_a = 'acc_a',
+								mid1 = preg_capture('/(?<=_).+$/',@missionId),
+								@missionId = preg_capture('/^.+?(?=_|$)/',@missionId);
+				END IF;
+
+				SET @3in1_body = "";
+					SET @sb = CONCAT_WS('',"DELETE a.* FROM ",@db_b," AS A \n",
+							"WHERE a.expid =",QUOTE(@expid)," AND a.missionid =", QUOTE(@missionid),
+								CONCAT(" AND a.missionid1 =", quote_d(mid1)));
+
+	
+					EXECUTE immediate @sb;
+
+				label4B:	BEGIN -- 处理 B字段		
+				CASE 
+						WHEN rowids REGEXP '^[0]{1}(,[1-9][0-9]{0,}){1,}$' THEN
+								SET rownum= SUBSTR(rowids,3);
+						WHEN rowids REGEXP '^[1-9]{1}(,[1-9][0-9]{0,}){0,}$' THEN
+								SET rownum = rowids;
+					ELSE 
+
+							LEAVE label4B; -- rowids 出错 
+
+				END CASE;	-- 取得B记录行 rownum
+
+				IF `funcid` <> '5' THEN
+-- SELECT @missionid,rownum,@a_fields,@a_row,@a_value;LEAVE l;
+					CALL generate_one_en(@missionid,rownum,@a_fields,@a_row,@a_value); 
+
+				END IF;
+
+
+					CALL Fetch_Set_values(field_names,'b',@field_names_1);-- 取得字r段名
+
+
+					IF @FIELD_NAMES_1 NOT REGEXP '^\'(B[1-9][0-9]{0,1})\'(,\'B[1-9][0-9]{0,1}\'){0,}$'   THEN
+						  SET @3in1_body = "SELECT NULL as `label4B1FEILEDNAMESeeror`";
+							CALL audit('3IN1',CONCAT_WS(':','B1FEILEDNAMESeeror:',QUOTE(@FIELD_NAMES_1)),`funcid`,key_names,key_values,field_names,field_values,rowids);
+							LEAVE label4b;
+					END IF; -- 校验B字段建
+
+
+					SET i = 1;
+
+          SET @a_b_row = CONCAT_WS(',',rownum,@a_row),
+							@a_b_row = Fielter_Set(@a_b_row);
+					CALL Fetch_Set_P0(@a_b_row,1,ir);
+
+
+					fetch_recode:LOOP
+
+						SET ia := Fetch_elt(ir,@a_row), 
+								@a_value_1 := Fetch_y_1(ia,@a_value);
+
+						SET @a = FIND_IN_SET(ir,rownum);
+
+						IF @a != 0 THEN 
+								CALL Fetch_Set_values(field_values,ir,@field_values_1);
+							ELSE
+								SET @field_values_1 = NULL;
+						END IF;
+
+
+						CALL Temp_Func_2(" ??? AS ??",@field_names_1,@field_values_1,NULL,@one);
+-- SELECT @one;
+						SET	@3in1_body =CONCAT_WS('',@3in1_body
+									,"SELECT  ",QUOTE(@expid)," ,", -- " AS expid,",
+													QUOTE(@missionid)," ,",-- " AS missionid ,",
+											IF(mid1,CONCAT(QUOTE(mid1)," ,"),NULL),
+															ir," AS rowNo,",
+															@one,','," \n");
+						SET @one =NULL;
+
+						CALL Temp_Func_3(" ???? REGEXP ??? AS ERR_B??",NULL,"@b_r_total := ",
+															"IFNULL(???? REGEXP ??? ,0)",'+','b',@a_fields,@a_value_1,@field_names_1,@field_values_1,@one);
+
+						SET  @3in1_body = CONCAT_WS('',@3in1_body,IFNULL(@one,0),",@b_total := IFNULL(@b_total,0)+ IFNULL(@b_r_total,0)");
+
+						SET i = i + 1;
+						CALL Fetch_Set_P0(@a_b_row,i,ir);
+						IF ir IS NULL THEN 	 LEAVE fetch_recode; END IF; -- SELECT  @3in1_body,rownum,i,ir,ia;
+						SET @3in1_body = CONCAT_WS('\nunion\n',@3in1_body,'');
+					END LOOP;
+
+					SET @3in1_body = CONCAT_ws('',"INSERT INTO ",@db_b,
+									"(expid,missionid,",
+								IF(mid1 IS NULL,NULL,'missionid1,'),"\n",
+									"rowNo," ,
+									REPLACE(@field_names_1,'\'',''),
+									CONCAT(',',REPLACE_set_0(@a_fields,'err_b')),",right_count,ERROR_count\n)\n",
+									@3in1_body,';');
+
+
+          IF @3in1_body IS NOT NULL THEN
+
+							EXECUTE IMMEDIATE  REGEXP_REPLACE(REGEXP_substr(@3in1_body,'(?i)select\\s+\\K\'(?:\\\\.|[^\'])+\'\\s*,\\s*\'(?:\\\\.|[^\'])+\'')
+							,"('[^']+')\\s*,\\s*('[^']+')",'SELECT 1 INTO @b FROM acc_1 AS a WHERE a.expID = \\1 AND  a.missionId = \\2');
+
+							IF FOUND_ROWS()=0 THEN
+							EXECUTE IMMEDIATE REGEXP_REPLACE(REGEXP_substr(@3in1_body,'(?i)select\\s+\\K\'(?:\\\\.|[^\'])+\'\\s*,\\s*\'(?:\\\\.|[^\'])+\'')
+							,"('[^']+')\\s*,\\s*('[^']+')",'INSERT INTO ACC_1(expID ,missionId)VALUES (\\1, \\2)');
+							END IF;
+-- SELECT @3in1_body;LEAVE l;
+							EXECUTE immediate @3in1_body;
+
+					END IF;
+				END label4B;-- 处理 B字段
+
+
+				SET @A_S = NULL;
+		-- 处理 A字段
+				label4A:BEGIN
+
+					SET @3in1_body = NULL,
+							@statu_value = NULL,
+							@statu_name = NULL,
+							@3in1_body = CONCAT_WS('',"SELECT b.expID,a.classNo INTO @statu_value ,@statu_name\nFROM exp_experimentclassstudent AS a\nLEFT JOIN ",
+																@db_a," AS b ON a.expNo = b.expID AND b.missionId = ",QUOTE(@missionid),
+																CONCAT(" AND b.missionid1 =", quote_d(mid1)),				
+																"\nWHERE a.expNo = ", QUOTE(@expid)); 
+
+
+					EXECUTE immediate @3in1_body;
+
+		 			IF  @statu_value IS NULL THEN
+							SET @3in1_body = CONCAT_WS('',"INSERT ",@db_a,"(EXPID,MISSIONID",
+																	IF(mid1 IS NULL,NULL,",missionId1,billid"),")\n",
+																						"VALUES(",QUOTE(@expid),',',QUOTE(@missionid),
+																		CONCAT(',',IF(mid1 IS NULL,NULL,QUOTE(mid1)),',',QUOTE('jzpz_bjzyfl')),
+																")");
+
+							EXECUTE immediate  @3in1_body;
+					END IF;
+
+					SET @3in1_body = "SET \n" ;
+					CALL Fetch_Set_values(field_names,'a',@field_names_1);-- 取得r字段名
+
+          IF IFNULL(@field_names_1,'') NOT REGEXP 
+							'^\'(a[1-9][0-9]{0,1}[0]{0,1}){1,}\'(,\'(a[1-9][0-9]{0,1}[0]{0,1})*\')*$' THEN -- 校验A字段 允许为空
+
+							CALL audit(CONCAT_WS(':','3IN1',`funcid`),CONCAT_WS(':','afieldWarning:',@FIELD_NAMES_1),`funcid`,key_names,key_values,field_names,field_values,rowids);
+
+							SET @one = ''; 
+						ELSE 
+						 CALL Fetch_Set_values(field_values,'0',@field_values_1);
+
+						 CALL Temp_Func_2("?? := ??? \n",@field_names_1,@field_values_1,NULL,@one);
+
+ 					END IF;	
+
+						SET @3in1_body = CONCAT(@3in1_body,@ONE,IF(IFNULL(@ONE,'')='' ,'',','));	
+
+
+					CALL generate_one_en(@missionid,'0',@a_fields,@a_row,@a_value);
+
+					IF IFNULL(@a_fields,'') !='' THEN 
+
+								CALL Fetch_Set_values(@a_value,'0',@a_values_1);
+
+								CALL Temp_Func_3("ERR_A?? = ???? REGEXP ??? ",NULL,"a.right_count = @right_count := ",
+																	"IFNULL(???? REGEXP ??? ,0)",'+','a',@a_fields,@a_values_1,@field_names_1,@field_values_1,@one);
+
+								SET @one =CONCAT(@one,'+');
+							ELSE 
+								SET @one ='';
+					END IF;
+
+					IF @one ='' THEN
+						SET @one = CONCAT('a.line  = ',j0(dblob,'line')),
+								@one = CONCAT_WS(',',@one, "a.right_count = @right_count := ");
+					END IF;
+
+					SET @3in1_body =CAST(
+											CONCAT("UPDATE ",@db_a," AS a, (\n",
+															"\t\t\t	SELECT \n",
+															"\t\t\t\t\t\t a1.classType, \n",
+															"\t\t\t\t\t\t IF(IFNULL(b.line_type,0) =0, 0, 1) AS is_line, \n",
+															"\t\t\t\t\t\t Count(b1.seal_id) AS shouldSeal, \n",
+															"\t\t\t\t\t\t Count(b3.expID) AS overSeal, \n",
+															"\t\t\t\t\t\t COUNT(b1.seal_id)-COUNT(b3.expid) AS unSealed, \n",
+															"\t\t\t\t\t\t @unS := \n",
+															"\t\t\t\t\t\t\t\t CAST(CONCAT_WS('\\n',\n",
+															"\t\t\t\t\t\t\t\t\t  CONCAT(IF(IFNULL(b0.max_page,1)=1 ,b0.billname,b0.page_title1),'缺少：（',\n",
+															"\t\t\t\t\t\t\t\t\t\t  GROUP_CONCAT(\n",
+															"\t\t\t\t\t\t\t\t\t\t\t 	IF((b.pageno = 0 AND b0.max_page >=1 or b.pageno =1) AND b1.pageid = 1 AND b3.expid IS NULL,CONCAT_WS('',b2.seal_name),NULL) \n",
+															"\t\t\t\t\t\t\t\t\t\t\t\t 	ORDER BY b1.seal_no) \n",
+															"\t\t\t\t\t\t\t\t ,'）'),",
+															Temp_Func(CONCAT("\n",
+															"\t\t\t\t\t\t\t\t\t CONCAT(b0.page_title??,'缺少：（',\n",
+															"\t\t\t\t\t\t\t\t\t\t  GROUP_CONCAT( \n",
+															"\t\t\t\t\t\t\t\t\t\t\t 	IF((b.pageno = 0 AND b0.max_page >=?? or b.pageno =??) AND b1.pageid = ?? AND b3.expid IS NULL,CONCAT_WS('',b2.seal_name),NULL) \n",
+															"\t\t\t\t\t\t\t\t\t\t\t\t 	ORDER BY b1.seal_no) \n",
+															"\t\t\t\t\t\t\t\t  ,'）')"),2,7,NULL),
+															"\t\t\t\t\t\t\t\t\t ,IF( Count(b1.seal_id)<>Count(b3.expID),'<p>注：请更换角色，在不同联次，完成签章！</p>',NULL) \n",
+															"\t\t\t\t\t\t\t\t  )AS CHAR ) AS uns,\n",
+															"\t\t\t\t\t\t IFNULL(a2.read_answer_size,0) as read_answer_size, \n",
+															"\t\t\t\t\t\t IFNULL(a2.answerScore,0) as answerScore, \n",
+															"\t\t\t\t\t\t IFNULL(a2.resultScore,0) AS resultScore, \n", 
+															"\t\t\t\t\t\t a2.pass_score_size, \n",
+															"\t\t\t\t\t\t a2.score_seal_size, \n",
+															"\t\t\t\t\t\t a2.score_line_size, \n",
+															"\t\t\t\t\t\t IFNULL(a2.resultcount,0) as resultcount, \n",
+															"\t\t\t\t\t\t @pt33 := IF(b.is_line,a2.score_line_size,0), \n",
+															"\t\t\t\t\t\t @pt44 :=a2.resultcount*a2.resultScore, \n",
+															"\t\t\t\t\t\t @pt55 :=a2.read_answer_size* a2.answerScore, \n",
+															"\t\t\t\t\t\t a2.max_score_size, \n",
+															"\t\t\t\t\t\t a2.redo_size \n",
+															"\t\t\t	FROM exp_experimentclass AS a1 \n",
+															"\t\t\t	INNER JOIN mysq1_schema.exp_difficulty AS a2 ON a1.difficulty_level = a2.difficulty_level \n",
+															"\t\t\t	JOIN acc_mission AS b ON b.missionId = ",QUOTE(@missionid)," \n",
+															"\t\t\t	INNER JOIN mysq1_schema.bill_list AS b0 ON b.billid = b0.billid \n",
+															"\t\t\t LEFT JOIN acc_mission_seal AS b1 ON b1.missionId = ",QUOTE(@missionid)," \n",
+															"\t\t\t INNER JOIN acc_enter_seal AS b2 ON b1.seal_id = b2.sealID AND b2.seal_content <> '操作' \n",
+															"\t\t\t INNER JOIN acc_enter_role AS b21 ON b21.roleid = b2.roleid \n",
+															"\t\t\t LEFT JOIN acc_seal_1 AS b3 ON b3.expID =",QUOTE(@expid)," \n",
+															"\t\t\t\t\t\t AND b3.missionId =",QUOTE(@missionid)," \n", 
+															"\t\t\t\t\t\t AND b1.pageId = b3.pageId AND b1.seal_id = b3.seal_Id \n",
+															"\t\t\t WHERE a1.ClassNo =",QUOTE(@statu_name)," \n",
+															"LOCK in SHARE mode",
+															"\t\t	) AS b  \n",
+														@3in1_body,
+														@one,@b_total," ,\n",
+														"a.log_count := IFNULL(a.log_count,0)+",IF(`funcid`=4,'1',0)," ,\n",
+														"a.already_no_seal = b.overSeal,\n",
+														"a.read_ans_size := IF(read_ans_size IS NULL ,0,a.read_ans_size) ,\n",
+														"a.error_count = @pt1 :=",REPLACE(@a_s,',','+'),",\n",
+ 														"a.pt1 = @pt1 := (@pt11 :=(100- IF(IFNULL(b.shouldSeal,0)=0,0,b.score_seal_size) -  b.score_line_size * b.is_line))*IF(IFNULL(@pt1,0) != 0,@right_count/@pt1,1), \n",
+														"a.pt2 = @pt2 := (@pt22 :=IF(IFNULL(b.shouldSeal,0)=0,0,b.score_seal_size))*b.overSeal/IF(b.shouldSeal = 0,1,b.shouldSeal), \n",
+														"a.pt3 = @pt3 := IF(b.is_line,IF(IFNULL(a.is_line,0),b.score_line_size,0),0), \n",
+														"a.pt4 = @pt4 := IF(b.resultcount > IFNULL(a.mission_result,0),a.mission_result,b.resultcount)*b.resultScore  ,\n",
+														"a.pt5 = @pt5 := IF(b.read_answer_size>a.read_ans_size, a.read_ans_size ,b.read_answer_size)* b.answerScore ,\n",
+														"a.score :=IF(IFNULL(@pt1,0) + IFNULL(@pt2,0) + IFNULL(@pt3,0)  - IFNULL(@pt4,0)  -IFNULL(@pt5,0) <0 ,0, IFNULL(@pt1,0) + IFNULL(@pt2,0) + IFNULL(@pt3,0)  - IFNULL(@pt4,0)  -IFNULL(@pt5,0))\n",
+														"WHERE a.missionId =",QUOTE(@missionid)," AND a.expid=",QUOTE(@expid)
+												)
+											AS CHAR);
+		
+					EXECUTE immediate @3in1_body;
+					-- 
+						
+					IF `funcid` <>4 THEN  SET @3in1_body="SELECT 'ok' AS teaa";LEAVE label4;END IF;
+					
+			IF	DATABASE() REGEXP  '5$' THEN
+ -- SELECT CONCAT_WS(',',QUOTE(@expid),QUOTE(@missionid),1); LEAVE `l`;
+					CALL v5_autoFlow(@expid,@missionid,1);
+					SET IS5=1;
+			END IF;
+
+
+					SET @3in1_body =CONCAT("
+
+SELECT \n",
+QUOTE(@expid)," AS expID,",
+QUOTE(@missionid)," AS missionId,",
+"IFNULL(d.redo_size,0) AS redoSize,
+IFNULL(d.max_score_size,0) AS missionMaxScore,
+IFNULL(a.score,0) AS missionScore,
+IFNULL(a.read_ans_size,0) AS readAnswer,
+IFNULL(a.read_ans_size,0) AS number,
+CAST(a.log_count AS char) AS logCount,
+IFNULL(a.error_count,0) AS error_count,
+IFNULL(a.right_count,0) AS RIGHT_COUNT,
+@b :=a.score AS tempscore,
+@pt44, @pt4,
+CAST(CASE WHEN IFNULL(c.CLASSTYPE,0) = 1   THEN CONCAT_WS('',
+'<h5><',C.CLASSNAME,'>','<h5>将在：',
+TIMEDIFF(c.endtime,NOW()),'后结束！')
+WHEN  d.difficulty_level =9 THEN '考试模式，无提示。' 
+WHEN a.log_count > d.resultcount THEN '提示次数用完'
+ELSE CONCAT_WS('','<h5><',e.node_No,'.',f.typesort,'>',TRIM(g.missionLabel),'（合格率:',
+IF(@b =0, 0,IF(ROUND(@b,2)=CEIL(@b),CEIL(@b),ROUND(@b,2))),
+'%）</h5>'",
+IF(@pt11<>0,CONCAT(",'<p>填空得分( ",@pt11," )：",CEIL(@pt1),"</p>'"),""),"\n",
+IF(@pt22<>0,CONCAT(",'<p>签章得分( ",FLOOR(@pt22)," )：",CEIL(@pt2),"</p>'"),""),"\n",
+IF(@pt33<>0,CONCAT(",'<p>画线得分( ",@pt33," )：",CEIL(@pt3),"</p>'"),""),"\n",
+IF(@pt44<>0 AND @pt4 <> 0,CONCAT(",'<p>对比扣分( -",@pt44," )：-",CEIL(@pt4),"</p>'"),""),"\n",
+IF(@pt55<>0 AND @pt5 <> 0,CONCAT(",'<p>查看答案扣分( -",@pt55," )：-",CEIL(@pt5),"</p>'"),""),"\n",
+IF(CHAR_LENGTH(@uns) <>0,CONCAT(",'<p>提示：</p>',",QUOTE(@uns)),''),"\n",
+")END AS char)AS missionLabel
+FROM acc_1 AS a
+LEFT JOIN acc_mission AS g ON g.missionId = a.missionId 
+LEFT JOIN exp_experimentclassstudent AS b ON a.expID = b.expNo
+LEFT JOIN exp_experimentclass AS c ON b.classNo = c.classNo
+",IF(IS5,'',"LEFT JOIN exp_experimentclass_course AS c1 ON c1.classNo = c.classNo"),"
+LEFT JOIN mysq1_schema.exp_difficulty AS d ON c.difficulty_level = d.difficulty_level
+LEFT JOIN exp_courses_node_content AS f ON g.missionId = f.missionid
+INNER JOIN exp_courses_node AS e ON  f.contentNo = e.contentNo  AND ",IF(IS5 ,'c','c1'),".courseNo = e.node_courseNo
+",	"\nWHERE a.missionId =",QUOTE(@missionid)," AND a.expid=",QUOTE(@expid));
+ -- SELECT @3in1_body 		;			
+--  SELECT @EXPID,@3in1_body; LEAVE  `l`;
+--  LEAVE `l`;
+				END label4A;-- 处理 A字段,';'
+			END label4;
+
+
+	END CASE;
+/*
+	IF IFNULL(@3in1_body,'')= '' THEN
+		SET @3in1_body ="SELECT NULL as `Elabel400`";
+		CALL audit('3IN1',CONCAT_WS(':',IFNULL(`funcid`,'400'),'something ERROR:',QUOTE(rowids)),`funcid`,key_names,key_values,field_names,field_values,rowids);
+	END IF;
+*/-- SELECT CAST(@3in1_body as CHAR) ;LEAVE `l`;--  
+
+		EXECUTE immediate  @3in1_body;
+-- select '1','2';
+--   SELECT @3in1_body; LEAVE `l`;
+-- SELECT null ;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `a`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `a`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `a`(`p` tinyint) RETURNS float
+    DETERMINISTIC
+BEGIN
+	#Routine body goes here...
+
+	RETURN 0;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `a+`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `a+`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `a+`(`a` longtext,`b` longtext) RETURNS longtext CHARSET utf8mb3
+    NO SQL
+    DETERMINISTIC
+BEGIN
+	#Routine body goes here...
+	DECLARE i INT(5) DEFAULT 0; 
+ DECLARE len INT(5) DEFAULT json_length(a) ;
+ DECLARE rs LONGTEXT DEFAULT NULL ;
+IF IFNULL(a,'')='' OR IFNULL(b,'')='' THEN RETURN IF(CONCAT_WS('',a,b)='',NULL,CONCAT_WS('',a,b));END IF;
+	l:LOOP
+		IF i > len THEN LEAVE l; END if;
+	SET	rs = CONCAT_WS(',',rs,json_merge(json_query(a,CONCAT('$[',i,']')),json_query(b,CONCAT('$[',i,']'))))
+			,i= i+1;
+
+	END LOOP;
+	RETURN CONCAT('[',rs,']') ;
 END
 ;;
 DELIMITER ;
@@ -1208,64 +1398,56 @@ DELIMITER ;
 -- ----------------------------
 DROP FUNCTION IF EXISTS `ab`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` FUNCTION `ab`(`ab` varchar(20000),`init` varchar(20000),`blur` varchar(1200)) RETURNS text CHARSET utf8mb4
+CREATE DEFINER=`root`@`%` FUNCTION `ab`(`ab` varchar(20000),`init` varchar(20000),`blur` varchar(1200)) RETURNS text CHARSET utf8mb3
     NO SQL
     DETERMINISTIC
 BEGIN
 
- DECLARE `e` TINYTEXT DEFAULT '\\[\\]\\-(){}.*?+$';
- DECLARE `rep` VARCHAR(200) DEFAULT '\\\\\\1';
- SET `e` = CONCAT_WS('','((?<!\\\\)[',`e`,']|\\\\(?![',`e`,']))');
+ DECLARE `e` TINYTEXT DEFAULT '\\[\\]\\-(){}.*?+$';DECLARE `rep` VARCHAR(200) DEFAULT '\\\\\\1';
+  DECLARE CONTINUE HANDLER FOR  SQLSTATE '21S01', SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22' , SQLSTATE	'HY000'-- ,SQLSTATE	'22007'
 
+-- INSERT plogs(Function_Name,summary,parameter) value('ab ',CONCAT_WS(' ',@errno ,@text),CONCAT_WS(',',json_quote(`ab`) ,json_quote(IFNULL(`init`,'NULL')) ,json_quote(`blur`)));
 
-	SET `ab` = TRIM(`ab`),
-			`blur` = TRIM(`blur`);
+	SET `e` = CONCAT_WS('','((?<!\\\\)[',`e`,']|\\\\(?![',`e`,']))'),`ab` = TRIM(`ab`),`blur` = TRIM(`blur`);
 
-	SET `ab` =IF(IFNULL(`ab`,'') REGEXP '^\\s*$',NULL,preg_replace('/(?=\\(|\\)|\\*)/','\\\\',`ab`)),
-			`init` = IF(IFNULL(`init` ,'') REGEXP '^[[:space:]]*$',NULL,'1'),
-			`blur` = IF(IFNULL(`blur` ,'')  REGEXP '^[[:space:]]*$',NULL,PREG_REPLACE('/\\s/','[[:space:]]+',`blur`));
+	SET `ab` = REGEXP_replace(IF(IFNULL(`ab`,'') REGEXP '^\\s*$',NULL,preg_replace('/(?=\\(|\\)|\\*)/','\\\\',`ab`)),'(?!\\\\)(\\+)','\\\\\\\\\\1'),
+			`init` = REGEXP_replace(IF(IFNULL(`init` ,'') REGEXP '^\\s*$',NULL,'1'),'(?!\\\\)(\\+)','\\\\\\\\\\1'),
+			`blur` = REGEXP_replace(IF(IFNULL(`blur` ,'')  REGEXP '^\\s*$',NULL,PREG_REPLACE('/\\s/','\\s+',`blur`)),'(?!\\\\)(\\+)','\\\\\\\\\\1');
 	SET @oab =`ab`;
+	
 
 
-	CASE
-							WHEN `init` = 1 		THEN  RETURN NULL;
-							WHEN IFNULL(`ab`,'')='' AND  IFNULL(`init`,'') ='' THEN RETURN NULL;
-						WHEN `blur` REGEXP '\\*{4}'THEN 
-							SET `init` = CONCAT_WS('','^(?:\\s*|',REGEXP_substr(`blur`,'(?<=\\*{4})\\d*(\\.\\d+)?'),')$');
 
-              WHEN `blur` LIKE '*%' THEN  RETURN '[[:alnum:]]+';
-						WHEN `blur` REGEXP '(?i)\\{y(?:md\\}?)?|@@' THEN
-
-								CASE 
-										WHEN IFNULL(`ab`,'') = '' THEN SET `ab` = '^\\d{1,4}$';
-										WHEN	`ab` REGEXP '^(?:0|零|〇).$' THEN  SET	`init` = REGEXP_SUBSTR(`ab`,'(?<=0|零|〇).$');
-										WHEN	`ab` REGEXP '^.$' THEN SET	`init` = CONCAT('(?:0|零|〇)',`ab`);
-
+	CASE		WHEN `init` = 1 		THEN  RETURN NULL;
+					WHEN IFNULL(`ab`,'')='' AND  IFNULL(`init`,'') ='' THEN RETURN NULL;
+					WHEN `blur` REGEXP '\\*{4}'THEN SET `init` = CONCAT_WS('','^(?:\\s*|',REGEXP_substr(`blur`,'(?<=\\*{4})\\d*(\\.\\d+)?'),')$');
+          WHEN `blur` LIKE '*%' THEN  RETURN '[[:alnum:]]+';
+					WHEN `blur` REGEXP '(?i)\\{y(?:md\\}?)?|@@' THEN
+								CASE	WHEN IFNULL(`ab`,'') = '' THEN SET `ab` = '^\\d{1,4}$';
+											WHEN	`ab` REGEXP '^(?:0|零|〇).$' THEN  SET	`init` = REGEXP_SUBSTR(`ab`,'(?<=0|零|〇).$');
+											WHEN	`ab` REGEXP '^.$' THEN SET	`init` = CONCAT('(?:0|零|〇)',`ab`);
 									ELSE SET `init` = REGEXP_SUBSTR(`ab`,'.{2}$');
 								END CASE ;
-	
-						WHEN `blur` REGEXP '^\\s*\\={2}\\s*$' THEN  
-							SET 	`ab` = CONCAT('^',REGEXP_replace(`ab`,e,`rep`),'$');
-						WHEN `blur` REGEXP '=[\\^!]' THEN  
+					WHEN `blur` REGEXP '^\\s*\\={2}\\s*$' THEN	SET 	`ab` = CONCAT('^',REGEXP_replace(`ab`,e,`rep`),'$');
+					WHEN `blur` REGEXP '=[\\^!]' THEN  
 							SET `init` = REGEXP_replace(REGEXP_replace(REGEXP_replace(`blur`,`e`,`rep`),'=[\\^!]','|'),'^\\||\\$','');
 							SET `init` = CONCAT_WS('','^(?!.*?(?:',`init`,'))');
 							SET `ab` = CONCAT_WS('',`init`,REGEXP_replace(`ab`,e,`rep`)),`init` = NULL;
-
-							WHEN `ab` is NULL THEN   
-								CASE
-									WHEN `blur` is null THEN RETURN NULL;
+					WHEN `ab` is NULL THEN   
+								CASE	WHEN `blur` is null THEN RETURN NULL;
 									ELSE SET `ab` = '^[[:space:]]*$',`init` = b2r(`blur`,null);
 								END CASE;
 					WHEN `blur` REGEXP '#{2}' THEN
-						 SET `init` = REGEXP_SUBSTR(`blur`,'(?<=#{2})(\\-|￥|\\$)?\\d+(\\.\\d+)');
-						IF IFNULL(`init`,'') = '' THEN
-							SET `ab` = Is_amount(`ab`);
-						ELSE SET `init` = Is_amount(`init`); END IF;
+								SET `init` = REGEXP_SUBSTR(`blur`,'(?<=#{2})(\\-|￥|\\$)?\\d+(\\.\\d+)');
+								IF IFNULL(`init`,'') = '' THEN 	SET `ab` = Is_amount(`ab`);
+								ELSE SET `init` = Is_amount(`init`); END IF;
 
-							WHEN `blur` is null THEN RETURN Is_amount(`ab`);
-							WHEN substr(@tb_:=b2r(`blur`,`ab`),1,2)='^[' THEN SET `ab` = Is_amount(`ab`),`init` = @tb_;
-							ELSE SET `init` =@tb_;
-               
+					WHEN `blur` is null THEN RETURN Is_amount(`ab`);
+					WHEN `blur` REGEXP '\\(\\?#REGEXP\\)' THEN 
+								
+								SET  `ab` = CONCAT_WS('|',ab,REGEXP_REPLACE(`blur`,'\\(\\?#REGEXP\\)',''));
+					WHEN substr(@tb_:=b2r(`blur`,`ab`),1,2)='^[' THEN SET `ab` = Is_amount(`ab`),`init` = @tb_;
+			ELSE SET `init` =@tb_;
 	END  CASE; 
 
   SET `ab` = CONCAT_WS('|',if(IFNULL(`ab`,'')='',NULL,`ab`),if(IFNULL(`init`,'')='',NULL,`init`));
@@ -1279,52 +1461,20 @@ END
 DELIMITER ;
 
 -- ----------------------------
---  Procedure definition for `ab_copy`
--- ----------------------------
-DROP FUNCTION IF EXISTS `ab_copy`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`%` FUNCTION `ab_copy`(`ab_` varchar(20000),`init_` varchar(20000),`blur_` varchar(1200)) RETURNS mediumtext CHARSET utf8mb4
-    NO SQL
-    DETERMINISTIC
-BEGIN
-	
- DECLARE `e` TINYTEXT DEFAULT '\\[\\]\\-(){}.*?+$';
- SET `e` = CONCAT_WS('','((?<!\\\\)[',`e`,']|\\\\(?![',`e`,']))');
- 
-	SET ab_ = TRIM(ab_),
-			blur_ = TRIM(blur_);
-
-	SET ab_ =IF(IFNULL(ab_,'') REGEXP '^[[:space:]]*$',NULL,preg_replace('/(?=\\(|\\)|\\*)/','\\\\',ab_)),
-			init_ = IF(IFNULL(init_ ,'') REGEXP '^[[:space:]]*$',NULL,'1'),
-			blur_ = IF(IFNULL(blur_ ,'')  REGEXP '^[[:space:]]*$',NULL,PREG_REPLACE('/\\s/','[[:space:]]+',blur_));
-	
-	RETURN 	
-					CASE
-							WHEN init_ = 1 		THEN NULL
-              WHEN blur_ LIKE '*%' THEN  '[[:alnum:]]+'
-							WHEN ab_ is NULL THEN   
-								CASE
-									WHEN blur_ is null THEN NULL
-									ELSE concat('^[[:space:]]*$','|',b2r(blur_,null))
-								END
-							WHEN blur_ is null THEN Is_amount(ab_)
-							WHEN substr(@tb_:=b2r(blur_,ab_),1,2)='^[' THEN CONCAT(Is_amount(ab_),'|',@tb_)
-
-							ELSE CONCAT(ab_,'|',@tb_)
-					END  ; 
-END
-;;
-DELIMITER ;
-
--- ----------------------------
 --  Procedure definition for `accsl`
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `accsl`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `accsl`(`account` varchar(200),`date` date)
 asll:BEGIN
-	
+	#Routine body goes here...
+/*
+START TRANSACTION;
+CALL Audit_1('accsl',CONCAT_WS(',',QUOTE(`account`),QUOTE(`date`)),'ok');COMMIT;
 
+LEAVE asll;
+
+*/
 
 	SET @`code` = NULL,
 			@`code` = preg_capture('/^\\d*/',`account` ),
@@ -1332,12 +1482,12 @@ asll:BEGIN
 			@`account1` = preg_capture('/^([0-9]+\\s*)*(.+?)(?=$| \\- )/',`account`,2) ,
 			@`account2` = NULL, 
 			@`account2` = preg_capture('/(?<= \\- ).+$/',`account`);
-
+-- SELECT c(@`account2`),c(@`account1`);
   IF	IFNULL(@`code`,'') = '' OR CONCAT_WS('',@`account2`,@`account1`) = ''THEN 
 			SELECT 'no code' ;LEAVE asll;
   END IF;
 	
-
+-- SELECT CAST(@`code` AS CHAR);
 	SET @stmtbody = CONCAT_WS('',"DELETE a.* FROM mxz AS a WHERE ",  
 								"a.`code` = ",QUOTE(@`code`)," AND " ,
 									"a.`year` = ",QUOTE(YEAR(`date`)));
@@ -1378,7 +1528,7 @@ IF(@`account2` IS NOT NULL ,CONCAT_WS(''," AND c.b3 = ",QUOTE(@`account2`)),NULL
 ORDER BY  DATE(CONCAT_WS('-',b.a1,b.a2,b.a3))")
 ;
 
-
+-- SELECT c(@stmtbody) ; LEAVE asll;
 	PREPARE stmt from  @stmtbody;
 	EXECUTE stmt ;
 DEALLOCATE PREPARE stmt;
@@ -1392,413 +1542,7 @@ DELIMITER ;
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `accslgl`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `accslgl`(IN `funid` varchar(60) ,IN `keyword` longtext)
-    READS SQL DATA
-accslgl:BEGIN
-/*
-0	总分类账-科目表
-1 明细账-科目表
-2 科目汇总表
-3 明细账
-4 总分类账 
-6 报表项目明细 
-7 经济业务 
-8 期初余额
-9 科目代码表
-*/
-	DECLARE i INT DEFAULT 1;
-DECLARE EXIT HANDLER FOR  SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22'	, SQLSTATE	'HY000'-- , SQLSTATE	'22007'
-		bl:BEGIN	GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;SET  @`sqlstate` = JSON_OBJECT('sqlstate',@`sqlstate`,'errno',@errno,'text',@text);
-		SET @`errsql` = @stmtbody;SET @funid :=  NULL,
-				@funid = CONCAT_WS(' ','Error：',REGEXP_substr("0	总分类账-科目表\n1 明细账-科目表\n2 科目汇总表\n3 明细账\n4 总分类账 \n6 报表项目明细 \n7 经济业务 \n8 期初余额\n9 科目代码表",CONCAT_WS('','(?ism)^\\s*' ,`funid` ,'\\s*[^\\d\\s]+'))
-										,' Accslgl'),
-				@pp = CONCAT_WS(',',QUOTE(`funid`),QUOTE(`p`));
-		CALL `Audit_3`(COLUMN_create('m',@funid,'pp',@pp,'SQL',@`errsql`,'err',@`sqlstate`,'l',1));
-END;/* */
-
-start TRANSACTION;
-SET @funid :=NULL,
-		@funid = CONCAT_WS(' ',REGEXP_substr("0	总分类账-科目表\n1 明细账-科目表\n2 科目汇总表\n3 明细账\n4 总分类账 \n6 报表项目明细 \n7 经济业务 \n8 期初余额\n9 科目代码表",CONCAT_WS('','(?ism)^\\s*' ,`funid` ,'\\s*[^\\d\\s]+'))
-
-                ,' Accslgl'),
-		@pp = CONCAT_WS(',',QUOTE(`funid`),QUOTE(`keyword`));
--- CALL `Audit_3`(COLUMN_create('m',@funid,'pp',@pp));COMMIT;
-
-INSERT INTO plogs (Function_Name,parameter) VALUES (@funid,@pp);
-commit;
-/**/
-	SET		@stmtbody = NULL;
-
-SET keyword = REPLACE(keyword,'"category":"负载类%"','"category":"负债类%"');
-	CASE  
-
-
-			WHEN funid = '9' THEN
-
-						SET		@stmtbody = CONCAT('LIMIT ',IF((@sn := CONCAT_WS(',',j5(`keyword`,"start"),j5(`keyword`,"number")))='' ,NULL,@sn)),
-									@bnote = @bnote,
-									@`WHERE` = CONCAT_WS(' AND ',CONCAT("b0.category LIKE  ",quotd(j5(`keyword`,'category'))),
-																							 CONCAT("CONCAT_WS('',a.`code`,a.account,a.yefx,a.fsefx,a.note) REGEXP ", quotd(j5(`keyword`,'searchVal'))));
-			
-						SET		@stmtbody = CONCAT_WS('',	"
-SELECT
-a.id,
-a.`code`,
-a.account,
-a.yefx,
-a.fsefx,
-a.note,
-(c(@bnote := IF(IFNULL(b.note,'')='',@bnote,b.note))) AS account_title,
-b0.category,
-b0.note AS category_title
-FROM
-accountcode AS a
-LEFT JOIN mysq1_schema.account AS b ON a.`code` = b.`code`
-LEFT JOIN mysq1_schema.accountcode_category AS b0 ON SUBSTR(a.`code`,1,1)= b0.`code`",
-CONCAT('\nWhere ',IF(IFNULL(@`WHERE`,'') = '',NULL,@`WHERE`)),"
-ORDER BY a.`code`
-",@stmtbody
-);
-
-
-			WHEN funid = '8' THEN
-
-						SET @`WHERE` = CONCAT_WS(' AND ',CONCAT("CONCAT_WS('',a.`code`,a.account,a.yefx,a.fsefx,c.balance,FORMAT(c.balance,2),c.creditAccumulated,FORMAT(c.creditAccumulated,2),c.debitAccumulated,FORMAT(c.debitAccumulated,2),c.quantityAccumulated,FORMAT(c.quantityAccumulated,2)) REGEXP ", quotd(j5(`keyword`,'searchVal'))));
-						SET @stmtbody = CONCAT_WS('',"
-SELECT
-'322' AS TOTAL,
-c.id,
-c.`code`,
-c.account,
-c.jd,
-FORMAT(c.balance,2) AS balance,
-c.creditAccumulated,
-c.debitAccumulated,
-c.quantityAccumulated
-FROM
-accountcode AS a
-LEFT JOIN initibalance AS c ON a.`code` = c.`code`"
-,CONCAT('\nWhere ',IF(IFNULL(@`WHERE`,'') = '',NULL,@`WHERE`))
-);		
-
-						
-						SET	@stmtbody = CONCAT_WS('',@stmtbody,CONCAT("\nLIMIT ",j(`keyword`, "start"),',',j(`keyword` ,"number")));
-
-			WHEN funid = '0' OR  funid = '1'  THEN
-
-					SET @stmtbody = CONCAT_WS('',	"SELECT
-CAST(a.`code` AS CHAR) AS missionIds,
-CONCAT_WS('',a.`code`,' ',a.account) AS km
-FROM initibalance AS a\n");
-
-					IF funid = '0' THEN 
-						SET @stmtbody = CONCAT_WS('',@stmtbody,"WHERE PREG_RLIKE(",QUOTE("/^\\d{4,4}$/"),",a.`code`)");
-					END IF;
-
-
-			WHEN funid = '2' THEN 
-
-					SET @mo = json_extra(keyword,'a2');
-					SET @stmtbody = CONCAT_WS('',"SELECT CONCAT_WS('',a.k2,' ',a.k3) AS account,money(a.k1) AS credit,money(a.k4) AS debit,a.k5 AS mo\n",
-					"FROM temp_km AS a ",CONCAT("WHERE a.k5 =",@mo),"\n",
-					"ORDER BY IF(a.k2 REGEXP '^[0-9]',a.k2,'hj')\n");
-
-			WHEN funid = '3' OR funid = '4' THEN
-
-					
-					SET @a1 = json_extra(keyword,'a1'),
-							@a2 = json_extra(keyword,'a2'),
-							@account = json_extra(keyword,'account');
-
-					SET @`code`= REGEXP_substr(j(keyword,'account'),'^[^\\s]+(?=\\s)');
-
-					SET 
-							@stmtbody = CONCAT_WS('',		"SELECT a.missionId , a.`code` AS `code` , a.account,\n",
-																					"			@tdate := DATE(CONCAT_WS('-',a.a1,a.a2,a.a3)) AS DATE,CONCAT_WS(' - ',a.classic,a.num) AS  classic,a.note,\n",
-																					"			FORMAT(a.debit,2) AS debit,FORMAT(a.credit,2) AS credit,money(SUM(@da := IFNULL(a.da,0)	+	IFNULL(a.debit	,0))) AS da,money(SUM(@ca :=	IFNULL(a.ca,0)	+	IFNULL(a.credit	,0))) AS ca,\n",
-																					"			a.cord,money(ABS(@remain := IFNULL(a.remain,0)*IF(a.cord = '借',1,-1))) AS remain,\n",
-																					"			money(@bda := 0) AS bda, money(@bca := 0) AS bca,\n",
-																					"			LPAD('1',2,0) AS `month`\n",
-																					"FROM inibalance AS a\n",
-																					"WHERE a.`code` LIKE ",QUOTE(CONCAT_WS('',@`code`,"%"))),
-							@sb_mo = CONCAT_WS('',	"SELECT  a.missionId,a.`code`,a.`code1`AS account,\n",
-																			"			@tdate := COLUMN_get(a.acc_b,'date' AS DATE) AS `DATE`,CONCAT_WS(' - ',IF(IFNULL(b.a4,'') ='','记', b.a4),b.a5) AS classic,COLUMN_get(a.acc_b,0 AS char) AS note,\n",
-																			"			money(a.b4) AS debit, money(a.b5) AS credit,\n",
-																			"			NULLIF(FORMAT(@da :=	IFNULL(@da,0) + IFNULL(a.b4,0),2),0) AS da,NULLIF(FORMAT(@ca :=  IFNULL(@ca,0) + IFNULL(a.b5,0),2),0) AS ca,\n",
-																			"			@fx := IF((@re:= @remain + @da -@ca) > 0 ,'借',IF(@re < 0,'贷','平'))	AS cord,money(ABS(@re)) AS remain,\n",
-																			"			NULLIF(FORMAT(@bda := IF(@mo <> b.a2 +0 ,0,IFNULL(@bda,0)+ IFNULL(a.b4,0)),2),0)  AS bda,NULLIF(FORMAT(@bca := IF(@mo <> b.a2+0,0,@bca) + IFNULL(a.b5,0),2),0) AS bca,\n",
-																			"			LPAD(@mo := IF(IFNULL(@mo,0) <> b.a2+0,b.a2,@mo),2,0) AS `month`\n",
-																			"FROM acc_standard_n AS a INNER JOIN acc_standard_1 AS b ON b.missionid = a.missionid\n",
-																			"WHERE a.`code` LIKE ",QUOTE(CONCAT_WS('',@`code`,"%"))," AND  b.a1 = ",@a1),
-							@sb_moe = CONCAT_WS('',
-																		"SELECT	NULL AS missionId,NULL AS `code`,NULL AS account,\n","@tdate := DATE(LAST_DAY(@tdate)) AS DATE,NULL	AS  classic,\n",
-																		"				'本期合计'	AS	note,money(@bda) AS debit,money(@bca) AS credit,money(@da) AS da,money(@ca) AS ca,\n",
-																		"				@fx	AS cord,money(ABS(@re)) AS remain,money(@bda),money(@bca),\n",
-																		"				LPAD(MONTH(@tdate),2,0) AS `month`",
-																		"\nUNION ALL\n",
-																		"SELECT	NULL AS missionId,NULL AS `code`,NULL AS account,DATE(LAST_DAY(@tdate)) AS DATE,NULL	AS  classic,\n",
-																		"				'本年累计'	AS	note,FORMAT(@da,2) AS debit,money(@ca) AS credit,FORMAT(@da,2) AS da,FORMAT(@ca,2) AS ca,\n",
-																		"				@fx	AS cord,money(ABS(@re)) AS remain,money(@bda),money(@bca),\n",
-																		"				LPAD(MONTH(@tdate),2,0) AS `month`\n"),
-							@sb_mob = CONCAT_WS('',"SELECT	NULL AS missionId,NULL AS `code`,NULL AS account,DATE_ADD(LAST_DAY(@tdate),INTERVAL 1 DAY) AS DATE,NULL	AS  classic,\n",
-																		"				'期初'	AS	note,NULL AS debit,NULL AS credit,NULL AS da,NULL AS ca,\n",
-																		"				@fx	AS cord,money(ABS(@re)) AS remain,NULL AS bda,NULL bca,\n",
-																		"				LPAD(MONTH(DATE_ADD(LAST_DAY(@tdate),INTERVAL 1 DAY)),2,0) AS `month`\n");
-
-SET @fileter = ') AS a WHERE a.`month` ';
-					CASE  
-							WHEN @a2 = '1' THEN
-									SET	i = @a2 ,
-											@fileter = CONCAT_WS('= ',@fileter,@a2);
-							WHEN @a2 REGEXP '全' THEN
-									SET	i = 1 ,@a2 =12,@fileter = CONCAT_WS('<= ',@fileter,@a2);
-						ELSE 	SET	@stmtbody = CONCAT_WS('',@stmtbody,'\nUNION All\n' , @sb_mo,"\t\tAND b.a2 < " ,@a2
-													,'\nUNION All\n' ,@sb_mob),
-											i = @a2,@fileter = CONCAT_WS('= ',@fileter,@a2);
- 					END CASE;
-
-					l1:LOOP 
-					SET	@stmtbody = CONCAT_WS('',@stmtbody,'\nUNION All\n' , @sb_mo,"\t\tAND b.a2 = " ,i,'\nUNION All\n' ,@sb_moe),
-							i = i + 1 ;
-						IF i > @a2 THEN 
-								SET @stmtbody = CONCAT_WS('\n','SELECT a.* FROM(',@stmtbody,@fileter);
-								LEAVE l1;
-						END IF;
-					END LOOP;
-
-				IF funid = '4' THEN
-					SET @stmtbody = CONCAT_WS('',@stmtbody," AND  a.missionId IS NULL");
-				END IF;
-
-
-
-
-			WHEN  funid = '6' THEN 
-				SET @stmtbody = CONCAT_WS('',	"SELECT a.b1 \nFROM acc_standard_n AS a\nWHERE a.missionId = 'qianxue-15123115081130306' AND preg_rlike('/:|：|合计|总计/',a.b1) =0 ");
-
-
-		else SELECT CONCAT("SOMEthing wrong, OR NO funid ON ",QUOTE(`funid`));
-
-	END case;
-
-	PREPARE stmt from  @stmtbody;
-	EXECUTE stmt ;
-
-
-END accslgl
-;;
-DELIMITER ;
-
--- ----------------------------
---  Procedure definition for `accslgl_copy`
--- ----------------------------
-DROP PROCEDURE IF EXISTS `accslgl_copy`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `accslgl_copy`(IN `funid` varchar(60) ,IN `keyword` longtext)
-    READS SQL DATA
-accslgl:BEGIN
-/*
-0	总分类账-科目表
-1 明细账-科目表
-2 科目汇总表
-3 明细账
-4 总分类账 
-6 报表项目明细 
-7 经济业务 
-8 期初余额
-9 科目代码表
-*/
-	DECLARE i INT DEFAULT 1;
-DECLARE EXIT HANDLER FOR  SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22'	, SQLSTATE	'HY000'-- , SQLSTATE	'22007'
-		bl:BEGIN	GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;SET  @`sqlstate` = JSON_OBJECT('sqlstate',@`sqlstate`,'errno',@errno,'text',@text);
-		SET @`errsql` = @stmtbody;SET @funid :=  NULL,
-				@funid = CONCAT_WS(' ','Error：',REGEXP_substr("0	总分类账-科目表\n1 明细账-科目表\n2 科目汇总表\n3 明细账\n4 总分类账 \n6 报表项目明细 \n7 经济业务 \n8 期初余额\n9 科目代码表",CONCAT_WS('','(?ism)^\\s*' ,`funid` ,'\\s*[^\\d\\s]+'))
-										,' Accslgl'),
-				@pp = CONCAT_WS(',',QUOTE(`funid`),QUOTE(`p`));
-		CALL `Audit_3`(COLUMN_create('m',@funid,'pp',@pp,'SQL',@`errsql`,'err',@`sqlstate`,'l',1));
-END;/* */
-/*
-start TRANSACTION;
-SET @funid :=NULL,
-		@funid = CONCAT_WS(' ',REGEXP_substr("0	总分类账-科目表\n1 明细账-科目表\n2 科目汇总表\n3 明细账\n4 总分类账 \n6 报表项目明细 \n7 经济业务 \n8 期初余额\n9 科目代码表",CONCAT_WS('','(?ism)^\\s*' ,`funid` ,'\\s*[^\\d\\s]+'))
-
-                ,' Accslgl'),
-		@pp = CONCAT_WS(',',QUOTE(`funid`),QUOTE(`keyword`));
--- CALL `Audit_3`(COLUMN_create('m',@funid,'pp',@pp));COMMIT;
-
-INSERT INTO plogs (Function_Name,parameter) VALUES (@funid,@pp);
-commit;
-
-LEAVE accslgl;
-*/
-	SET		@stmtbody = NULL;
-
-SET keyword = REPLACE(keyword,'"category":"负载类%"','"category":"负债类%"');
-	CASE  
-
-
-			WHEN funid = '9' THEN
-
-						SET		@stmtbody = CONCAT('LIMIT ',IF((@sn := CONCAT_WS(',',j5(`keyword`,"start"),j5(`keyword`,"number")))='' ,NULL,@sn)),
-									@bnote = @bnote,
-									@`WHERE` = CONCAT_WS(' AND ',CONCAT("b0.category LIKE  ",quotd(j5(`keyword`,'category'))),
-																							 CONCAT("CONCAT_WS('',a.`code`,a.account,a.yefx,a.fsefx,a.note) REGEXP ", quotd(j5(`keyword`,'searchVal'))));
-			
-						SET		@stmtbody = CONCAT_WS('',	"
-SELECT
-a.id,
-a.`code`,
-a.account,
-a.yefx,
-a.fsefx,
-a.note,
-(c(@bnote := IF(IFNULL(b.note,'')='',@bnote,b.note))) AS account_title,
-b0.category,
-b0.note AS category_title
-FROM
-accountcode AS a
-LEFT JOIN mysq1_schema.account AS b ON a.`code` = b.`code`
-LEFT JOIN mysq1_schema.accountcode_category AS b0 ON SUBSTR(a.`code`,1,1)= b0.`code`",
-CONCAT('\nWhere ',IF(IFNULL(@`WHERE`,'') = '',NULL,@`WHERE`)),"
-ORDER BY a.`code`
-",@stmtbody
-);
-
-
-			WHEN funid = '8' THEN
-
-						SET @`WHERE` = CONCAT_WS(' AND ',CONCAT("CONCAT_WS('',a.`code`,a.account,a.yefx,a.fsefx,c.balance,FORMAT(c.balance,2),c.creditAccumulated,FORMAT(c.creditAccumulated,2),c.debitAccumulated,FORMAT(c.debitAccumulated,2),c.quantityAccumulated,FORMAT(c.quantityAccumulated,2)) REGEXP ", quotd(j5(`keyword`,'searchVal'))));
-						SET @stmtbody = CONCAT_WS('',"
-SELECT
-'322' AS TOTAL,
-c.id,
-c.`code`,
-c.account,
-c.jd,
-FORMAT(c.balance,2) AS balance,
-c.creditAccumulated,
-c.debitAccumulated,
-c.quantityAccumulated
-FROM
-accountcode AS a
-LEFT JOIN initibalance AS c ON a.`code` = c.`code`"
-,CONCAT('\nWhere ',IF(IFNULL(@`WHERE`,'') = '',NULL,@`WHERE`))
-);		
-
-						
-						SET	@stmtbody = CONCAT_WS('',@stmtbody,CONCAT("\nLIMIT ",j(`keyword`, "start"),',',j(`keyword` ,"number")));
-
-			WHEN funid = '0' OR  funid = '1'  THEN
-
-					SET @stmtbody = CONCAT_WS('',	"SELECT
-CAST(a.`code` AS CHAR) AS missionIds,
-CONCAT_WS('',a.`code`,' ',a.account) AS km
-FROM initibalance AS a\n");
-
-					IF funid = '0' THEN 
-						SET @stmtbody = CONCAT_WS('',@stmtbody,"WHERE PREG_RLIKE(",QUOTE("/^\\d{4,4}$/"),",a.`code`)");
-					END IF;
-
-
-			WHEN funid = '2' THEN 
-
-					SET @mo = json_extra(keyword,'a2');
-					SET @stmtbody = CONCAT_WS('',"SELECT CONCAT_WS('',a.k2,' ',a.k3) AS account,money(a.k1) AS credit,money(a.k4) AS debit,a.k5 AS mo\n",
-					"FROM temp_km AS a ",CONCAT("WHERE a.k5 =",@mo),"\n",
-					"ORDER BY IF(a.k2 REGEXP '^[0-9]',a.k2,'hj')\n");
-
-			WHEN funid = '3' OR funid = '4' THEN
-
-					
-					SET @a1 = json_extra(keyword,'a1'),
-							@a2 = json_extra(keyword,'a2'),
-							@account = json_extra(keyword,'account');
-
-					SET @`code`= REGEXP_substr(j(keyword,'account'),'^[^\\s]+(?=\\s)');
-
-					SET 
-							@stmtbody = CONCAT_WS('',		"SELECT a.missionId , a.`code` AS `code` , a.account,\n",
-																					"			@tdate := DATE(CONCAT_WS('-',a.a1,a.a2,a.a3)) AS DATE,CONCAT_WS(' - ',a.classic,a.num) AS  classic,a.note,\n",
-																					"			FORMAT(a.debit,2) AS debit,FORMAT(a.credit,2) AS credit,money(SUM(@da := IFNULL(a.da,0)	+	IFNULL(a.debit	,0))) AS da,money(SUM(@ca :=	IFNULL(a.ca,0)	+	IFNULL(a.credit	,0))) AS ca,\n",
-																					"			a.cord,money(ABS(@remain := IFNULL(a.remain,0)*IF(a.cord = '借',1,-1))) AS remain,\n",
-																					"			money(@bda := 0) AS bda, money(@bca := 0) AS bca,\n",
-																					"			LPAD('1',2,0) AS `month`\n",
-																					"FROM inibalance AS a\n",
-																					"WHERE a.`code` LIKE ",QUOTE(CONCAT_WS('',@`code`,"%"))),
-							@sb_mo = CONCAT_WS('',	"SELECT  a.missionId,a.`code`,a.`code1`AS account,\n",
-																			"			@tdate := COLUMN_get(a.acc_b,'date' AS DATE) AS `DATE`,CONCAT_WS(' - ',IF(IFNULL(b.a4,'') ='','记', b.a4),b.a5) AS classic,COLUMN_get(a.acc_b,0 AS char) AS note,\n",
-																			"			money(a.b4) AS debit, money(a.b5) AS credit,\n",
-																			"			NULLIF(FORMAT(@da :=	IFNULL(@da,0) + IFNULL(a.b4,0),2),0) AS da,NULLIF(FORMAT(@ca :=  IFNULL(@ca,0) + IFNULL(a.b5,0),2),0) AS ca,\n",
-																			"			@fx := IF((@re:= @remain + @da -@ca) > 0 ,'借',IF(@re < 0,'贷','平'))	AS cord,money(ABS(@re)) AS remain,\n",
-																			"			NULLIF(FORMAT(@bda := IF(@mo <> b.a2 +0 ,0,IFNULL(@bda,0)+ IFNULL(a.b4,0)),2),0)  AS bda,NULLIF(FORMAT(@bca := IF(@mo <> b.a2+0,0,@bca) + IFNULL(a.b5,0),2),0) AS bca,\n",
-																			"			LPAD(@mo := IF(IFNULL(@mo,0) <> b.a2+0,b.a2,@mo),2,0) AS `month`\n",
-																			"FROM acc_standard_n AS a INNER JOIN acc_standard_1 AS b ON b.missionid = a.missionid\n",
-																			"WHERE a.`code` LIKE ",QUOTE(CONCAT_WS('',@`code`,"%"))," AND  b.a1 = ",@a1),
-							@sb_moe = CONCAT_WS('',
-																		"SELECT	NULL AS missionId,NULL AS `code`,NULL AS account,\n","@tdate := DATE(LAST_DAY(@tdate)) AS DATE,NULL	AS  classic,\n",
-																		"				'本期合计'	AS	note,money(@bda) AS debit,money(@bca) AS credit,money(@da) AS da,money(@ca) AS ca,\n",
-																		"				@fx	AS cord,money(ABS(@re)) AS remain,money(@bda),money(@bca),\n",
-																		"				LPAD(MONTH(@tdate),2,0) AS `month`",
-																		"\nUNION ALL\n",
-																		"SELECT	NULL AS missionId,NULL AS `code`,NULL AS account,DATE(LAST_DAY(@tdate)) AS DATE,NULL	AS  classic,\n",
-																		"				'本年累计'	AS	note,FORMAT(@da,2) AS debit,money(@ca) AS credit,FORMAT(@da,2) AS da,FORMAT(@ca,2) AS ca,\n",
-																		"				@fx	AS cord,money(ABS(@re)) AS remain,money(@bda),money(@bca),\n",
-																		"				LPAD(MONTH(@tdate),2,0) AS `month`\n"),
-							@sb_mob = CONCAT_WS('',"SELECT	NULL AS missionId,NULL AS `code`,NULL AS account,DATE_ADD(LAST_DAY(@tdate),INTERVAL 1 DAY) AS DATE,NULL	AS  classic,\n",
-																		"				'期初'	AS	note,NULL AS debit,NULL AS credit,NULL AS da,NULL AS ca,\n",
-																		"				@fx	AS cord,money(ABS(@re)) AS remain,NULL AS bda,NULL bca,\n",
-																		"				LPAD(MONTH(DATE_ADD(LAST_DAY(@tdate),INTERVAL 1 DAY)),2,0) AS `month`\n");
-
-SET @fileter = ') AS a WHERE a.`month` ';
-					CASE  
-							WHEN @a2 = '1' THEN
-									SET	i = @a2 ,
-											@fileter = CONCAT_WS('= ',@fileter,@a2);
-							WHEN @a2 REGEXP '全' THEN
-									SET	i = 1 ,@a2 =12,@fileter = CONCAT_WS('<= ',@fileter,@a2);
-						ELSE 	SET	@stmtbody = CONCAT_WS('',@stmtbody,'\nUNION All\n' , @sb_mo,"\t\tAND b.a2 < " ,@a2
-													,'\nUNION All\n' ,@sb_mob),
-											i = @a2,@fileter = CONCAT_WS('= ',@fileter,@a2);
- 					END CASE;
-
-					l1:LOOP 
-					SET	@stmtbody = CONCAT_WS('',@stmtbody,'\nUNION All\n' , @sb_mo,"\t\tAND b.a2 = " ,i,'\nUNION All\n' ,@sb_moe),
-							i = i + 1 ;
-						IF i > @a2 THEN 
-								SET @stmtbody = CONCAT_WS('\n','SELECT a.* FROM(',@stmtbody,@fileter);
-								LEAVE l1;
-						END IF;
-					END LOOP;
-
-				IF funid = '4' THEN
-					SET @stmtbody = CONCAT_WS('',@stmtbody," AND  a.missionId IS NULL");
-				END IF;
-
-
-
-
-			WHEN  funid = '6' THEN 
-				SET @stmtbody = CONCAT_WS('',	"SELECT a.b1 \nFROM acc_standard_n AS a\nWHERE a.missionId = 'qianxue-15123115081130306' AND preg_rlike('/:|：|合计|总计/',a.b1) =0 ");
-
-
-		else SELECT CONCAT("SOMEthing wrong, OR NO funid ON ",QUOTE(`funid`));
-
-	END case;
-SELECT  @stmtbody; LEAVE accslgl;
-	PREPARE stmt from  @stmtbody;
-	EXECUTE stmt ;
-
-
-END accslgl
-;;
-DELIMITER ;
-
--- ----------------------------
---  Procedure definition for `accslgl_n`
--- ----------------------------
-DROP PROCEDURE IF EXISTS `accslgl_n`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `accslgl_n`(IN `funcid` varchar(60) ,IN `p` longtext)
+CREATE DEFINER=`root`@`%` PROCEDURE `accslgl`(IN `funcid` varchar(60) ,IN `p` longtext)
     READS SQL DATA
 accslgl:BEGIN
 /*
@@ -1830,11 +1574,6 @@ SET @funcid :=NULL,
 		@pp = CONCAT_WS(',',QUOTE(`funcid`),QUOTE(`p`));
 -- CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp));COMMIT;
 
-INSERT INTO plogs (Function_Name,parameter) VALUES (@funcid,@pp);
-commit;
-/*
-LEAVE accslgl;
-*/
 	SET		@stmtbody = NULL;
 
 	CASE	WHEN funcid = '10' THEN
@@ -1855,12 +1594,12 @@ LEAVE accslgl;
 
 						IF @`where` = '' THEN SELECT "NO WHERE ";LEAVE accslgl; end IF;
 		
-						SET		@stmtbody = CONCAT_WS('\n',	"SELECT\na.id,\na.`code`,\nTRIM(a.account) AS account,\na.yefx,\na.fsefx,\na.note,\n(c(@bnote := IF(ifnulll(b.note,'')='',@bnote,b.note))) AS account_title,\nb0.category,\nb0.note AS category_title","FROM\naccountcode AS a\nLEFT JOIN mysq1_schema.account AS b ON a.`code` = b.`code`\nLEFT JOIN mysq1_schema.accountcode_category AS b0 ON SUBSTR(a.`code`,1,1)= b0.`code`"),
+						SET		@stmtbody = CONCAT_WS('\n',	"SELECT\na.id,\na.`code`,\nTRIM(a.account) AS account,\na.yefx,\na.fsefx,\na.note,\n(c(@bnote := IF(IFNULL(b.note,'')='',@bnote,b.note))) AS account_title,\nb0.category,\nb0.note AS category_title","FROM\naccountcode AS a\nLEFT JOIN mysq1_schema.account AS b ON a.`code` = b.`code`\nLEFT JOIN mysq1_schema.accountcode_category AS b0 ON SUBSTR(a.`code`,1,1)= b0.`code`"),
 									@bnote = j0(`p`,"codefield") ;
 
 						
 							CASE 
-									WHEN ifnulll(@bnote,'') = '' THEN
+									WHEN IFNULL(@bnote,'') = '' THEN
 											SET @stmtbody = @stmtbody ;
 									WHEN @bnote = 'b2' THEN
 											SET @`WHERE` = CONCAT_WS(' AND\n',@`WHERE`, 'CHAR_LENGTH(a.`code`) <=4');
@@ -1870,7 +1609,7 @@ LEAVE accslgl;
 							END CASE;
 
 
-						SET		@stmtbody = CONCAT_WS('\n',@stmtbody,CONCAT('Where ',IF(ifnulll(@`WHERE`,'') = '',NULL,@`WHERE`)),"ORDER BY a.`code`",@`limit`);
+						SET		@stmtbody = CONCAT_WS('\n',@stmtbody,CONCAT('Where ',IF(IFNULL(@`WHERE`,'') = '',NULL,@`WHERE`)),"ORDER BY a.`code`",@`limit`);
 
 
 			WHEN funcid = '8' THEN
@@ -1900,7 +1639,7 @@ LEAVE accslgl;
 			BEGIN DECLARE period VARCHAR(30) DEFAULT j0(p,"period");DECLARE i INT(5) DEFAULT 1;
 				SET @a1 := NULL, @a2 = NULL,@p2 := `p`;
 
-				IF ifnulll(period,'') ='' THEN
+				IF IFNULL(period,'') ='' THEN
 								SET @a1 = json_extra(`p`,'a1'),@a2 = json_extra(`p`,'a2');
 					ELSE	SET @a1 = REGEXP_substr(period,'^.*?(?=\\-|$)'),@a2 = REGEXP_substr(period,'(?<=\\-).*?$');
 
@@ -1921,20 +1660,20 @@ LEAVE accslgl;
 
 					SET	@stmtbody = CONCAT_WS('',		"SELECT a.missionId , a.`code` AS `code` , a.account,\n",
 																					"			@tdate := DATE(CONCAT_WS('-',a.a1,a.a2,a.a3)) AS DATE,CONCAT_WS(' - ',a.classic,a.num) AS  classic,a.note,\n",
-																					"			FORMAT(a.debit,2) AS debit,FORMAT(a.credit,2) AS credit,money(SUM(@da := ifnulll(a.da,0)	+	ifnulll(a.debit	,0))) AS da,money(SUM(@ca :=	ifnulll(a.ca,0)	+	ifnulll(a.credit	,0))) AS ca,\n",
-																					"			a.cord,money(ABS(@remain := ifnulll(a.remain,0)*IF(a.cord = '借',1,-1))) AS remain,\n",
+																					"			FORMAT(a.debit,2) AS debit,FORMAT(a.credit,2) AS credit,money(SUM(@da := IFNULL(a.da,0)	+	IFNULL(a.debit	,0))) AS da,money(SUM(@ca :=	IFNULL(a.ca,0)	+	IFNULL(a.credit	,0))) AS ca,\n",
+																					"			a.cord,money(ABS(@remain := IFNULL(a.remain,0)*IF(a.cord = '借',1,-1))) AS remain,\n",
 																					"			money(@bda := 0) AS bda, money(@bca := 0) AS bca,\n",
 																					"			LPAD('1',2,0) AS `month`\n",
 																					"FROM inibalance AS a\n"
 																					,@`where`
 																							),
 							@sb_mo = CONCAT_WS('',	"SELECT  a.missionId,a.`code`,a.`code1`AS account,\n",
-																			"			@tdate := COLUMN_get(a.acc_b,'date' AS DATE) AS `DATE`,CONCAT_WS(' - ',IF(ifnulll(b.a4,'') ='','记', b.a4),b.a5) AS classic,COLUMN_get(a.acc_b,0 AS char) AS note,\n",
+																			"			@tdate := COLUMN_get(a.acc_b,'date' AS DATE) AS `DATE`,CONCAT_WS(' - ',IF(IFNULL(b.a4,'') ='','记', b.a4),b.a5) AS classic,COLUMN_get(a.acc_b,0 AS char) AS note,\n",
 																			"			money(a.b4) AS debit, money(a.b5) AS credit,\n",
-																			"			money(@da :=	ifnulll(@da,0) + ifnulll(a.b4,0)) AS da,money(@ca :=  ifnulll(@ca,0) + ifnulll(a.b5,0)) AS ca,\n",
+																			"			money(@da :=	IFNULL(@da,0) + IFNULL(a.b4,0)) AS da,money(@ca :=  IFNULL(@ca,0) + IFNULL(a.b5,0)) AS ca,\n",
 																			"			@fx := IF((@re:= @remain + @da -@ca) > 0 ,'借',IF(@re < 0,'贷','平'))	AS cord,money(ABS(@re)) AS remain,\n",
-																			"			money(@bda := IF(@mo <> b.a2 +0 ,0,ifnulll(@bda,0)) + ifnulll(a.b4,0)) AS bda,money(@bca := IF(@mo <> b.a2+0,0,@bca) + ifnulll(a.b5,0)) AS bca,\n",
-																			"			LPAD(@mo := IF(ifnulll(@mo,0) <> b.a2+0,b.a2,@mo),2,0) AS `month`\n",
+																			"			money(@bda := IF(@mo <> b.a2 +0 ,0,IFNULL(@bda,0)) + IFNULL(a.b4,0)) AS bda,money(@bca := IF(@mo <> b.a2+0,0,@bca) + IFNULL(a.b5,0)) AS bca,\n",
+																			"			LPAD(@mo := IF(IFNULL(@mo,0) <> b.a2+0,b.a2,@mo),2,0) AS `month`\n",
 																			"FROM acc_standard_n AS a INNER JOIN acc_standard_1 AS b ON b.missionid = a.missionid\n",
 																			"WHERE a.`code` LIKE ",QUOTE(CONCAT_WS('',@`code`,"%"))," AND  b.a1 = ",@a1),
 							@sb_moe = CONCAT_WS('',
@@ -1979,7 +1718,7 @@ LEAVE accslgl;
 				END IF;
 
 -- 				SET @bca := 0.00,@bda = 0.00,@ca =0.00, @da =0.00,@mo = 0;
-SELECT @stmtbody; LEAVE accslgl;
+
 -- SELECT @stmtbody;
 				PREPARE accslgl_stmt from  @stmtbody;	EXECUTE accslgl_stmt ;DEALLOCATE PREPARE accslgl_stmt ; LEAVE accslgl;
 
@@ -1989,7 +1728,7 @@ SELECT @stmtbody; LEAVE accslgl;
 				BEGIN
 					DECLARE `i` VARCHAR(5) DEFAULT NULL;
 
-					SET i =IF(ifnulll(j0(`p` ,"expid"),'') = '',NULL,1);
+					SET i =IF(IFNULL(j0(`p` ,"expid"),'') = '',NULL,1);
 
 	 				SET @stmtbody = r5(R4('jjywlb-repair'),j0("keyword",`p`));
 	 				PREPARE stmt from  @stmtbody; EXECUTE stmt ;
@@ -2012,8 +1751,8 @@ SELECT @stmtbody; LEAVE accslgl;
 							IF p2 IS NULL OR  ((@enter := j0(p2,'enter') )OR (@courseNO := j0(p2,'courseNO')))  IS NULL THEN CALL Error("no p2 OR (enter OR courseNO)");END IF;
 
 						CASE 
-									WHEN ifnulll(`SQL`,'') = '' OR `SQL` REGEXP '(?i)select'  THEN 
-											IF ifnulll(@enter,"") <> '' THEN
+									WHEN IFNULL(`SQL`,'') = '' OR `SQL` REGEXP '(?i)select'  THEN 
+											IF IFNULL(@enter,"") <> '' THEN
 															SET @stmtbody = CONCAT_WS('\t',R4("qyxx-1"),QUOTE(@enter));
 												ELSE  SET @stmtbody = CONCAT_WS('\t',R4("qyxx-2"),QUOTE(@courseNO));
 
@@ -2053,7 +1792,7 @@ SELECT @stmtbody; LEAVE accslgl;
 			 WHEN CAST(@stmtbody AS CHAR ) IS NULL THEN SET @stmtbody = CONVERT(@stmtbody USING gbk);
 			ELSE SET @stmtbody = @stmtbody;
 	END CASE;
-
+-- SELECT @stmtbody; LEAVE accslgl;
 	PREPARE accslgl_stmt from  @stmtbody;	EXECUTE accslgl_stmt ;	DEALLOCATE PREPARE accslgl_stmt ;
 
 END accslgl
@@ -2081,7 +1820,7 @@ Auditlavel:BEGIN
 										',',QUOTE(field_values),
 										',',QUOTE(rowids),
 										',',QUOTE(NAME_),")");
-
+-- SELECT @vaule ;LEAVE Auditlavel;
 
 PREPARE stmt FROM @vaule ;
 EXECUTE stmt ;
@@ -2099,17 +1838,17 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `Audit_1`(IN `NAME_` varchar(80),IN `Summary` longtext,IN `statu` longtext)
 Auditlavel:BEGIN
 
-
+-- start TRANSACTION ;
 	SET @vaule = NULL,
 
 		@vaule = CONCAT("INSERT INTO plogs(Function_Name,Summary,statu)
-										VALUES(",QUOTE(NAME_),",",QUOTE(Summary),",",QUOTE(statu),")");
-
+										VALUES(",QUOTE(NAME_),",",QUOTE(Summary),",",QUOTE(statu),")");--
+--  SELECT @vaule ;LEAVE Auditlavel;
 
 PREPARE stmt FROM @vaule ;
 EXECUTE stmt ;
 DEALLOCATE PREPARE stmt;
-
+-- COMMIT;
 
 END
 ;;
@@ -2123,17 +1862,17 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `Audit_2`(IN `NAME_` varchar(80),IN `Summary` longtext,INout `dblob` longblob)
 Auditlavel:BEGIN
 
-
+-- start TRANSACTION ;
 	SET @vaule = NULL,
 	 		@DBLOB =DBLOB,
 
-		@vaule = CONCAT("INSERT INTO plogs(Function_Name,Summary,DBLOB)
-										VALUES(",QUOTE(NAME_),",",if(`Summary` IS NULL AND dblob IS NOT NULL,QUOTE(dblob),QUOTE(Summary)),",?)");
-
+		@vaule = CONCAT("INSERT INTO plogs(Function_Name,Summary,parameters)
+										VALUES(",QUOTE(NAME_),",",if(`Summary` IS NULL AND dblob IS NOT NULL,QUOTE(dblob),QUOTE(Summary)),",?)");--
+-- SELECT @vaule ;LEAVE Auditlavel;
 PREPARE stmt FROM @vaule ;
 EXECUTE stmt USING @DBLOB;
 DEALLOCATE PREPARE stmt;
-
+-- COMMIT;
 
 END
 ;;
@@ -2145,40 +1884,41 @@ DELIMITER ;
 DROP PROCEDURE IF EXISTS `Audit_3`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `Audit_3`(IN `p` longblob)
-Audit_3:BEGIN	DECLARE err text DEFAULT NULL ;DECLARE eno INT DEFAULT 0;
+`l`:BEGIN	DECLARE err BLOB DEFAULT NULL/**/ ;DECLARE eno INT DEFAULT 0;
 
+ -- INSERT INTO plogs (Function_Name,parameter) VALUES ('audio_3',CAST(IF(COLUMN_CHECK(p) ,COLUMN_json(p),p)as char));COMMIT;
+ 
+ -- SELECT CONCAT_WS('','INTO plogs (Function_Name,parameter) VALUES (',REGEXP_replace(CAST(JSON_EXTRACT(IF(COLUMN_CHECK(p) ,COLUMN_json(p),p),'$.*') AS char),'^\\[|]$',''),')');
 
 	IF JSON_VALID(p) THEN  	SET @am = CONCAT_WS('','set @am = COLUMN_create(',REGEXP_replace(p,'(?s).*?("(?3)"):("((?:\\\\.|[^"])+)")(?:(,)|})','\\1,\\2\\4'),')'); EXECUTE IMMEDIATE @am; SET p = @am;  END IF ;
 
-START TRANSACTION;
-	IF ! COLUMN_check(p) THEN INSERT INTO	plogs(Function_Name,summary,parameter)VALUE('Audit_3','',`p`); END IF;
-
-	SET err = column_get(p,'err'AS CHAR ),@am = NULL;
-
+	START TRANSACTION;
+	IF ! COLUMN_check(p) THEN INSERT INTO	plogs(Function_Name,summary,parameter)VALUE('`l`','',`p`); END IF;
+   -- json_value(COLUMN_get(@A,'err' AS CHAR),'$.errno');
+	SET err = CONVERT(REPLACE(column_get(p,'err'AS BINARY),'\\','`')USING ascii),@am = NULL;
 	SET @am = CONCAT_WS('   ',COLUMN_get(p,'m' AS CHAR )
 							,IF(IFNULL(column_get(`p`,'l' AS CHAR),'') = '' ,NULL,CONCAT_WS(': ','Level',column_get(`p`,'l' AS CHAR)))),
 			@aparameter =column_get(p,'pp' AS CHAR ),
 			@`summ` := column_get(p,'summ' AS CHAR ),
 			@`summ` =IF(IFNULL(err,'') = '' AND IFNULL(@`summ`,'') = '','记录参数',CONCAT_WS(',',@`summ`,CONCAT_WS(' - ',json_value(err,'$.errno'),json_value(err,'$.text')))),
 			@`SQL` = NULLIF(COLUMN_get(p,'SQL'AS CHAR),'');
-
-	UPDATE plogs AS a SET 			a.number = IFNULL(a.number,0) +1, a.summary = @`summ`,		a.parameter = @`aparameter`,a.`sql`=@`SQL`
-,a.dblob = COLUMN_get(p ,'dblob' AS BINARY )
-	WHERE a.Function_Name = @am AND a.`function_name` = @am
-	AND IF(IFNULL(column_get(`p`,'l' AS CHAR),'') = '' ,1, a.parameter = @`aparameter`)
-; 
-
+IF IF(COLUMN_EXISTS(p,'记录'),COLUMN_get(p,'记录'AS INT),1) THEN 
+	UPDATE plogs AS a SET 			a.number = IFNULL(a.number,0) +1, a.summary = @`summ`,		a.parameter = @`aparameter`,a.`sql`=@`SQL`,a.dblob = COLUMN_get(p ,'dblob' AS BINARY )
+	WHERE a.Function_Name = @am AND a.`function_name` = @am AND IF(IFNULL(column_get(`p`,'l' AS CHAR),'') = '' ,1, a.parameter = @`aparameter`);
+ 
 	IF ROW_COUNT() = 0 THEN 				
 		INSERT INTO	plogs(Function_Name,summary,parameter,`SQL`,number,dblob) VALUE(@`am`,@`summ`,@aparameter,@`SQL`,1,COLUMN_get(p ,'dblob' AS BINARY ));
 	END IF;	
+END if;
 	SET @am = NULL, @`aparameter` = NULL , @`summ` = NULL;
 
-COMMIT;
+	COMMIT;
 
-	IF IFNULL(err,'') <> '' THEN 
+	IF IFNULL(err,'') <> '' AND !IFNULL(column_get(p,'继续执行' AS CHAR),'0')=1 THEN 
 			SET  eno =  json_value(err,'$.errno'),
-					err= IFNULL(SUBSTR(IFNULL(json_value(err,'$.text'),''),1,120),'MESSAGE_TEXT  is null');
-			SIGNAL SQLSTATE 'HY000' SET MYSQL_ERRNO =eno , MESSAGE_TEXT = err ;
+					err= IFNULL(CONCAT(SUBSTR(json_value(err,'$.text'),1,120),' ...'),'');
+SELECT err;COMMIT;
+			SIGNAL SQLSTATE 'HY000' SET MYSQL_ERRNO =eno , MESSAGE_TEXT = err;
 	END IF;
 
 END
@@ -2194,17 +1934,21 @@ CREATE DEFINER=`root`@`%` PROCEDURE `b`(b longblob)
     MODIFIES SQL DATA
     DETERMINISTIC
 bl:BEGIN
-	
+	#Routine body goes here...
 
-	DECLARE p2 VARCHAR(2000) DEFAULT j(b,'p2');
-
+	DECLARE p2 VARCHAR(2000) DEFAULT j0(b,'p2');
+/*
+start TRANSACTION;
+SET @DBLOB = b;
+CALL Audit_2('b',quotej(b),@dblob );COMMIT;
+LEAVE bl;*/
 	IF IFNULL(p2,'') = '' THEN LEAVE bl;END IF;
 	BEGIN
 
 		DECLARE `funid` VARCHAR(1) DEFAULT NULL ;
 		DECLARE `billid` VARCHAR(30) DEFAULT NULL ;
  
-		SET `funid` = j(p2,'funid'), `billid` = j(p2,'billid');
+		SET `funid` = j0(p2,'funid'), `billid` = j0(p2,'billid');
 	CASE
 			WHEN `funid` = 1 THEN 
 
@@ -2230,7 +1974,7 @@ bl:BEGIN
 				DECLARE `dn` VARCHAR(5) DEFAULT NULL;
 
 				DECLARE `WHERE` VARCHAR(2000) DEFAULT CONCAT_WS(' AND ',CONCAT('a.',Fetch_Elt(1,`kfield`),' = ',quotd(j5(p2,Fetch_Elt(1,`kfield`)))),									CONCAT('a.',Fetch_Elt(2,`kfield`),' = ',quotd(j5(p2,Fetch_Elt(2,`kfield`)))),									CONCAT('a.',Fetch_Elt(3,`kfield`),' = ',quotd(j5(p2,Fetch_Elt(3,`kfield`)))));
-				DECLARE `v4k` VARCHAR(2000) DEFAULT Eltm(`kn`,CONCAT_WS(',',quotn(j(p2,Fetch_Elt(1,`kfield`))),quotn(j(p2,Fetch_Elt(2,`kfield`))),quotn(j(p2,Fetch_Elt(3,`kfield`)))));
+				DECLARE `v4k` VARCHAR(2000) DEFAULT Eltm(`kn`,CONCAT_WS(',',quotn(j0(p2,Fetch_Elt(1,`kfield`))),quotn(j0(p2,Fetch_Elt(2,`kfield`))),quotn(j0(p2,Fetch_Elt(3,`kfield`)))));
 
 
  				IF `WHERE` ='' OR  IFNULL(`billid`,'') = '' THEN CALL error('no key or billid'); END IF;
@@ -2278,16 +2022,16 @@ bl:BEGIN
 ))
 ,CONCAT_WS('\t','replace','""','null')
 ,CONCAT_WS('\t','(((?:"(?:\\\\.|[^"])*")|(?:\'(?:\\\\.|[^\'])*\')|(?:[^,\\n\\r]*))(?:,(?2))*?)([\\n\\r]+)',CONCAT_WS('','\\1',IF(`dfield` IS NULL,' ',')'),'UNION \\3SELECT ',`v4k`,','))
-
+/**/
 ),
-
+--  					@stmt2 = f2(@r,@stmt2);
 				@stmt2 =	CONCAT('SELECT ',`v4k`,',',f2(@r,@stmt2),IF(dfield IS NULL,' ',')'));
 
 				SET @stmt2 :=	CONCAT_WS(' UNION\n',CONCAT_WS('\t','SELECT',REGEXP_replace(`field`,r('4elt2'),'NULL AS \\1\\2')),@stmt2),
 						@stmt2 = CONCAT_WS('','SELECT a.* FROM (\n',@stmt2,'\n)AS a WHERE ',`WHERE`);
+/**/
 
-
-
+-- SELECT @stmt2;LEAVE bl;
 				CASE
 						WHEN IFNULL((@a := COLUMN_get(@excl,'inss' AS CHAR)),'') <> ''THEN
 							DROP TABLE IF EXISTS pza;
@@ -2309,7 +2053,7 @@ bl:BEGIN
 												SET @stmt1 = r5(@stmt1,p2);
 											END IF;		
 
- 
+ -- IF i = 3 THEN SELECT p2 , COLUMN_get(@inss,i AS CHAR),c(@stmt1);LEAVE bl; END IF;
 											PREPARE stmt2 FROM @stmt1;					EXECUTE stmt2; 
 
 											SET i:=i+1;
@@ -2334,7 +2078,7 @@ bl:BEGIN
 					afl:LOOP 
 						SET @stmt1 = COLUMN_get(@afinss,i AS CHAR);
 							IF @stmt1 IS NULL THEN LEAVE afl;END IF;
-
+-- SELECT @stmt1,c(@afinss);-- LEAVE bl;
 							PREPARE stmt2 FROM @stmt1;					EXECUTE stmt2; 
 							SET i:=i+1;
 					END LOOP;
@@ -2344,9 +2088,9 @@ bl:BEGIN
 			END;
 		ELSE SELECT NULL;
 	END CASE;
-
-
-
+-- SELECT @stmt2;LEAVE bl;
+-- LEAVE bl;
+-- 	DEALLOCATE PREPARE stmt2;
 				END;	
 END
 ;;
@@ -2361,10 +2105,14 @@ CREATE DEFINER=`root`@`%` PROCEDURE `b2`(b longblob)
     MODIFIES SQL DATA
     DETERMINISTIC
 bl:BEGIN
-	
+	#Routine body goes here...
 
-	DECLARE p2 VARCHAR(2000) DEFAULT j(b,'p2');
-
+	DECLARE p2 VARCHAR(2000) DEFAULT j0(b,'p2');
+/*
+start TRANSACTION;
+SET @DBLOB = b;
+CALL Audit_2('b2',quotej(b),@dblob );COMMIT;
+LEAVE bl;*/
 
 SELECT 
 
@@ -2373,11 +2121,11 @@ SELECT
 ,@a0 :=f(@r0,@a) AS `抓数据`
 ,@a0 
 ,@f :=CONCAT_WS('',REGEXP_substr(@a0,'^.+?\\(\\K(.+?)(?=\\)valu)'),'')AS `oFIELDs`,@r1 :=  NULL
- 
+ -- COLUMN_create(1,@r11 := COLUMN_create(1,CONCAT('(?m)((?:',r('4elt'), ',){3})((?:(?&f),){11})((?:(?&f),){4})(.*?(?=[\\r\\n]+|$))'),2,CONCAT('\\1\\4\\3\\5'))) 
 AS r1 ,@f := f(@r1,@f)AS `2FIELDS` 
 ,CONCAT('(?m)((?:',r('4elt'), ',){3})((?:(?&f),){11})((?:(?&f),){4})(.*?(?=[\\r\\n]+|$))')
 ,@`ttable` := '' ,@`tfields` := IF(IFNULL(@`ttable`,'') ='', @f,CONCAT(
-'' 
+'' -- 'missionId,missionLabel,mission_ask,need_input_a,need_input_b,need_seal,is_line'
 ,',dblob')) as tfields
 ,@n := Eltm(0,@`tfields`) AS `tn`,@sn := Eltm(0,@`f`) AS `sn`,@dn := IF(@n = @sn,NULL,@sn - @n+1) AS `dn`,@`dfield` := IF(@`dn` IS NULL ,NULL,Eltm(-@n+1,@f)) AS `dfields`
 ,CONCAT('(?i)(?:[^\'"\\r\\n]+values\\((?=[\'"]))|(?:\\s*\\]\\]></sql>)')
@@ -2386,15 +2134,17 @@ AS r1 ,@f := f(@r1,@f)AS `2FIELDS`
  
 ,20,COLUMN_create( 1,CONCAT('(?ism)',r('4elt3'),'((?:,(?&f)){',@dn,'}\\))([\\n\\r]*)'),2,CONCAT('\\1,column_create(@i:=0,',QUOTE(@`dfield`),'\\2\\3'))
 ,30,COLUMN_create(1,CONCAT(r('4elt5'),'(?=(?:\,(?&f)){0,',@dn-1,'}\\))'),2,'@i:=@i+1,\\3\\1')
-
+/*,50,COLUMN_create(1,"'\\s*'",2,'null')-- 賦值 NULL
+-- ,6,COLUMN_create(1,CONCAT('(?m)^',r('4elt')),2,"concat(\\1,' 1')")
+,70,COLUMN_create(1,CONCAT('([\\n\\r]+(?!$))',r('4elt5')),2,'union\\1select \\2')*/
 ) REG
 ,@a2 := f(@r,@a0) AS result
-
+-- 生成sql
 ,CONCAT_WS(';\n',CONCAT_WS('\n'  ,IF(IFNULL(@`ttable`,'') <> '', CONCAT_WS(' ',"REPLACE INTO",@`ttable`,"(",@`tfields`,")"), IF((SELECT  a.TABLE_SCHEMA FROM information_schema.`TABLES` AS a WHERE a.TABLE_SCHEMA = DATABASE() AND a.TABLE_NAME = @k) IS NULL  ,CONCAT_WS(' ',"CREATE TABLE",@k,'AS') 	,CONCAT_WS(' ',"REPLACE INTO",@k,CONCAT('(',@`tfields`,')')))),"SELECT a.* FROM(SELECT a.* FROM(",CONCAT_WS(' ',"SELECT	",REGEXP_REPLACE(@`tfields`,CONCAT(r('4elt3'),'(?=,|$)'),'NULL AS \\1'),"UNION" )  ,CONCAT("SELECT	",@a2)  ,CONCAT_WS(' ',") AS a WHERE" ,CONCAT("a.",Eltm(1,@`tfields`)),"IS NOT NULL) AS a"))) AS `SQL`
 
 ;
 
-
+-- PREPARE stmt2 FROM @stmt1;					EXECUTE stmt2; 
 	
 END
 ;;
@@ -2409,7 +2159,7 @@ CREATE DEFINER=`root`@`%` FUNCTION `b2j`(`d` mediumtext) RETURNS mediumtext CHAR
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 	DECLARE `r` VARCHAR(500) DEFAULT CONCAT('(?:(?<=^)(?:("(?:\\\\.|[^"])+"):("(?:\\\\.|[^"])*"),?\\s?))');
 	DECLARE `c` VARCHAR(500) DEFAULT NULL;
 	DECLARE `l` VARCHAR(10) DEFAULT 1;
@@ -2442,7 +2192,9 @@ BEGIN
 			SET @`one` = `one`,
 					@`d`  = REGEXP_replace(@d,'(?<=^|\\s)("\\w+":"(?:\\\\.|[^"])*",?\\s?)','');
 			
-
+/*IF `l` =2 THEN
+RETURN  @`d`;		
+END IF;*/
 			OrLa3:LOOP
 				SET `k`	= REGEXP_substr(@`c`,`r`); 
 
@@ -2476,7 +2228,7 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`%` FUNCTION `b2jr`(`d` mediumblob) RETURNS mediumtext CHARSET utf8mb3
     NO SQL
 BEGIN
-	
+	#Routine body goes here...
 	DECLARE `r0` VARCHAR(500) DEFAULT '(?iJx)(?<k1>"\\w+")(:"(?:\\\\.|[^"])*")';
 	DECLARE `r` VARCHAR(500) DEFAULT '(?:^,)?(?:((?iJx),?"b1":"(?:\\\\.|[^"])*")|((?:,?"\\w+")(?::"(?:\\\\.|[^"])*")))(?:,$)?';
 	DECLARE `count` VARCHAR(5) DEFAULT 1;
@@ -2492,13 +2244,13 @@ BEGIN
 		WHEN `d` REGEXP '<div|name=[ab]' THEN
 			SET `d` := c(filter1(REG2('`Dom2kw`'),`d`));
 		WHEN `d` REGEXP '"b":{' THEN 
-			SET `d` = j(`d`,'b');
+			SET `d` = j0(`d`,'b');
 			
 		ELSE SET @ok = 'ok';
 	END CASE;
 
 
-
+-- RETURN r;
 	label:LOOP
 				SET `res0` = REGEXP_substr(`d`,`r0`);
 
@@ -2509,7 +2261,7 @@ BEGIN
 						`res` = CONCAT_WS(',',`res`,filter1(CONCAT(`r`,'\t\\1'),`d`)),
 						`d` = filter1(CONCAT(`r`,'\t\\2'),`d`)
 ;
-
+-- IF `count` = 4 THEN RETURN `res` ; END  IF;
 	
 			SET	`count` = `count` + 1;
 
@@ -2529,13 +2281,13 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` FUNCTION `b2r`(`field_br` varchar(400),field_ varchar(5000)) RETURNS varchar(5000) CHARSET utf8mb3
     NO SQL
 BEGIN
-	
-
-
-
-
-
-
+	#Routine body goes here...
+-- CREATEtime 2012-12-30 
+-- GBK/GB2312编码：[x80-xff>]+ 或 [xa1-xff]+
+-- UTF-8编码：[x{4e00}-x{9fa5}]+/u 
+-- blur FIELD translate to REGEXP
+-- 
+--  == TO |
 	
 		DECLARE result_ VARCHAR(200);
 		DECLARE _frag VARCHAR(120);
@@ -2571,17 +2323,17 @@ BEGIN
 		SET result_ = '',
 				_frag = '',
 				_idf1 = '', _idf2 = '',
-
+-- 	           				   
 				nece ='==,||,&&,##￥,^^';
 
-
-
+-- == ,||,  
+-- &&,
 		SET	field_br = REPLACE(field_br,'//','||'),
 				field_br = TRIM(field_br),
 				field_  = TRIM(field_), 
-
+-- 				field_br = REPLACE(FIELD_br,'||====','===='),
 				field_br = REPLACE(field_br,'====','^^');
-
+-- 				field_br = REPLACE(field_br,'&&','.*');
 				
 
 
@@ -2591,7 +2343,7 @@ BEGIN
 		END IF;
 
 		SET field_br = replace(field_br,'??','||');
-	
+	-- RETURN  CONCAT_WS(' ','field_br:',field_br,'result_:',result_,' ','_frag:',_frag,' ','_idf1:',_idf1 ,' ','_idf2',_idf2,'@x',@x);
 
 		CASE
 				WHEN field_ IS  NULL THEN
@@ -2647,14 +2399,14 @@ BEGIN
 					ELSE SET  _idf2 = '';
 
 			END CASE ;
-
+-- rETURN  CONCAT_WS(',',field_br,'result_:',result_,' ','_frag:',_frag,' ','_idf1:',_idf1 ,' ','_idf2',_idf2);
 			SET _frag ='',
 					field_br = substr(field_br,v1+1);
 
 		UNTIL field_br = ''	
 		END REPEAT ;
 
-
+-- 	RETURN  result_;
 
  		IF result_ REGEXP '^\\|'  THEN
 			SET result_ = SUBSTR(result_,2);
@@ -2674,26 +2426,51 @@ DROP PROCEDURE IF EXISTS `busy`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `busy`(IN `p` varchar(200))
 busyl:BEGIN
-	
-
-	DECLARE `id` VARCHAR(5) DEFAULT  j(p,'id');
+	#Routine body goes here...
+/*
+其他按照 视图 数据库字段 
+expid,coursno,node_no,contentno , seacher{}
+功能 id
+	7 经济业务 
+'{"id":"7","classNo":"EXP17032712533136485","contentNo":"","courseNo":"business-1","expId":"17051813230548093327","searchs":"","stuNo":"s01","limit":"0,20"}'
+*/
+	DECLARE `id` VARCHAR(5) DEFAULT  j0(p,'id');
 	DECLARE expId VARCHAR(60) DEFAULT j3(p,"expId");
-	
-
-
 
   DECLARE CONTINUE HANDLER FOR  SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22'
 	BEGIN GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;SET  @`sqlstate` = JSON_OBJECT('sqlstate',@`sqlstate`,'errno',@errno,'text',@text);
-			 	SET @funcid := `id`;
+			 	SET @funcid := `id`;-- @funcid = (SELECT CONCAT_WS(', ',a.note,CONCAT_WS('',UPPER(SUBSTR(a.`name`,1,1)),LOWER(substr(a.`name`,2))),a.id) FROM mysq1_schema.qs AS a WHERE a.`name` = `funcid`);
 				CALL `Audit_3`(COLUMN_create('m',CONCAT_WS(' ','Error: ',@funcid, ' busy' ),'err',@`sqlstate`,'SQL',@`p1_body`,'pp',QUOTE(`p`)));
 	END;
 
-
+/*
+start TRANSACTION;
+SET @DBLOB = p;
+CALL Audit_2('busy',quotej(p),@dblob );COMMIT;
+LEAVE bl;*/
 
 	SET @s1=NULL,@s2 = NULL,@s20 = NULL,@s3 = NULL,@s4 = NULL,
 			@manu = NULL;
+
+
 	CASE
 		WHEN IFNULL(expid,'') <> '' OR `id` = 7 THEN 
+
+			SET @s1 := r9('missionG') ,
+					@s = CONVERT(R5(COLUMN_get(@s1,'isgroup'AS CHAR),p)USING gbk);
+
+			EXECUTE IMMEDIATE @s;
+
+			IF @s IS NOT NULL THEN
+
+
+				SET @s = CONVERT(R5(COLUMN_get(@s1,'sql'AS CHAR),p)USING gbk);
+-- SELECT @s;
+			IF j0(p,'(?i)limit') <> '' THEN SET @s  = REGEXP_REPLACE(@s,'(?im)^"(\\d+\\s*(?:,\\s*\\d+)?)"','LIMIT \\1');END IF;
+
+-- SELECT @s;LEAVE busyl;
+				EXECUTE IMMEDIATE @s;LEAVE busyl;
+			END IF;
 
 			BEGIN
 				DECLARE `classNo` VARCHAR(60) DEFAULT j3(p,'classNo');
@@ -2716,7 +2493,7 @@ busyl:BEGIN
 		DECLARE s20 VARCHAR(1000) DEFAULT "LEFT JOIN acc_mission AS b3 ON b2.contentType = 'kj' AND b2.missionid = b3.missionId\nLEFT JOIN  `mysq1_schema`.bill_list AS b30 ON b2.contentType = 'kj' AND b3.billid =  b30.billid\nLEFT JOIN exp_courseware_cells AS b4 ON b2.missionid = b4.unique_id\nLEFT JOIN mysq1_schema.media_library AS b5 ON b2.contentType = 'edit' AND b4.unique_id = b5.missionID";
     DECLARE s3 VARCHAR(1000) DEFAULT CONCAT_WS('\tAND\n',CONCAT('b1.node_courseNo = ',j3(p,'courseNo')),CONCAT('b1.contentNo = ',j3(p,"contentNo")),CONCAT('b2.contentType = ',j3(p,'contentType')));
 		
-		IF  IFNULL(j(`p`,"backInfo"),'') = 'bk' THEN
+		IF  IFNULL(j0(`p`,"backInfo"),'') = 'bk' THEN
 				SET s20 = "LEFT JOIN acc_mission_back_information AS b25 ON b2.contentType = 'kj' AND b25.type = 'bk' AND b2.missionid = b25.missionid\nLEFT JOIN acc_mission AS b3 ON b2.contentType = 'kj' AND b2.missionid = b3.missionId OR b25.quoteid = b3.missionId\nLEFT JOIN  `mysq1_schema`.bill_list AS b30 ON b2.contentType = 'kj' AND b3.billid =  b30.billid\nLEFT JOIN exp_courseware_cells AS b4 ON b2.missionid = b4.unique_id\nLEFT JOIN mysq1_schema.media_library AS b5 ON b2.contentType = 'edit' AND b4.unique_id = b5.missionID",
              s0 = "CONCAT_WS('.',b1.node_No,b2.typesort) AS `CODE`,\n@sort := IF(b25.quoteid = b3.missionId,b25.sort,NULL)AS sort,\n CONCAT_WS('.',b2.typesort,@sort) AS typesort,\nIF(b25.quoteid = b3.missionId,b3.missionlabel,IF(b2.title IS NOT NULL ,b2.title ,IFNULL(IF(b2.contentType = 'kj',b3.missionLabel,b4.title),''))) AS title,\nIF(b2.contentType = 'kj' AND FIND_IN_SET(b3.billId,'kjan_a-e,kjan_a-f,kjan_abcd,kjan_dtb,kjqt_kjfl00_kjfl'),'test',IF(b25.quoteid = b3.missionId,'bk',b2.contentType))  AS contentType",
 						@s4 ="ORDER BY CONCAT_WS('.',b1.node_No,b2.typesort,IF(b25.quoteid = b3.missionId,b25.sort,NULL))" ;
@@ -2725,63 +2502,9 @@ busyl:BEGIN
 
 		SET @s = NULL,
 				@s1 = CONCAT_WS(',',s0,s1) ;
-		SET @s = CONCAT_WS('\n','SELECT',@s1,'FROM',@s2,s2,@s20,s20,'WHERE',CONCAT_WS('\tAND\n',s3,@s3),@s4,CONCAT('LIMIT ',j(`P`,'LIMIT')));
-  
-		PREPARE s FROM @s;
-		EXECUTE s ;
-		DEALLOCATE PREPARE s;
-	END;
-END
-;;
-DELIMITER ;
-
--- ----------------------------
---  Procedure definition for `busy_copy`
--- ----------------------------
-DROP PROCEDURE IF EXISTS `busy_copy`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `busy_copy`(IN `p` varchar(200))
-    DETERMINISTIC
-busyl:BEGIN
-	
-
-	DECLARE `id` VARCHAR(5) DEFAULT  j(p,'id');
-	DECLARE expId VARCHAR(60) DEFAULT j3(p,"expId");
-	
-	
-
-
-
-
-	SET @s1=NULL,@s2 = NULL,@s20 = NULL,@s3 = NULL ;
-	CASE
-		WHEN IFNULL(expid,'') <> '' OR `id` = 7 THEN 
-
-			BEGIN
-				DECLARE `classNo` VARCHAR(60) DEFAULT j3(p,'classNo');
-				IF `classNo` IS NULL OR `expid` IS NULL THEN SELECT '7';LEAVE busyl; END IF;
-				SET @s2 = 'exp_experimentclassstudent AS a\nINNER JOIN exp_experimentclass AS a0 ON a.classNo = a0.classNo\nINNER JOIN exp_experimentclass_course AS a1 ON a1.classNo = a0.classNo\nINNER JOIN exp_courses AS b0 ON a1.courseNo = b0.courseNo',
-						@s20 = 'LEFT JOIN qianxue_test.exp_cour_node_cont AS b20 ON b20.contentNo = b2.contentNo AND b20.typesort = b2.typesort AND b20.missionid = b2.missionid AND b20.classNo = a1.classNo AND b20.courseNo = a1.courseNo',
-						@s3 = CONCAT_WS('\tAND\n',CONCAT('a.expNo = ',expId),CONCAT('a.classNo = ',`classNo`),'b20.classNo IS NULL');
-			END;
-
-
-		
-	 ELSE  SET @s2='exp_courses AS b0';
-	END case;
-
-	BEGIN
-		DECLARE s1 VARCHAR(1000) DEFAULT "b1.node_courseNo,\nb1.contentNo,\nb2.missionid,\nCONCAT_WS('.',b1.node_No,b2.typesort) AS `CODE`,\nb2.typesort,\nb2.contentType,\nIF(b2.contentType = 'kj' AND FIND_IN_SET(b3.billId,'kjan_a-e,kjan_a-f,kjan_abcd,kjan_dtb,kjqt_kjfl00_kjfl'),'test',b2.contentType)  AS N,\nIF(b2.contentType = 'kj',b3.referencedId,b4.referencedID) AS referencedID,\nIF(b2.title IS NOT NULL ,b2.title ,IFNULL(IF(b2.contentType = 'kj',b3.missionLabel,b4.title),'')) AS title,\nb4.fileID AS fileURL,\nb4.edit0_file1_url2,\nb4.url,\nb4.detail,\n'说明' AS file_detail,\nIF(b2.contentType = 'edit' AND b5.fileName IS NULL ,'wenzi.pdf', b5.fileName) AS fileName,\nNULL AS dblob";
-		DECLARE s2 VARCHAR(1000) DEFAULT "INNER JOIN exp_courses_node AS b1 ON b1.node_courseNo = b0.courseNo\nINNER JOIN exp_courses_node_content AS b2 ON b2.contentNo = b1.contentNo";
-		DECLARE s20 VARCHAR(1000) DEFAULT "LEFT JOIN acc_mission AS b3 ON b2.contentType = 'kj' AND b2.missionid = b3.missionId\nLEFT JOIN exp_courseware_cells AS b4 ON b2.missionid = b4.unique_id\nLEFT JOIN mysq1_schema.media_library AS b5 ON b2.contentType = 'edit' AND b4.unique_id = b5.missionID";
-    DECLARE s3 VARCHAR(1000) DEFAULT CONCAT_WS('\tAND\n',CONCAT('b1.node_courseNo = ',j3(p,'courseNo')),CONCAT('b1.contentNo = ',j3(p,"contentNo")),CONCAT('b2.contentType = ',j3(p,'contentType')));
-		SET @s = NULL;
-		SET @s = CONCAT_WS('\n','SELECT',s1,'FROM',@s2,s2,@s20,s20,'WHERE',CONCAT_WS('\tAND\n',s3,@s3));
-
-
-		PREPARE s FROM @s;
-		EXECUTE s ;
-		DEALLOCATE PREPARE s;
+		SET @s = CONCAT_WS('\n','SELECT',@s1,'FROM',@s2,s2,@s20,s20,'WHERE',CONCAT_WS('\tAND\n',s3,@s3),@s4,CONCAT('LIMIT ',j0(`P`,'LIMIT')));
+-- SELECT s0,s3 ,c(@s); LEAVE busyl;
+		PREPARE s FROM @s;		EXECUTE s ;		DEALLOCATE PREPARE s;
 	END;
 END
 ;;
@@ -2792,13 +2515,40 @@ DELIMITER ;
 -- ----------------------------
 DROP FUNCTION IF EXISTS `c`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `c`(`w` longblob) RETURNS longtext CHARSET utf8mb3
+CREATE DEFINER=`root`@`localhost` FUNCTION `c`(`p` longblob) RETURNS longtext CHARSET utf8mb3
     NO SQL
     DETERMINISTIC
-BEGIN
+BEGIN 	DECLARE `rs` LONGTEXT DEFAULT NULL;DECLARE `v` LONGTEXT DEFAULT null;DECLARE `i` INT(5) DEFAULT 0;
+DECLARE r TINYTEXT DEFAULT '(?:[一-鿆]+\\s*)++';
+
+RETURN p;
+	`l`:LOOP
+
+	IF `p` NOT REGEXP r OR i > 100 THEN LEAVE `l`;END IF;
+
+	SET  	rs = CONCAT_WS('',rs,REGEXP_substr(p,CONCAT_WS('','(?ms)^.*?(?!',r,')'))),
+				p = REGEXP_REPLACE(p,CONCAT_WS('','(?ms)^.*?(?!',r,')'),'');
+
+	SET		v = REGEXP_substr(p,CONCAT_WS('','(?ms)^',r));
+
+
+	SET 	v=CASE 
+						WHEN CONVERT(v USING gbk) = v THEN CONVERT(v USING gbk)
+						ELSE CONVERT(v USING utf8)
+					END,
+				p = REGEXP_replace(p,CONCAT_WS('','(?ms)^',r),'')
+
+			;
+
+
+
+	SET `rs` = CONCAT_WS('',`rs`,v);
+RETURN rs;
+SET i= i+1;
+	END LOOP;
 	
 
-	RETURN w;
+	RETURN CONCAT_WS('',rs,p);
 END
 ;;
 DELIMITER ;
@@ -2811,7 +2561,7 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` FUNCTION `cabc`(`num` varchar(50)) RETURNS varchar(100) CHARSET utf8mb3
     NO SQL
     DETERMINISTIC
-BEGIN
+BEGIN 
 	declare  resu varchar(100);
 	declare p varchar(10);
 
@@ -2841,14 +2591,86 @@ DELIMITER ;
 -- ----------------------------
 DROP FUNCTION IF EXISTS `calcuscore`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `calcuscore`(classno varchar(20),expno varchar(60)) RETURNS varchar(200) CHARSET utf8mb3
+CREATE DEFINER=`root`@`localhost` FUNCTION `calcuscore`(`classno` varchar(20),expno varchar(200)) RETURNS varchar(200) CHARSET utf8mb3
     MODIFIES SQL DATA
     DETERMINISTIC
 BEGIN
+-- 121220100222901204618
+/*
+INSERT plogs( Function_Name,summary)
+SELECT 'calcuscore',CONCAT_WS(',',QUOTE(`classno`),QUOTE(`expno`));
+*/
 
 			CASE 
-				when  classno is not null  then 
-							SET @classno = classno, @expno = '' ;
+				WHEN  IFNULL(expno,'') <> '' AND COLUMN_check(expno) THEN
+						SET @classno = IFNULL(COLUMN_get(expno,'classno'AS CHAR),''),
+								@keyword = IFNULL(COLUMN_get(expno,'keyword'AS CHAR),''),
+								@expno = IFNULL(COLUMN_get(expno,'expno'AS CHAR),'');
+						DROP TEMPORARY TABLE IF EXISTS cur1;
+
+CREATE TEMPORARY TABLE cur1 AS
+SELECT
+a.expNo,
+COUNT(e2.missionid) AS total,
+Sum((@score := e.score)) AS score,
+Sum(e.read_ans_size) AS read_ans_size,
+Sum(e.mission_result) AS mission_result,
+Sum(e.log_count) AS log_count,
+Count(e.score) AS done,
+Sum(@score BETWEEN 0 AND 59) AS bad,
+Sum(@score BETWEEN 60 AND 79) AS good,
+Sum(@score BETWEEN 80 AND 89) AS better,
+Sum(@score BETWEEN 90 AND 200) AS perfect,
+a.statu
+FROM exp_experimentclassstudent as a
+INNER JOIN exp_experimentclass AS b ON  a.classNo = b.classNo
+LEFT JOIN exp_experimentclass_course AS b1 ON  b1.classNo = b.classNo
+LEFT join mysq1_schema.exp_classstudent as c on a.studentNo = c.stuNo
+LEFT join mysq1_schema.exp_class as d on c.classno = d.classNo
+INNER JOIN exp_courses_node AS e1 ON e1.node_courseNo = b1.courseNo
+INNER JOIN exp_courses_node_content AS e2 ON  e2.contentNo = e1.contentNo
+INNER JOIN acc_mission as a3 ON e2.missionid = a3.missionId
+LEFT JOIN exp_cour_node_cont AS a2 ON IF(@classno ='',1,a2.classNo = @classno) AND  a2.courseNo = b1.courseNo AND a2.missionid =  e2.missionid 
+LEFT JOIN acc_1 AS e ON a.expNo = e.expID AND e.missionId = e2.missionid
+where  IF(@classno ='',1,a.classNo = @classno)-- 'EXP17032712533136485'
+AND  a.statu IS NOT NULL  
+AND SUBDATE(NOW(),INTERVAL 1 MINUTE)>a.stamptime
+AND a2.classNo IS NULL 
+AND CASE 
+when @keyword='' then 1
+when CONCAT_WS('',d.classNo,d.className) REGEXP @keyword  then 1
+when concat(c.stu_name,a.studentNo) REGEXP @keyword  then 1 
+ELSE 0
+end  
+GROUP BY a.expno;
+
+					UPDATE exp_experimentclassstudent as a 
+					INNER JOIN cur1 as b	ON a.expNo = b.expNo																																						
+								set 
+										a.missionscore = ROUND(b.score / b.total,2) ,
+										a.score1 = b.score,
+										a.read_ans_size = b.read_ans_size,
+										a.mission_result = b.mission_result,
+										a.log_count = b.log_count,
+										a.nodone = b.total - ifnull(b.done ,0) ,
+										a.done = b.done,
+										a.missionbad = b.bad ,
+										a.missiongood = b.good,
+										a.missionbetter = b.better,
+										a.missionperfect = b.perfect,
+										a.mission_result = b.total,
+										a.statu = null 
+					where a.expNo = b.expNo  ;
+
+
+					DROP TEMPORARY TABLE IF EXISTS cur1;
+					RETURN FOUND_ROWS();
+
+
+
+							
+				WHEN  classno IS NOT NULL THEN 
+							SET @classno = classno, @expno = '';
 
 				WHEN  expno IS NOT NULL THEN
 
@@ -2858,7 +2680,6 @@ BEGIN
 										a.classno ,a.statu into @classno,@statu
 							FROM exp_experimentclassstudent AS a 
 							WHERE  a.expno = @expno;
-
 							if @statu IS NULL OR @classno IS NULL then 
 								 RETURN concat('1-','operration cancel,','Deal---Exp',IFNULL(expno, 'null'),'-ClassNo:',IFNULL(@classno,'NULL'));
 							end if ;
@@ -2869,7 +2690,7 @@ BEGIN
 							
 
 		end case ;
-
+-- filter
 							SELECT  
 										a.classno into @x
 							FROM exp_experimentclassstudent AS a 
@@ -2880,38 +2701,43 @@ BEGIN
 		if FOUND_ROWS() = 0 then 
 				return concat('2-','operration cancel,','Deal---Exp',IFNULL(expno, 'null'),'-ClaNo:',IFNULL(@classno,'NULL'));
 		end if ;
-
-
+RETURN @classno;
+-- calcu  score 
 DROP TEMPORARY TABLE IF EXISTS cur1;
 CREATE TEMPORARY TABLE cur1
 AS
-										SELECT
-										a.expNo,
-
-										d.mission_total as total ,
-										Sum(c.score) AS score,
-										Sum(c.read_ans_size) AS read_ans_size,
-										Sum(c.mission_result) AS mission_result,
-										Sum(c.log_count) AS log_count,
-
-										count(c.score) AS done ,
-										sum(Inscore(IFNULL(c.score,0) ,0,60)) AS bad, 
-										SUM(inscore(c.score,60,70)) as good,
-										SUM(inscore(c.score,70,80)) AS better,
-										SUM(inscore(c.score,90,150)) as perfect,
-										a.statu  
-										FROM exp_experimentclassstudent AS a
-										INNER JOIN acc_1 AS c ON a.expNo = c.expid
-
-										INNER JOIN exp_experimentclass as d on a.classNo = d.classNo
-										WHERE 
-										
-										a.statu is not NULL  AND 
-										instr(a.expno , @expno)AND 
-										instr(a.classno , @classno)
-										GROUP BY
-										a.expNo;
-
+SELECT
+a.expNo,
+COUNT(e2.missionid) AS total,
+Sum((@score := e.score)) AS score,
+Sum(e.read_ans_size) AS read_ans_size,
+Sum(e.mission_result) AS mission_result,
+Sum(e.log_count) AS log_count,
+Count(e.score) AS done,
+Sum(@score BETWEEN 0 AND 59) AS bad,
+Sum(@score BETWEEN 60 AND 79) AS good,
+Sum(@score BETWEEN 80 AND 89) AS better,
+Sum(@score BETWEEN 90 AND 200) AS perfect,
+a.statu
+FROM exp_experimentclassstudent as a
+INNER JOIN exp_experimentclass AS b ON a.classNo = b.classNo
+LEFT JOIN exp_experimentclass_course AS b1 ON b1.classNo = b.classNo
+LEFT join mysq1_schema.exp_classstudent as c on a.studentNo = c.stuNo
+LEFT join mysq1_schema.exp_class as d on c.classno = d.classNo
+INNER JOIN exp_courses_node AS e1 ON e1.node_courseNo = b1.courseNo
+INNER JOIN exp_courses_node_content AS e2 ON  e2.contentNo = e1.contentNo
+INNER JOIN acc_mission as a3 ON e2.missionid = a3.missionId
+LEFT JOIN exp_cour_node_cont AS a2 ON IF(@classno ='',1,a2.classNo = @classno) AND  a2.courseNo = b1.courseNo AND a2.missionid =  e2.missionid 
+LEFT JOIN acc_1 AS e ON a.expNo = e.expID AND e.missionId = e2.missionid
+where  a2.classNo IS NULL AND  IF(@classno ='',1,a.classNo = @classno) AND -- 'EXP17032712533136485'
+a.statu is not NULL  and
+case 
+when @keyword='' then 1
+when CONCAT_WS('',d.classNo,d.className) REGEXP @keyword  then 1
+when concat(c.stu_name,a.studentNo) REGEXP @keyword  then 1 
+else 0
+end  
+GROUP BY a.expno;
 
 		UPDATE exp_experimentclassstudent as a ,cur1 as b																																										
 					set 
@@ -2926,6 +2752,7 @@ AS
 							a.missiongood = b.good,
 							a.missionbetter = b.better,
 							a.missionperfect = b.perfect,
+a.mission_result = b.total,
 							a.statu = null 
 		where a.expNo = b.expNo  ;
 
@@ -2939,7 +2766,7 @@ DROP TEMPORARY TABLE IF EXISTS cur1;
    
 
 
-
+-- sort
     SELECT b.classno into @x
 		FROM exp_experimentclass as b
     WHERE b.statu IS NOT NULL AND instr(b.classno , @classno)
@@ -2971,7 +2798,7 @@ AS
 							order by a.classno , case when a.missionscore is null then 1 else 0 end aSC ,a.missionscore DESC ;
 
 			UPDATE exp_experimentclassstudent as a, cur1 as  b 
-			set a.rowid = b.rowid1
+			set a.rowNo = b.rowid1
 			WHERE a.expno = b.expno ;
 
   UPDATE exp_experimentclass as a
@@ -2979,56 +2806,6 @@ AS
 	WHERE a.statu is not NULL  AND instr(a.classno , @classno);
 
 RETURN  concat('5-DealRecS',FOUND_ROWS()) ;
-
-END
-;;
-DELIMITER ;
-
--- ----------------------------
---  Procedure definition for `capt`
--- ----------------------------
-DROP FUNCTION IF EXISTS `capt`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`%` FUNCTION `capt`(`r` varchar(200),`v` blob) RETURNS text CHARSET utf8mb3
-    NO SQL
-    DETERMINISTIC
-BEGIN
-	
-  SET `r` = preg_replace('/\\s*/','',`r`);
-	IF NOT preg_rlike('/^\\/.*\\/[is]*$/',`r`) THEN
-			SET `r` =CONCAT('/',`r`,'/');
-			IF	NOT preg_rlike('/^\\/.*\\/$/',`r`) THEN 
-					RETURN NULL;
-		END IF;
-	END IF;
-
-	IF NOT preg_check(`r`) THEN RETURN NULL; END IF;
-	RETURN preg_capture(`r`,`v`);
-
-END
-;;
-DELIMITER ;
-
--- ----------------------------
---  Procedure definition for `capture`
--- ----------------------------
-DROP FUNCTION IF EXISTS `capture`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`%` FUNCTION `capture`(`r` varchar(200),`v` blob) RETURNS text CHARSET utf8mb3
-    NO SQL
-    DETERMINISTIC
-BEGIN
-	
-  SET `r` = preg_replace('/\\s*/','',`r`);
-	IF NOT preg_rlike('/^\\/.*\\/[is]*$/',`r`) THEN
-			SET `r` =CONCAT('/',`r`,'/');
-			IF	NOT preg_rlike('/^\\/.*\\/$/',`r`) THEN 
-					RETURN NULL;
-		END IF;
-	END IF;
-
-	IF NOT preg_check(`r`) THEN RETURN NULL; END IF;
-	RETURN preg_capture(`r`,`v`);
 
 END
 ;;
@@ -3043,7 +2820,7 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `changeOrder`(`k` tinytext, `a`  tiny
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 
 	DECLARE y TINYINT DEFAULT 0 ;DECLARE x TINYINT DEFAULT 0;
 	DECLARE r LONGTEXT DEFAULT NULL;DECLARE rs LONGTEXT DEFAULT NULL;
@@ -3107,79 +2884,6 @@ END
 DELIMITER ;
 
 -- ----------------------------
---  Procedure definition for `changeOrder_copy`
--- ----------------------------
-DROP FUNCTION IF EXISTS `changeOrder_copy`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `changeOrder_copy`(`k` tinytext, `a`  tinytext,`b`  tinytext,`av` longtext,`bv` longtext) RETURNS longtext CHARSET utf8mb3
-    NO SQL
-    DETERMINISTIC
-BEGIN
-	
-	DECLARE y TINYINT DEFAULT 0 ;DECLARE x TINYINT DEFAULT 0;
-	DECLARE r LONGTEXT DEFAULT NULL;DECLARE rs LONGTEXT DEFAULT NULL;
-
-
-
-  IF k IS NULL AND  a IS NULL AND b IS NULL OR NOT PREG_RLIKE('/^\\w+(,\\w+)*$/',CONCAT_WS(',',k,a,b))  THEN
-		RETURN a;
-	END IF;
-
-
-	SET av = Fetch_Sub(k,av);RETURN 'ok';
-	IF av IS NULL OR preg_rlike('/^(?<F>\"\\\'\\d\\\',NULL(,NULL)*\")(,\\g<F>)*$/',av) THEN RETURN a;END IF;
-	SET bv = Fetch_Sub(k,bv);
-	IF bv IS NULL OR preg_rlike('/^(?<F>\"\\\'\\d\\\',NULL(,NULL)*\")(,\\g<F>)*$/',bv)THEN RETURN a;END IF;
-
-	y:LOOP
-		SET y = y + 1;
-
-		IF Fetch_Elt(y,a) IS NULL THEN LEAVE y; END IF; 
-		SET	r = Fetch_y(y,bv);
-
-		CASE
-
-
-				WHEN r_com_arr(r,av) IS NOT NULL THEN
-
-					SET r = r_com_arr(r,av),
-							av = preg_replace (CONCAT('/,?\\Q',r,'\\E/'),'',av,1) ,
-							av = IF(LEFT(av,1)=',',SUBSTR(av,2),av),
-							r = preg_capture('/^\"\\\'(\\w+)\\\'/',r,1),
-							a = preg_replace(CONCAT('/(?<=^|,)',r,'+(?=$|,)/'),'0',a,1),
-							x = preg_capture(CONCAT('/(?<=^|,)',r,'+(?=$|,)/'),rs);
-
-					IF	x IS NOT NULL THEN
-							SET x = preg_capture('/(?<=^|0,)[1-9]\\d*(?=$|,)/',a);
-						ELSE SET x ='0';
-					END IF;
-
-					SET	rs = preg_replace(CONCAT('/(?<=^|,)',r,'+(?=$|,)/'),x,rs,1),
-							rs = IF( r IS NULL,rs, CONCAT_WS(',',rs,r));
-
-
-			ELSE 
-		SET  r = preg_capture('/(?<=^|0,)[1-9]\\d*(?=$|,)/',a);
-
-
-				IF r IS NULL THEN LEAVE y; END IF;
-				SET rs = CONCAT_WS(',',rs,r),
-						a = preg_replace(CONCAT('/(?<=^|,)',r,'+(?=$|,)/'),'0',a,1) ;
-
-		END CASE;
-
-	END LOOP y;
-
-	
-	IF LEFT(rs,1) = ',' THEN SET rs = SUBSTR(rs,2); END IF;
-   
-	RETURN rs;
-   
-END
-;;
-DELIMITER ;
-
--- ----------------------------
 --  Procedure definition for `clearj`
 -- ----------------------------
 DROP FUNCTION IF EXISTS `clearj`;
@@ -3187,9 +2891,45 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` FUNCTION `clearj`(`v` blob) RETURNS text CHARSET utf8mb3
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 
 	RETURN preg_replace('/((?>"((?:[^\\\\"]|\\\\.)*)"))|([:,{}])|[\\s]/','$1$3',v) ;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `count`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `count`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `count`(`p` TINYINT) RETURNS tinyint(4)
+    DETERMINISTIC
+BEGIN
+/*
+  SET p  = CASE WHEN p IS NULL THEN 0  
+				     ELSE p 
+						END ;*/
+
+	RETURN p ;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `counts`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `counts`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `counts`(`p` TINYblob) RETURNS tinyblob
+    DETERMINISTIC
+BEGIN
+
+  SET p  = CASE WHEN p IS NULL THEN 0  
+				     ELSE p 
+						END ;
+
+	RETURN p +1 ;
 END
 ;;
 DELIMITER ;
@@ -3201,8 +2941,15 @@ DROP PROCEDURE IF EXISTS `cutmpcourse`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `cutmpcourse`(IN `period` varchar(20))
 BEGIN
+
+/*
+INSERT plogs( Function_Name,summary)
+SELECT 'cutmpcourse',CONCAT_WS(',',QUOTE(`period` ),NULL);
+*/
+
+CALL Error('调用不存在的函数 ');
 set @period = period ,
-	@a = 1;
+	@a := 1;
 	if time(period ) != 0 then 
 		select subdate( now() ,INTERVAL @period  DAY_SECOND) > updatetime into @a from  tmpcourse limit 1;
 
@@ -3262,8 +3009,9 @@ set @period = period ,
 
 					update exp_experimentclass as a
 						set	a.cycle = if(a.cycle <= 0 ,10,a.cycle),
-							a.period =  (UNIX_TIMESTAMP( a.endtime )-UNIX_TIMESTAMP(a.starttime))/a.cycle,
-							updatetime = @a ;
+							a.period =  (UNIX_TIMESTAMP( a.endtime )-UNIX_TIMESTAMP(a.starttime))/a.cycle
+							-- updatetime = @a 
+;
 			
 					update exp_experimentclass as a
 						set a.step = case 	
@@ -3321,6 +3069,22 @@ END
 DELIMITER ;
 
 -- ----------------------------
+--  Procedure definition for `d`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `d`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `d`(`d` varchar(100)) RETURNS decimal(10,2)
+    NO SQL
+    DETERMINISTIC
+BEGIN
+	#Routine body goes here...
+
+	RETURN REGEXP_replace(d,'￥|,','');
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
 --  Procedure definition for `dom2j`
 -- ----------------------------
 DROP FUNCTION IF EXISTS `dom2j`;
@@ -3329,14 +3093,14 @@ CREATE DEFINER=`root`@`%` FUNCTION `dom2j`(`d` mediumblob) RETURNS mediumtext CH
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 	DECLARE `0` VARCHAR(2000) DEFAULT NULL;
 	DECLARE `r` VARCHAR(1000) DEFAULT '^"`[0123]`":["{]';
 
 	IF d REGEXP `r` THEN
 
 		CASE	WHEN `d` REGEXP '^"`[0]`":["{]' THEN
-						SET `0` = CONCAT('"`0`":{',j(`d`,"`0`"),'}');
+						SET `0` = CONCAT('"`0`":{',j0(`d`,"`0`"),'}');
 					WHEN d REGEXP '^"`[1]`":["{]' THEN
 						SET `0` = CONCAT('"`1`":',j2(`d`,"`1`"));
 					WHEN d REGEXP '^"`[2]`":["{]' THEN
@@ -3344,8 +3108,8 @@ BEGIN
 					WHEN d REGEXP '^"`3`":["{]' THEN
 
 						SET `0` = CONCAT(	'"`3`":',j2(`d`,"`3`"));
-
-			ELSE SET `0` = NULL ; 
+-- 															'"`3`":'
+			ELSE SET `0` = NULL ; -- CONCAT('"`0`":{',j0(`d`,"`2`"),'}');
 		END CASE;
 
 		IF `0` IS NOT NULL THEN SET	`d` = REGEXP_REPLACE(`d`,CONCAT('(?:,?(?:"(?&c)":)',r('`json1`'),'\s*)*'),''); END IF;
@@ -3356,9 +3120,9 @@ BEGIN
 
 	SET `d` = f2(REG2('`Dom2kwn`'),`d`);
 
-	IF `0` IS NOT NULL AND IFNULL(j(`0`,'`1`'),'') <> '' THEN
+	IF `0` IS NOT NULL AND IFNULL(j0(`0`,'`1`'),'') <> '' THEN
 
-			SET	d = f2(j(`0`,'`1`'),d);
+			SET	d = f2(j0(`0`,'`1`'),d);
 
 	END IF;
 
@@ -3369,17 +3133,82 @@ BEGIN
 						);
 	SET		`d` = filter1(r('`,`\t'),`d`);
 
-	IF `0` IS NOT NULL AND IFNULL(j(`0`,'`2`'),'') <> '' THEN
-			SET d = f2(j(`0`,'`2`'),`d`);
+	IF `0` IS NOT NULL AND IFNULL(j0(`0`,'`2`'),'') <> '' THEN
+			SET d = f2(j0(`0`,'`2`'),`d`);
 	END IF;
 
-
-	IF `0` IS NOT NULL AND IFNULL(j(`0`,'`3`'),'') <> '' THEN
-
-			SET d = f2(j(`0`,'`3`'),`d`);
+-- RETURN  QUOTE(j0(`0`,'`3`'));
+	IF `0` IS NOT NULL AND IFNULL(j0(`0`,'`3`'),'') <> '' THEN
+-- RETURN QUOTE(j0(`0`,'`3`'));
+			SET d = f2(j0(`0`,'`3`'),`d`);
 	END IF;
 	RETURN `d`;
 
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `e`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `e`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `e`(`p` longblob) RETURNS longblob
+    NO SQL
+    DETERMINISTIC
+BEGIN
+  DECLARE  path TINYTEXT DEFAULT NULL;	DECLARE  rs LONGBLOB DEFAULT NULL;    
+DECLARE  r varchar(100)  DEFAULT '\\b\\w:((?:/+[^/]*+)+)'; 
+DECLARE  r1 varchar(100)  DEFAULT CONCAT_WS('','(?s)^.*?(?=',r,'|$)');
+DECLARE  r2 varchar(100)  DEFAULT CONCAT_WS('','(?s)^.*?(',r,'|$)');
+
+
+	IF IFNULL(p,'') = '' THEN RETURN  p ;END  IF; 
+
+	
+l:LOOp
+
+	IF p NOT REGEXP r OR IFNULL(p,'')='' THEN LEAVE l;  END IF;
+	SET path= REGEXP_substr(p,r);
+	SET path = REGEXP_replace(cast(path  AS CHAR),'(?-U)/+','\\\\');
+-- RETURN path;
+	set	rs = CONCAT_WS('',rs,REGEXP_substr(p,r1),path),
+			p = REGEXP_replace(p,r2,'');
+
+
+END LOOP;
+	SET p= CONCAT_WS('',rs,p);
+
+--  RETURN p;
+	RETURN (SELECT SYS_eval(CONVERT(cast(p AS CHAR )USING gbk)));
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `e0`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `e0`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `e0`(`p` longblob) RETURNS varchar(100) CHARSET utf8mb3
+    NO SQL
+    DETERMINISTIC
+BEGIN
+	#Routine body goes here...
+	DECLARE  rs  LONGBLOB DEFAULT NULL; DECLARE  i  LONGBLOB DEFAULT 0; DECLARE  r TINYTEXT DEFAULT '([\\\'"])(?:(?=\\\\).{2}|(?:(?!\\g1|\\\\).)++)*?\\g1';
+	SET i = REGEXP_inSTR(p,r); 
+
+	IF i >0   THEN
+		SET	rs  := REGEXP_substr(p,r)
+				,p = substr(p,i,i+lenght(rs))
+				,i = REGEXP_inSTR(p,r);
+		IF i>0 THEN
+			SELECT JSON_UNQUOTE(rs) INTO  DUMPFILE 'c:/dsdd.js';-- JSON_UNQUOTE(REGEXP_substr(p,r)) ;
+		END IF;
+					
+	END IF;
+
+	RETURN RS ;
 END
 ;;
 DELIMITER ;
@@ -3393,7 +3222,7 @@ CREATE DEFINER=`root`@`%` FUNCTION `Eltm`(`i` varchar(200),`v` longtext) RETURNS
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 	DECLARE r TINYTEXT DEFAULT '\\s*(?<c>(?:(?:"(?:\\\\.|[^"])*")|(?:\'(?:\\\\.|[^\'])*\')|(?:`[^`]*`)|(?:[^,"\'`]*))*)';
 	DECLARE d VARCHAR(1) DEFAULT ',';
  
@@ -3407,7 +3236,7 @@ BEGIN
 										ELSE RETURN NULL;
 									END CASE;
 								WHEN i REGEXP '(^\\s*-)' THEN 
-									SET i := REGEXP_replace(i,'(^\\s*-)','') ,r = CONCAT('(?s)^(?&c)(,',r,CONCAT(')*?(?=,',i,')')),i=-1;
+									SET i := REGEXP_replace(i,'(^\\s*-)','')/*;SET */ ,r = CONCAT('(?s)^(?&c)(,',r,CONCAT(')*?(?=,',i,')')),i=-1;
 							ELSE	SET r = CONCAT('(?s)^(?&c)(,',r,CONCAT(')*?(?=,',i,')')),i=1;
 						END CASE;
 				WHEN IFNULL(i,0) = 0   THEN RETURN CHAR_LENGTH(REGEXP_replace(v,CONCAT(r,'(,|$)'),'\\2'))+1;
@@ -3416,7 +3245,7 @@ BEGIN
 			ELSE 	SET r = CONCAT('(?s)^\\s*(?&c)\\s*(?:,\\s*(?&c)){',ABS(i)-2,'}\\s*,',r);
    END CASE;
 
-
+-- RETURN  QUOTE(CONCAT(r,'(?:,|$)'));
 	RETURN IF( i>0,REGEXP_substr(v,r),REGEXP_replace(v,CONCAT(r,'(?:,|$)'),''));
 
 END
@@ -3432,7 +3261,7 @@ CREATE DEFINER=`root`@`%` FUNCTION `Eltn`(`k` TINYBLOB,`v` longblob) RETURNS lon
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 	DECLARE i INT(5) DEFAULT NULL;
 	DECLARE `ak` TINYBLOB DEFAULT NULL;
 
@@ -3442,7 +3271,7 @@ BEGIN
 	IF `k` IS NOT NULL  THEN
 			SET i = FIND_IN_SET(`k`,`ak`);
 
-
+-- RETURN i;
 			IF IFNULL(i,0 ) <> 0 THEN
 					SET `v` = column_get(`v`,i AS CHAR);
 				ELSE SET `v` = NULL;
@@ -3456,15 +3285,64 @@ END
 DELIMITER ;
 
 -- ----------------------------
+--  Procedure definition for `env`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `env`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `env`(p LONGBLOB,action blob) RETURNS longblob
+    DETERMINISTIC
+BEGIN
+	DECLARE
+		path,r,id,id1,id2,`mod` TINYTEXT DEFAULT NULL;
+	DECLARE
+		次数 int(5) DEFAULT 0;
+		
+
+	多个动作:WHILE  次数=0  DO
+		SET 次数 = 1;
+		CASE
+				WHEN action  REGEXP  @szy:='^\\s*(?:2|p(?:ath)?|l(?:oad)?)' THEN
+					SET action = NULL; 
+		 ELSE 
+					SET action = NULL; 
+		END case;
+	END while 多个动作;
+
+
+	RETURN p;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
 --  Procedure definition for `Error`
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `Error`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `Error`(IN `m` longtext)
 BEGIN
-	
+	#Routine body goes here...
 
 		SIGNAL SQLSTATE 'HY000' SET MESSAGE_TEXT =  m; 
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `exetime`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `exetime`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `exetime`(`开始时间` BLOB) RETURNS blob
+    NO SQL
+    DETERMINISTIC
+BEGIN
+	#Routine body goes here...
+
+	RETURN CASE 
+					WHEN   IFNULL(开始时间 ,'') = '' THEN sysdate(6)
+					else  (TIMESTAMPDIFF(MICROSECOND,`开始时间`,SYSDATE(6)))/1000000
+				END ;
 END
 ;;
 DELIMITER ;
@@ -3772,11 +3650,664 @@ DELIMITER ;
 -- ----------------------------
 DROP FUNCTION IF EXISTS `f`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` FUNCTION `f`(`k` blob,`t` mediumblob) RETURNS mediumtext CHARSET utf8mb3
+CREATE DEFINER=`root`@`localhost` FUNCTION `f`(`p` LONGBLOB, k text ) RETURNS longblob
+    DETERMINISTIC
+p : BEGIN#Routine body goes here...
+	DECLARE `rs`,`ts`,		`jrs`,	`抓拍`,`trs`  LONGBLOB DEFAULT NULL;
+	DECLARE addr,		`计数器`,		`计数` INT ( 5 ) DEFAULT 0;
+	DECLARE `次数`,		`取队列` INT ( 11 ) DEFAULT NULL;
+	DECLARE `arr`,调试 TEXT DEFAULT NULL;
+	DECLARE `r` TEXT DEFAULT '^\\[?((".+"|[\\d\\-]+)(?:,(?-1))*+)\\]?(?)(.*?)$';
+	DECLARE	i VARCHAR ( 100 ) DEFAULT 0;
+	DECLARE	`t` VARCHAR ( 20 ) DEFAULT NULL;
+	DECLARE	`kword`,tracer   VARCHAR ( 200 ) DEFAULT NULL;
+	DECLARE	`l` INT ( 5 ) DEFAULT 23;
+	DECLARE		`jl` VARCHAR ( 100 ) DEFAULT -1;
+	
+
+	DECLARE callf  CONDITION FOR 666;
+	DECLARE CONTINUE HANDLER FOR callf
+	BEGIN
+	DECLARE fn TINYTEXT DEFAULT NULL;
+	GET DIAGNOSTICS CONDITION 1 fn = MESSAGE_TEXT;
+
+								set trs  = IF(fn = 'f_else',f_else(JSON_ARRAY(p,rs)),f_react(JSON_ARRAY(p,rs)));
+
+								CASE WHEN  json_valid(trs) && JSON_EXTRACT(trs,'$.RETURNED_SQLSTATE') is NOT NULL || JSON_EXISTS(trs,'$.tiaoShi') THEN 
+													SET 调试 = JSON_value(trs,'$.tiaoShi');
+
+													SET @RETURNED_SQLSTATE = CONCAT('f_else',json_value(trs,'$.RETURNED_SQLSTATE')),
+															@MYSQL_ERRNO =  json_value(trs,'$.MYSQL_ERRNO'),
+															@MESSAGE_TEXT = json_value(trs,'$.MESSAGE_TEXT');
+
+													RETURN _s(json_array(@MYSQL_ERRNO,@MESSAGE_TEXT));
+											WHEN   json_valid(trs) && JSON_EXISTS(trs, '$.p') THEN
+
+												 SET p = IF(JSON_EXISTS(trs, '$.p'),json_value(trs,'$.p'),trs),
+														 rs = CAST(IF(JSON_EXISTS(trs, '$.rs'),json_value(trs,'$.rs'),rs) AS CHAR);
+											
+									ELSE  
+
+												SET p = trs, rs ='["f_else","未处理"]';
+												
+								END  case;	
+	SET @状态 =state(@状态,0);
+	
+
+	END;
+	DECLARE CONTINUE HANDLER FOR SQLSTATE '22001',SQLSTATE '23000',		SQLSTATE '42000',		SQLSTATE '42S22',		SQLSTATE 'HY000',SQLSTATE	'22007'
+
+		bl : BEGIN
+			GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE,
+			@errno = MYSQL_ERRNO,
+			@TEXT = MESSAGE_TEXT;
+	
+		SET @`sqlstate` = JSON_OBJECT( 'sqlstate', @`sqlstate`, 'errno', @errno, 'text', @TEXT );
+		RETURN CONCAT_WS( '\n'
+		,CASE WHEN 调试 IS NULL THEN CONCAT(@errno,',',@TEXT)
+		      else 调试 END
+		,CONCAT(@RETURNED_SQLSTATE, @TEXT)
+		,CONCAT(@`sqlstate`)
+		
+	,CONCAT('K=',K), CONCAT('arr=',arr),CONCAT('i=',i), CONCAT( "计数器=",计数器), CONCAT( "计数:",计数), CONCAT( "当前表达式 : ", @当前表达式 ), CONCAT( "抓拍",抓拍) );
+		
+	END bl;
+SET @状态 = state('{"fn":"state"}',0);
+
+	IF k IS NULL ||  k REGEXP'^\\s*$' THEN RETURN p; END IF;
+		SET @f专用 =null;
+		SET @f专用 =  '^\\s*([^,\\s]+)(?:[\\s,]+((?-2)(?:[\\s,]+(?-2))*))?\\s*$';
+
+			IF k NOT REGEXP '["\']'  && k REGEXP @f专用 THEN 
+					-- RETURN 
+					SET k = 	
+								REGEXP_replace(REGEXP_replace(
+									REGEXP_replace(k,@f专用,'{done:[\\1],k:[\\2],t:2}')
+								,'[^\\s,:\\[\\]{}]+','"\\0"') 
+								,'[\\s,]+',' , ')
+								;
+
+			END IF; 
+			
+
+		IF !JSON_VALID(K) THEN
+
+				SET k := REGEXP_replace ( k, o ( '(")?k\\g1(\\s*:\\s*(?&j)),j' ), '"k" \\2}' );
+
+				SET  r := o ( '^\\s*\\{?\\[?((?&v)\\s*)(?:,(?-1))*\\]?(?!:),j' );
+
+				SET  	k = CONCAT(
+					'{"done":',
+					REGEXP_replace (
+						k,
+						r,
+					CONCAT('[',REGEXP_REPLACE(REGEXP_replace(REGEXP_substr(k,R),'\\]$',''),'(?<!")\\b\\w+','"\\0"') ,']')
+					));
+
+			SET  k = REGEXP_REPLACE(K ,'[^}]\\s*$','\\0}');
+
+
+			SET k =			IF				( JSON_EXISTS( k, '$.t' ) = 0, JSON_MERGE( k, JSON_OBJECT( 't', 2 )), k );
+
+
+		END IF;
+
+
+								  SET @RETURNED_SQLSTATE=NULL,
+											@MYSQL_ERRNO = null,
+											@MESSAGE_TEXT = NULL;
+
+	  IF  p = '0'   THEN SET p = IF( IFNULL(json_value(k,'$.done[0]'),'') != '',  s(json_value(k,'$.done[0]'),0),p); END IF;
+
+		IF 		IFNULL( `p`, '' ) REGEXP '(?-m)^\\s*$' THEN	
+
+			RETURN `p`
+		
+		;END IF;
+
+		IF json_valid( k ) THEN
+			
+				SET t = Json_value( k, '$.t' ),
+				kword := JSON_value( k, '$.k[0]' ),
+				kword = 	IF( kword = 'NULL', NULL, kword );
+			
+		END IF;
+
+
+
+		IF
+			json_value( `k`, '$.start' ) IS NOT NULL THEN
+				
+				SET i = json_value( `k`, '$.start' );
+			
+		END IF;
+	  IF !json_valid(k)  THEN SIGNAL  SQLSTATE 'HY000' SET MYSQL_ERRNO =12345 , MESSAGE_TEXT ='K 不是 有效json';END IF;
+		SET `arr` = CAST( JSON_EXTRACT( `k`, '$.done' ) AS CHAR );
+
+		SET 计数器 = 0;
+
+l :LOOP-- 跳出
+
+			
+-- IF k REGEXP '^\\[\\s*\\[?"来自"'  THEN SET rs = k , k = "来自"  ; END IF; 
+
+
+			IF 	`jrs` IS NOT NULL && json_length( `jrs` ) = 0 && json_length( rs ) < 3 THEN 
+					SET i = IF ( jl REGEXP '^[\\d\\-\\.]+$', jl + 1, CONCAT_WS( '', jl, '+1' )), jl =-1, jrs = NULL; 
+			END IF;
+ /* 跳出 屎山代码
+IF rs = '["来自", "react"]' then  RETURN -- i REGEXP '^\\d+$' && i >= l + 1 && jrs IS NULL 
+							   JSON_LENGTH(rs)<3
+									&&(json_value(rs,'$[0]')='来自' || json_length(JSON_EXTRACT(jrs,'$[0]'))<3)
+							;END IF;
+
+*/
+
+
+			CASE 
+			
+			WHEN i REGEXP '^\\d+$' && i >= l + 1 && jrs IS NULL 
+							||   JSON_LENGTH(rs)<3
+							&& (json_value(rs,'$[0]')='来自' || json_length(JSON_EXTRACT(jrs,'$[0]'))<3)
+
+							
+					THEN	LEAVE l;
+			
+
+			WHEN rs IS NOT NULL && json_length( rs ) > 3 && json_value( Rs, '$[2]' ) = 'done' && IFNULL( json_value( Rs, '$[3]' ), '' )!= '' && json_value( Rs, '$[3]' ) REGEXP '^\\w+$' THEN
+
+					SET i = json_value( Rs, '$[3]' ),
+					
+					rs = json_remove( rs, '$[2]', '$[2]' );
+
+
+					IF 	JSON_LENGTH( rs ) > 2 && ( json_value( rs, '$[1]' ) <=> '接' ) = 0 THEN
+							
+							SET jrs = JSON_MERGE(
+								json_array( rs ),
+							IF 	( jrs IS NULL, '[]', jrs ));
+						
+						SET rs = NULL;
+						ELSE 
+							SET rs = json_REMOVE( rs, '$[0]', '$[0]' );
+						
+					END IF;
+					
+					SET 取队列 = 1;
+			
+			WHEN `jrs` IS NULL && arr IS NOT NULL && json_valid( arr ) THEN
+				IF 	JSON_length( arr )> 0 THEN
+						
+						SET i = JSON_VALUE( arr, '$[0]' ),
+						arr = json_REMOVE( arr, '$[0]' );
+					
+					SET 取队列 = 1;
+					ELSE  LEAVE l;
+					
+				END IF;
+				ELSE 
+
+					SET @eee = NULL;
+				
+			END CASE;
+
+
+			CASE
+			
+					WHEN JSON_DEPTH(JSON_EXTRACT(rs ,'$[2]'))>1 THEN	
+							SET jrs = JSON_ARRAY_INSERT(jrs,'$[0][2]',JSON_REMOVE(rs,'$[2]'))
+									,rs = JSON_EXTRACT(rs,'$[2]');
+
+					
+					WHEN 取队列 = 0 && /*`Jl`REGEXP'\\-\\d+' && */`Jl` REGEXP '^\\s*\\-' 	&& ( json_length( `jrs` )> 0 || json_length( rs )< 3 ) THEN
+						IF	json_length( rs )< 3 && json_length( `jrs` )> 0 THEN
+		
+								SET rs = JSON_EXTRACT( jrs, '$[0]' );
+							
+						END IF;
+
+					SET `rs` = JSON_EXTRACT( `jrs`, '$[0]' ),
+					jrs = JSON_REMOVE( jrs, '$[0]' );
+					
+ 					WHEN json_length(rs)<3 && json_length(JSON_EXTRACT(jrs,'$[0]'))>2 THEN 
+						SET rs = JSON_EXTRACT(jrs,'$[0][2]'),
+								jrs = JSON_remove(jrs,'$[0][2]');
+
+						IF rs IS NULL THEN return _s(json_array(666,'rs 不能为空'));END if;
+
+					WHEN `t` = '1' THEN
+					
+					SET `ts` = r4b1 (
+						json_array(
+							i,
+						JSON_EXTRACT( `k`, '$.k[*]' )));
+					
+					WHEN 取队列 = 1 THEN
+
+					CASE
+							
+							WHEN `t` REGEXP '^(?:react|2)$' THEN
+
+							SET `Ts` = r4b2 (
+								json_array(
+									i,
+								JSON_EXTRACT( `k`, '$.k[*]' )));
+
+						WHEN `t` = '3' THEN
+						
+						SET `ts` = r4b3 (
+							json_array(
+								i,
+							JSON_EXTRACT( `k`, '$.k[*]' )));
+						
+						WHEN `t` = '4' THEN
+						
+						SET `ts` = r4b_json (
+							json_array(
+								i,
+							JSON_EXTRACT( `k`, '$.k[*]' )));
+						
+						WHEN `t` IN ( 'r4b_time', '`r4b_time`' ) THEN
+						
+						SET `ts` = r4b_time (
+							json_array(
+								i,
+							JSON_EXTRACT( `k`, '$.k[*]' )));
+						
+						WHEN `t` = 'r4b_time0' THEN
+						
+						SET `ts` = r4b_time0 (
+							json_array(
+								i,
+							JSON_EXTRACT( `k`, '$.k[*]' )));
+						ELSE 
+							SET `ts` = r4b (
+								json_array(
+									i,
+								JSON_EXTRACT( `k`, '$.k[*]' )));
+						
+					END CASE;
+					
+					WHEN json_value(k,'$[0]') = '来自' THEN
+					SET rs = k;
+
+					ELSE  -- RETURN 	"CONCAT_WS( '____', rs, jrs )"
+
+							RETURN CONCAT_WS( '\n', 'something wrong', 抓拍 );
+					
+				END CASE;
+
+				SET rs = JSON_MERGE_PRESERVE (
+					IFNULL( ts, '[]' ),
+				IFNULL( rs, '[]' ));
+
+
+				SET 取队列 = 0,
+				`ts` = NULL;
+				CASE
+						
+						WHEN IFNULL( `rs`, '' )= '' THEN
+						
+						SET i =
+					IF
+						( i REGEXP '^\\d+$', i - 1, i );
+					LEAVE l;
+					ELSE 队列 :
+					WHILE
+							json_length( `rs` )> 2 && JSON_DEPTH(
+							JSON_EXTRACT( `rs`, '$[2]' )) > 1 DO
+							
+							SET jrs = JSON_MERGE(
+								json_array(
+								JSON_REMOVE( rs, '$[2]' )),
+							IF
+							( jrs IS NULL, '[]', jrs )),
+							rs = JSON_EXTRACT( rs, '$[2]' );
+						
+					END WHILE 队列;
+
+					SET jl = i;
+					
+				END CASE;
+
+
+
+				SET 抓拍 = CONCAT_WS(
+					'\n',抓拍,
+					CONCAT_ws(
+						' : ',计数器,
+					CONCAT_WS( '____', rs, jrs ))),计数器 = 计数器 + 1;
+					
+
+SET @状态 = state(@状态,0);
+
+-- 队列开始
+				CASE
+						WHEN k IS NULL THEN  RETURN 'k';
+						WHEN JSON_LENGTH( rs ) = 2 && JSON_EXTRACT(rs,'$[1]' )  NOT REGEXP '"\\Q(?#抓取\\E' THEN
+
+						ITERATE l;
+					
+					WHEN json_extract( rs, '$[0]' ) IN ( '"-1"', '"跳"' ) THEN
+					
+					SET @i = NULL;
+					
+					WHEN IFNULL( json_value( Rs, '$[2]' ), '' )!= '' && json_value( Rs, '$[2]' ) = 'done' && IFNULL( json_value( Rs, '$[3]' ), '' )!= '' && json_value( Rs, '$[3]' ) REGEXP '^\\w+$' THEN
+					ITERATE l;
+					
+					WHEN json_extract( rs, '$[0]' ) = '-3' THEN
+					RETURN 'p';
+					
+WHEN json_value( `rs`, '$[1]' ) REGEXP '(?i)^(react|多多|c$)' &&( json_length( rs )> 4  || json_extract(rs,'$[2]') REGEXP  '\\Q(?#抓取\\E[^)]*?\\)\\s*\\S+' )THEN
+
+-- ----------------------------------------------------------------------------------------------
+SET @auusd8dsuusd8ds := _s(json_array(666,'f_react'));
+-- -------------------------------------------------------------------------------------------------
+
+
+WHEN json_value( `rs`, '$[1]' ) REGEXP '^多(?!多)' THEN
+					BEGIN
+						DECLARE
+							`trs` LONGBLOB DEFAULT NULL;
+						DECLARE
+							`tr` LONGTEXT DEFAULT NULL;
+						IF
+							p REGEXP CONVERT ( json_value( `rs`, '$[2]' ) USING gbk ) 
+							AND p NOT REGEXP CONVERT ( CONCAT_WS( '', '(?ims)(', json_value( `rs`, '$[2]' ), ').*?(?1)' ) USING gbk ) THEN
+								
+								SET `trs` = REGEXP_replace (
+									p,
+									json_value( `rs`, '$[2]' ),
+								json_value( `rs`, '$[3]' )),
+								`rs` = json_remove( rs, '$[0]', '$[0]', '$[1]' );
+							l1 :
+							LOOP
+								IF
+									json_length( `rs` ) <= 1 THEN
+										LEAVE l1;
+									
+								END IF;
+								IF
+									JSON_VALID(
+									JSON_EXTRACT( `rs`, '$[1]' )) 
+									AND JSON_EXTRACT( `rs`, '$[1]' ) REGEXP '^\\[' THEN
+										
+										SET @ddr = CONVERT ( JSON_value( `rs`, '$[1][0]' ) USING gbk ),
+										@ddre = CONVERT ( JSON_value( `rs`, '$[1][1]' ) USING gbk ),
+										`rs` = json_remove( rs, '$[1]' );
+									ELSE 
+										SET @ddr = CONVERT ( JSON_value( `rs`, '$[1]' ) USING gbk ),
+										@ddre = CONVERT ( JSON_value( `rs`, '$[2]' ) USING gbk ),
+										`rs` = json_remove( rs, '$[1]', '$[1]' );
+									
+								END IF;
+								IF
+									`trs` REGEXP @ddr THEN
+										
+										SET `trs` = REGEXP_replace ( `trs`, @ddr, @ddre );
+									
+								END IF;
+								
+							END LOOP;
+							
+							SET p = REGEXP_replace ( p, CONVERT ( json_value( `rs`, '$[0]' ) USING gbk ), `trs` );
+							
+						END IF;
+						
+					END;
+					
+					WHEN json_value( `rs`, '$[1]' )REGEXP '^抓循' THEN
+					BEGIN
+						DECLARE
+							`trs` LONGBLOB DEFAULT NULL;
+						DECLARE
+							`tr` LONGTEXT DEFAULT NULL;
+						IF
+							p REGEXP CONVERT ( json_value( `rs`, '$[2]' ) USING gbk ) THEN
+								
+								SET `trs` = REGEXP_substr (
+									p,
+								json_value( `rs`, '$[2]' )),
+								`rs` = json_remove( rs, '$[0]', '$[0]' );
+							l1 :
+							LOOP
+								IF
+									json_length( `rs` ) = 1 THEN
+										LEAVE l1;
+									
+								END IF;
+								IF
+									`trs` REGEXP CONVERT ( json_value( `rs`, '$[1]' ) USING gbk ) THEN
+										
+										SET `trs` = REGEXP_replace (
+											`trs`,
+											CONVERT ( json_value( `rs`, '$[1]' ) USING gbk ),
+										CONVERT ( json_value( `rs`, '$[2]' ) USING gbk ));
+									ELSE LEAVE l1;
+									
+								END IF;
+								
+							END LOOP;
+							
+							SET p = REGEXP_replace ( p, CONVERT ( json_value( `rs`, '$[0]' ) USING gbk ), `trs` );
+							
+						END IF;
+						
+					END;
+
+					ELSE 
+
+--  重要的----------------------------------------------
+
+SET @auusd8dsuusd8ds := _s(json_array(666,'f_else'));
+-- --------------------------------------------
+
+		END CASE;
+
+							IF IFNULL( p, '' ) = '' THEN RETURN NULL;END IF;
+	
+							SET i =IF(
+									i REGEXP '^[\\d\\-\\.]+$',
+									i + 1,
+								CONCAT_WS( '', i, '+1' ));
+
+
+
+	END LOOP l;
+  SET @状态 =  CONCAT_WS('\n状态1\n',state(@状态,-1),@状态1);
+
+ -- RETURN @状态1;
+	RETURN CASE WHEN  p = 'null' THEN NULL 
+	ELSE p END;
+			
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `f0`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `f0`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `f0`(`k` blob,`t` longblob) RETURNS longblob
+    NO SQL
+    DETERMINISTIC
+BEGIN
+	#Routine body goes here...
+
+  IF NOT json_valid(k) THEN
+		RETURN filter(`k`,`t`);
+	END IF;
+
+	BEGIN DECLARE i INT(5) DEFAULT 0;	DECLARE kp BLOB DEFAULT NULL;	DECLARE k0 BLOB DEFAULT NULL;	DECLARE k1 BLOB DEFAULT NULL;	DECLARE k2 VARCHAR(1000) DEFAULT NULL;
+	loop1:LOOP
+
+		SET kp = json_query(k,CONCAT('$[',i,']'));
+
+		IF kp IS NULL THEN LEAVE loop1;END IF;
+
+
+			SET	k2 = json_value(kp,CONCAT('$[',2,']')),
+					k1 = json_value(kp,CONCAT('$[',1,']'));
+			set	k0 = json_value(kp,CONCAT('$[',0,']'));
+
+SET kp = REGEXP_replace(REGEXP_replace(kp,'(?<=\\Q(?:\\E)KEYS',REGEXP_replace(QUOTE(k1),"^'|'$",'')),'SUBROUTING',REGEXP_replace(QUOTE(k2),"^'|'$",''));
+
+			IF k1 IS NULL THEN SET k1 = ''; END IF;
+			
+			IF IFNULL(k0,'') != ''  THEN 
+
+
+				CASE		WHEN k0 REGEXP '^\\s*(?:three|3)' AND IFNULL(k1,'') <> '' AND IFNULL(k2,'') <> ''THEN 
+
+
+	BEGIN DECLARE result	longblob DEFAULT NULL; DECLARE ops LONGTEXT DEFAULT NULL; DECLARE op LONGBLOB DEFAULT NULL;
+-- 	DECLARE r0 BLOB DEFAULT json_value(k,CONCAT('$[',i,'][',2,']');
+	DECLARE r1 BLOB DEFAULT json_value(kp,CONCAT('$[',3,']'));
+	DECLARE r2 text DEFAULT json_value(kp,CONCAT('$[',4,']'));
+	DECLARE r3 text DEFAULT json_value(kp,CONCAT('$[',5,']'));	
+	DECLARE r4 text DEFAULT json_value(kp,CONCAT('$[',6,']'));	
+	DECLARE rp BLOB DEFAULT json_value(kp,CONCAT('$[',6,']'));	
+
+	SET r2 = CONCAT_WS('','(?isx)^.*?',r2),
+			r1 = CONCAT_WS('','(?isx)^.*?',r1);
+
+				loop11:LOOP
+
+
+					SET result = CONCAT_WS('',result,REGEXP_subStr(T,r1)),
+							t = REGEXP_replace(t,r1,'');
+
+					IF t = '' THEN LEAVE loop11;END IF;
+
+					IF t NOT REGEXP r2 THEN LEAVE loop11; END IF;
+
+					SET ops = REGEXP_substr(t,r2),
+							t = REGEXP_replace(t,CONCAT('^',r2),'');
+					IF ops = '' THEN LEAVE loop11;END IF;
+SET @i = 0 ;
+					LOOP111:LOOP
+
+							SET		op	=  	REGEXP_SUBSTR(ops,r3),
+										ops	=		REGEXP_replace(ops,r3,'');
+RETURN op	;
+							IF IFNULL(op,'') = ''  THEN LEAVE LOOP111; END IF;
+
+							LOOP112:LOOP
+										
+										RETURN op	;
+
+							END LOOP;
+						
+
+							SET result = CONCAT_WS('',result,REGEXP_replace(CAST(ops AS CHAR),CAST(r3 AS CHAR),CAST(rp AS CHAR)));
+
+					END LOOP;
+							
+			
+				
+				END LOOP;SET t=   CONCAT_WS('',result ,t);
+	END;	
+
+							WHEN k0 = 'two' AND IFNULL(k1,'') <> '' AND IFNULL(k2,'') <> ''THEN 
+	SET k2 = REGEXP_replace(QUOTE(k2),"^'|'$",'');
+	BEGIN DECLARE result	longblob DEFAULT NULL; DECLARE ops LONGBLOB DEFAULT NULL;
+	DECLARE r1 BLOB DEFAULT json_value(k,CONCAT('$[',i,'][',3,']'));
+	DECLARE r2 BLOB DEFAULT json_value(k,CONCAT('$[',i,'][',4,']'));
+	DECLARE r3 BLOB DEFAULT json_value(k,CONCAT('$[',i,'][',5,']'));	
+	DECLARE rp BLOB DEFAULT json_value(k,CONCAT('$[',i,'][',6,']'));	
+
+				loop2:LOOP
+
+
+					SET result = CONCAT_WS('',result,REGEXP_subStr(T,r1)),
+							t = REGEXP_replace(t,CONCAT('^',r1),'');
+
+					IF t = '' THEN LEAVE loop2;END IF;
+
+					SET ops = REGEXP_substr(t,r2),
+							t = REGEXP_replace(t,CONCAT('^',r2),'');
+
+					IF ops = '' THEN LEAVE loop2;END IF;
+
+					SET result = CONCAT_WS('',result,REGEXP_replace(CAST(ops AS CHAR),CAST(r3 AS CHAR),CAST(rp AS CHAR)));
+							
+			
+				
+				END LOOP;SET t=   CONCAT_WS('',result ,t);
+	END;
+						WHEN IFNULL(k1,'') != '' AND   k1 REGEXP 'cap' THEN  
+							
+								SET @tempt = NULL,
+										@tempt =	REGEXP_SUBSTR(t,k0);
+								IF IFNULL(@tempt,'') ='' THEN 
+										IF k0 = r('body') THEN
+											 SET t = t;
+											ELSE RETURN t;
+										END IF;
+									ELSE SET t = @tempt; 
+								END IF;
+								
+								
+-- IF i=1 THEN  RETURN k1; END IF;
+						WHEN k0 REGEXP '^\\s*(?:\\--|\\{2})\s' THEN
+							SET i = i+1;
+							ITERATE loop1;
+						WHEN k0 REGEXP '^cj' THEN
+							CASE 
+									WHEN k0 = 'cjg' THEN
+										SET t = COLUMN_get(t,k1 AS CHAR);
+								ELSE SET t = NULL;
+							END CASE;
+						WHEN k0 = 'j' THEN
+							IF k1 IS NOT NULL THEN
+
+								SET t = j(t,k1);
+							END IF;
+						WHEN k0 = 'dom2j' THEN
+							SET t = dom2j(t);
+						WHEN k0 = 'j2v' THEN
+							SET t = j2v(t);
+						WHEN k0 ='replace' AND IFNULL(CONCAT(k1,k2),'') <> '' THEN
+							SET t = REPLACE(t,k1,k2);
+						WHEN k0 = 'j1n' THEN
+							SET t = j1n(t);
+						WHEN k0 = 'b2jr' THEN 
+
+							SET t = b2jr(t);
+						WHEN k0 = 'b2j' THEN
+							SET t = b2j(t);
+						WHEN k0 REGEXP '(?i)(repl)ace\\s*,\\s*sub(str)?' AND CONCAT(k1,k2) IS NOT NULL  THEN
+
+						SET t = REGEXP_replace(t,k2,REGEXP_substr(t,k1)) ;
+
+					ELSE 	
+
+ SET t = REGEXP_REPLACE(t,k0,k1);
+
+				END CASE;
+			END IF;
+
+
+		SET i = i+1;
+		ITERATE loop1;
+	END loop;END;
+
+	RETURN t;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `f1`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `f1`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` FUNCTION `f1`(`k` blob,`t` mediumblob) RETURNS mediumtext CHARSET utf8mb3
     READS SQL DATA
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
   
 	RETURN filter(`k`,`t`);
 END
@@ -3792,9 +4323,328 @@ CREATE DEFINER=`root`@`%` FUNCTION `f2`(`k` blob,`t` mediumblob) RETURNS mediumt
     READS SQL DATA
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
   
 	RETURN filter2(`k`,`t`);
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `f4b`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `f4b`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `f4b`(`p` longblob,k blob) RETURNS longblob
+    DETERMINISTIC
+p:BEGIN
+	#Routine body goes here...
+	DECLARE `rs` LONGTEXT DEFAULT NULL;DECLARE `jrs` LONGTEXT DEFAULT NULL;
+	DECLARE `arr` TEXT DEFAULT NULL;
+	DECLARE i INT(5) DEFAULT 0;
+	DECLARE `l` INT(5) DEFAULT 20;
+	DECLARE `jl` INT(5) DEFAULT -1;	
+	
+	DECLARE `t` VARCHAR(20) DEFAULT NULL;DECLARE `kword` varchar(200) DEFAULT NULL;DECLARE addr  INT(5) DEFAULT 0;
+	
+/*
+	DECLARE CONTINUE HANDLER FOR  SQLSTATE '21S01', SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22' ,SQLSTATE '21000', SQLSTATE	'HY000'-- ,SQLSTATE	'22007'
+	bl:BEGIN GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;SET  @`sqlstate` = JSON_OBJECT('sqlstate',@`sqlstate`,'errno',@errno,'text',CONCAT(i,@text));
+
+				SET @`errsql` = p,@funcid =  NULL;
+				SET @funcid = CONCAT_WS(' ','Error: ',(SELECT CONCAT_WS(', ',a.note,CONCAT_WS('',UPPER(SUBSTR(a.`name`,1,1)),LOWER(substr(a.`name`,2))),a.id) FROM mysq1_schema.qs AS a WHERE a.`name` = `funcid`)
+									, ' 执行' ),
+				@pp = QUOTE(p);
+				CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp,'SQL',@`errsql`,'err',@`sqlstate`,'l',1,"继续执行",'0'));END;
+
+
+START TRANSACTION;
+SET @funcid = CONCAT_WS(' ',(SELECT CONCAT_WS(', ',a.note,CONCAT_WS('',UPPER(SUBSTR(a.`name`,1,1)),LOWER(substr(a.`name`,2))),a.id) FROM mysq1_schema.qs AS a WHERE a.`name` = `funcid`)
+							, ' 执行' ),
+		@pp = QUOTE(`p`);
+
+CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp));COMMIT;*/
+	IF IFNULL(`p`,'') = '' THEN RETURN NULL;END IF; 
+
+	IF json_valid(k) THEN 
+
+		SET t = Json_value(k,'$.t')
+       ,kword = JSON_value(k,'$.k[0]');
+	end IF ;
+
+
+IF  json_value(`k`,'$.start') is NOT NULL THEN SET i =  json_value(`k`,'$.start') ; END IF;
+ SET `arr` = JSON_EXTRACT(`k`,'$.done') ; 
+
+
+
+  l:LOOP
+
+		IF `jrs`is NOT NULL  AND json_length(`jrs`) = 0 THEN SET i= jl+1,jl=-1,jrs = NULL;END if; 
+
+		IF i>=l+1 AND jrs IS NULL THEN LEAVE l;END if;
+		
+		IF `jrs`is  NULL AND   arr IS NOT NULL  AND json_valid(arr) THEN 
+			IF JSON_length(arr)>0 THEN 
+				SET i = JSON_VALUE(arr , '$[0]'),arr = json_REMOVE(arr,'$[0]');
+				ELSE LEAVE l;
+			END IF;
+		END IF;
+
+
+	
+		CASE 	
+		
+					WHEN `Jl` >-1 AND json_length(`jrs`)>0  THEN 
+						SET `rs` = JSON_EXTRACT(`jrs`,'$[0]'),jrs=JSON_REMOVE(jrs,'$[0]');
+
+					WHEN `t` = 1 then SET `rs` =   r4b1(json_array(i,JSON_EXTRACT(`k`,'$.k[*]')));
+					WHEN `t` REGEXP '^(?:react|2)$' then SET `rs` =   r4b2(json_array(i,JSON_EXTRACT(`k`,'$.k[*]')));
+					WHEN `t` = 3 then SET `rs` =   r4b3(json_array(i,JSON_EXTRACT(`k`,'$.k[*]')));
+					WHEN `t` = 4 then SET `rs` =   r4b_json(json_array(i,JSON_EXTRACT(`k`,'$.k[*]')));
+					
+			 ELSE SET `rs` =  r4b(json_array(i,json_value(`k`,'$[0]')));
+		END case ;
+
+
+
+		IF IFNULL(`rs`,'')='' THEN SET i = i-1;LEAVE l;END IF;
+
+		IF json_length(`rs`)>0 AND JSON_DEPTH(`rs`)=3 AND jl = -1  THEN 
+
+				SET jl= i,jrs=JSON_REMOVE(rs,'$[0]'),`rs` = JSON_EXTRACT(`rs`,'$[0]');
+
+		END if;
+
+		IF json_value(`rs`,'$[2]') = '' THEN RETURN i;END IF;
+
+
+		CASE 
+		WHEN json_extract( rs,'$[0]') IN('"-1"','"跳"') THEN SET @i = null; 
+		WHEN json_extract( rs,'$[0]') = '-3' THEN RETURN 'p'; 
+		WHEN CONVERT(json_value(`rs`,'$[1]')USING gbk) REGEXP '(?i)^(react|多多|c$)'   THEN BEGIN DECLARE `brs`  LONGBLOB DEFAULT NULL;DECLARE `res`  LONGBLOB DEFAULT NULL;DECLARE `trs`  LONGBLOB DEFAULT NULL;DECLARE `tr` LONGTEXT DEFAULT NULL;
+
+
+					SET @rr0 := CONVERT(json_value(`rs`,'$[2]')using gbk),`res`= NULL;
+
+					l0:LOOP
+
+							SET addr =  REGEXP_instr(p,@rr0);		
+
+							IF addr <= 0 OR IFNULL(p,'') = '' THEN LEAVE l0;END IF;
+
+							SET `res` := CONCAT_WS('',`res`,substr(p,1,addr-1)),`brs`=json_remove(rs,'$[0]','$[0]')
+									,`trs` = REGEXP_substr(p,@rr0);
+							-- 移除头
+
+
+							SET p = SUBSTR(p,addr+LENGTH(trs));
+							-- 处理
+
+
+							BEGIN
+
+								l2:LOOP
+
+												IF json_length(`brs`)<=1 THEN LEAVE l2;END if;
+
+												SET  @rr1 :=CAST(json_value(`brs`,'$[1]') AS CHAR),@rr1s :=CAST(json_value(`brs`,'$[2]') AS CHAR)
+
+														,@`res`=NULL,`brs`  = JSON_REMOVE(`brs`,'$[1]','$[1]');	
+/**/
+
+												IF  CAST(`trs` AS CHAR) NOT REGEXP  @rr1 THEN ITERATE l2;END IF;
+
+									l3:loop   
+SET @i = 1;
+												l4:LOOP 
+
+
+														SET addr = REGEXP_instr(cast(`trs`AS CHAR),@rr1);
+
+
+
+														IF IFNULL(addr,0) <1 THEN LEAVE l4;END IF;
+														SET @`res` := CONCAT_WS('',@`res`,substr(cast(`trs`AS CHAR),1,addr-1));
+														-- 处
+
+														set tr = REGEXP_substr(CAST(`trs` AS char),@rr1);
+
+
+														SET trs = substr(CAST(`trs` AS char),addr+char_length(tr)) ;
+
+														CASE 
+																 WHEN  @rr1s REGEXP '(?i)`json(:\\w+)?`' THEN 
+
+																	IF IFNULL(@rr1s,'')!='' AND NOT json_valid(@rr1s) THEN
+
+																		SET @rr11 = REGEXP_replace(REGEXP_replace(tr,@rr1,'\\1'),'^:','') ;
+
+																		IF @rr11 ='' THEN SET @rr11 = REGEXP_substr(@rr1s,'(?i)`json:\\K\\w+\\b');
+																		END if;
+
+																		SET @rr11 = json_extract(k,CONCAT('$.p.',@rr11));
+																	END IF; 
+
+																-- 	,',\\s?(?=[\"}])','\r\n')"
+	
+																	SET  @rr11 := REGEXP_replace(REGEXP_replace(REGEXP_replace(@rr11,'^\\{|\\}','')
+																										,',\\s?(?=["}])','\r\n')
+																										,'"((?:(?=\\\\).{2}|(?:(?=[^\\\\"]).))*?)"','\\1')
+																			,@rr11 := REGEXP_replace(@rr1s,'(?i)`json:(\\w+)`',@rr11) ;
+																			
+
+																	
+															ELSE
+																SET @rr11 = @rr1s;
+														END CASE;
+
+
+												
+													SET tr = REGEXP_replace(tr,REGEXP_replace(@rr1 , '\\Q(?<=\\E[^)]+?\\)|\\Q(?=\\E[^)]+?\\)','') ,@rr11);
+
+												CASE 
+															 WHEN  @rr1 REGEXP '(?i)\\Q(?#UPPER)\\E' THEN 
+
+																set tr = UPPER(tr);
+																														
+															 WHEN  @rr1s REGEXP '(?i)`载入:(.*?)`' THEN 
+																	
+																			SET @rr11 := REGEXP_substr(tr,'(?i)`载入:\\K(.*?)(?=`)');
+
+																			SET @rr11s := LOAD_FILE(@rr11),@rr11 = IF (@rr11s IS NULL ,CONCAT_WS(' ','无法载入',@rr11), @rr11s);
+
+																			SET tr =  REGEXP_replace(tr,'(?i)`载入:.+?`',@rr11); 
+															ELSE SET tr = tr ; 
+												END CASE;
+														-- 放回
+if @rr1 = '(?is)<link[^>]+?(css/bill/(?:[^/"\\\']+/)*+[\\w\\.]+)\\b[^>]*?>e' AND @i = 1 THEN RETURN
+tr
+;END IF;
+
+														SET  @`res` = CONCAT_WS('',@`res`,tr);
+																-- @`@rss` = json_remove(@`@rss`,'$[1]','$[1]'); 
+
+
+
+SET @i =@i+1;
+												END loop;
+
+											SET `trs` = CAST(CONCAT_WS('',@`res`,trs) AS CHAR),@`res`=NULL;
+
+											IF  IF(json_value(rs,'$[0]')='l3', `trs` NOT REGEXP  @rr1 ,1) THEN 	leave l3;END IF;
+
+
+									END loop l3;
+							END loop;
+
+							END;
+
+							-- 放回
+
+							SET `res` = CONCAT_WS('',`res`,trs);
+			
+					END loop;
+
+				SET p = CONCAT_WS('',`res`,p);
+				
+
+				-- SET i =i +1;ITERATE l;
+
+		END;
+
+	
+		 WHEN CONVERT(json_value(`rs`,'$[1]')USING gbk) REGEXP '^多(?!多)'   THEN
+					BEGIN DECLARE `trs`  LONGBLOB DEFAULT NULL;DECLARE `tr` LONGTEXT DEFAULT NULL;
+
+
+
+
+				IF p REGEXP  CONVERT(json_value(`rs`,'$[2]')using gbk) AND p NOT REGEXP CONVERT(CONCAT_WS('','(?ims)(',json_value(`rs`,'$[2]'),').*?(?1)')USING gbk)  THEN 
+
+
+					SET `trs` = REGEXP_replace(p ,json_value(`rs`,'$[2]'),json_value(`rs`,'$[3]')) ,`rs` = json_remove(rs,'$[0]','$[0]','$[1]'); 
+
+					l1:LOOP
+
+						IF json_length(`rs`) <= 1 THEN LEAVE l1;END IF;
+
+					if JSON_VALID(JSON_EXTRACT(`rs`,'$[1]')) AND JSON_EXTRACT(`rs`,'$[1]') REGEXP '^\\[' THEN
+							SET @ddr =  CONVERT(JSON_value(`rs`,'$[1][0]')using gbk),@ddre = CONVERT(JSON_value(`rs`,'$[1][1]')using gbk),`rs` = json_remove(rs,'$[1]');
+					 ELSE SET @ddr = CONVERT(JSON_value(`rs`,'$[1]')using gbk),@ddre = CONVERT(JSON_value(`rs`,'$[2]')using gbk),`rs` = json_remove(rs,'$[1]','$[1]');
+					END if;
+
+						IF `trs` REGEXP @ddr THEN 
+
+							SET `trs` = REGEXP_replace(`trs`,@ddr,@ddre) ;
+						END IF;
+
+
+					END loop;
+
+					SET p = REGEXP_replace(p ,CONVERT(json_value(`rs`,'$[0]') USING gbk),`trs`);
+				END IF;
+
+				-- SET i =i +1;ITERATE l;
+
+		END;
+
+		WHEN CONVERT(json_value(`rs`,'$[1]')USING gbk) REGEXP '^抓(?!取)'   THEN BEGIN DECLARE `trs`  LONGBLOB DEFAULT NULL;DECLARE `tr` LONGTEXT DEFAULT NULL;
+
+				IF p REGEXP  CONVERT(json_value(`rs`,'$[2]')using gbk) AND p NOT REGEXP CONVERT(CONCAT_WS('','(?ims)(',json_value(`rs`,'$[2]'),').*?(?1)')USING gbk)  THEN 
+
+ 
+					SET `trs` = REGEXP_substr(p ,json_value(`rs`,'$[2]')) ,`rs` = json_remove(rs,'$[0]','$[0]');
+
+					l1:LOOP
+						IF json_length(`rs`) = 1 THEN LEAVE l1;END IF;
+
+						IF `trs` REGEXP CONVERT(json_value(`rs`,'$[1]')using gbk) THEN 
+
+							SET `trs` = REGEXP_replace(`trs`,CONVERT(json_value(`rs`,'$[1]')using gbk),CONVERT(json_value(`rs`,'$[2]')using gbk)) ;
+						END IF;
+
+						SET `rs` = json_remove(rs,'$[1]','$[1]');	
+
+					END loop;
+
+					SET p = REGEXP_replace(p ,CONVERT(json_value(`rs`,'$[0]') USING gbk),`trs`);
+				END IF;
+
+		END;
+		
+
+		WHEN CONVERT(json_value(`rs`,'$[1]')USING gbk) REGEXP '^抓取' THEN
+			
+			SET p= REGEXP_replace(p
+									,CONCAT_WS('','(?sm)^.*?(',CONVERT(json_value(`rs`,'$[2]')using gbk),').*?(?=(?1)|(?-m)$)')
+									,'\\1'
+								);
+
+		 ELSE 
+
+		  lend:LOOP 
+
+					IF JSON_LENGTH(`rs`)<3 THEN LEAVE lend; end if;
+
+					SET @rr1 := CONVERT(json_value(`rs`,'$[2]')using gbk),@rr1s := cast(json_value(`rs`,'$[3]')AS CHAR)
+					     ,p = REGEXP_replace(p,@rr1,@rr1s)
+					 ,rs = JSON_REMOVE(rs,'$[2]','$[2]')
+							;
+
+			END LOOP ;
+
+		END case;
+
+		IF p IS NULL OR  p = ''THEN RETURN json_array(i,json_value(`rs`,'$[2]'),json_value(`rs`,'$[3]'));END IF;
+		SET  i = i+1;
+
+	END LOOP;
+
+
+RETURN p;
+	RETURN  REGEXP_replace( p ,'<!DOCTYPE[^>]+>',CONCAT_WS('','\\0\n<!--',i,'-->'));
+
 END
 ;;
 DELIMITER ;
@@ -3808,7 +4658,7 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `Fetch`(`x` int(5),`y` int(5),`v` lon
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
    IF NOT IFNULL(x,0) > 0 THEN
 			RETURN NULL;
    END IF;
@@ -3842,7 +4692,7 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `Fetch_Elt`(`i` int(5),`v` longtext) 
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 	DECLARE r LONGTEXT DEFAULT '\\s*\\K(?<c>(?:(?:"(?:\\\\.|[^"])*")|(?:\'(?:\\\\.|[^\'])*\')|(?:`[^`]*`)|(?:[^,"\'`]*))*)';
 
    CASE 
@@ -3868,7 +4718,7 @@ CREATE DEFINER=`root`@`%` FUNCTION `Fetch_Set`(`fieldsValue` varchar(2000),`num`
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 
 	DECLARE i INT(5) ;
 	DECLARE i1 INT(5);
@@ -3919,12 +4769,16 @@ BEGIN
 						SET i = i+1;
 
 		END CASE;
+/*
+		set i = i+1;
 
+		IF i = 999 then LEAVE label1;END IF;
+*/
 	END LOOP label1 ;
 
 	RETURN @word;
-
-
+-- CONCAT(@word,'_',w,'_',i,'_',i1);
+-- concat(IFNULL(@word,'null'),'_',i,'_',fieldsvalue,'_',w) ;
 END
 ;;
 DELIMITER ;
@@ -3936,7 +4790,7 @@ DROP PROCEDURE IF EXISTS `Fetch_Set_P`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `Fetch_Set_P`(in `vstring` longtext,IN `x` int(3),IN `y` int(3))
 BEGIN
-	
+	#Routine body goes here...
 	 DECLARE EXIT  HANDLER FOR  SQLSTATE '42S22'  SET @reuslt =null; 
    DECLARE EXIT  HANDLER FOR SQLSTATE '42000' set @reulst =null;
 
@@ -3962,7 +4816,7 @@ BEGIN
 	 END LOOP ;
 
 	 DEALLOCATE PREPARE stmt;
- 
+ -- 
 
 END
 ;;
@@ -3975,10 +4829,10 @@ DROP PROCEDURE IF EXISTS `Fetch_Set_P0`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `Fetch_Set_P0`(in `vstring` longtext,IN `x` int(3),out `results_` longtext)
 p0:BEGIN
-	
+	#Routine body goes here...
 	 DECLARE EXIT  HANDLER FOR  SQLSTATE '42S22' SET results_ =null; 
  	 DECLARE EXIT  HANDLER FOR  SQLSTATE '42000' SET results_ =null; 
-
+-- SELECT vstring NOT REGEXP  '^[[:alnum:]]{1,}(,[[:alnum:]]{1,}){0,}$' ; LEAVE p0;
 		CASE 
       WHEN  x IS  NULL THEN  
 				LEAVE p0;
@@ -4003,7 +4857,7 @@ p0:BEGIN
 	 END LOOP ;
 	 DEALLOCATE PREPARE stmt;
 	SET results_ = @results; 
-
+--   SELECT @results;
 END
 ;;
 DELIMITER ;
@@ -4015,14 +4869,16 @@ DROP PROCEDURE IF EXISTS `Fetch_Set_P1`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `Fetch_Set_P1`(in `vstring` longtext,IN `x` int(3),out `results_` longtext)
 p1:BEGIN
-	
+	#Routine body goes here...
 	 DECLARE EXIT  HANDLER FOR  SQLSTATE '42S22'  SET results_ =null; 
  	 DECLARE EXIT  HANDLER FOR  SQLSTATE '42000'  SET results_ =null; 
 
 		CASE 
       WHEN  x IS  NULL THEN  
 				LEAVE p1;
-			WHEN IFNULL(vstring,'') = '' THEN 
+/*			WHEN vstring NOT REGEXP  '^[[:alnum:]]{1,}(,[[:alnum:]]{1,}){0,}$' THEN
+				LEAVE p1;	
+*/			WHEN IFNULL(vstring,'') = '' THEN 
 					LEAVE p1;
 				ELSE 
 				SET @results = NULL,@sb = NULL;
@@ -4046,7 +4902,7 @@ p1:BEGIN
 	 END LOOP ;
 
 	 DEALLOCATE PREPARE stmt;
-
+--  SELECT @results;
 	SET results_ = @results; 
 END
 ;;
@@ -4059,7 +4915,7 @@ DROP PROCEDURE IF EXISTS `Fetch_Set_P2`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `Fetch_Set_P2`(in `vstring` longtext,IN `x` int(3),IN `y` int(3),out `results_` longtext)
 BEGIN
-	
+	#Routine body goes here...
 	 DECLARE EXIT  HANDLER FOR  SQLSTATE '42S22'  SET results_ =null; 
  	 DECLARE EXIT  HANDLER FOR  SQLSTATE '42000'  SET results_ =null; 
    SET @results = NULL,@sb = NULL;
@@ -4084,7 +4940,7 @@ BEGIN
 	 END LOOP ;
 
 	 DEALLOCATE PREPARE stmt;
- 
+ -- SELECT @results;
 	SET results_ = @results; 
 END
 ;;
@@ -4099,7 +4955,9 @@ CREATE DEFINER=`root`@`%` FUNCTION `Fetch_Set_Pop`(`fieldsValue` varchar(2000),`
     NO SQL
     DETERMINISTIC
 BEGIN
-
+/*Routine body goes here... 
+ 1406
+*/
 	DECLARE i INT(5) ;
 	DECLARE i1 INT(5);
 	DECLARE w CHAR(5);
@@ -4163,7 +5021,11 @@ BEGIN
 						SET i = i+1;
 
 		END CASE;
+/*
+		set i = i+1;
 
+		IF i = 999 then LEAVE label1;END IF;
+*/
 	END LOOP label1 ;
 
 	RETURN @word;
@@ -4179,23 +5041,23 @@ DROP PROCEDURE IF EXISTS `Fetch_Set_values`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `Fetch_Set_values`(IN `fieldvalues` longtext,in `fields_` varchar(200),OUT `resultvalues` longtext)
 BEGIN
-	
+	#Routine body goes here...
 	DECLARE n INT(2);
 	SET n = 1,@results = NULL;
 
-
+-- 	SELECT @results ,fieldvalues,n,1;
 	label1:LOOP
-
+-- SELECT @results ,fieldvalues,n,1;
 		CALL Fetch_Set_P(fieldvalues,n,1);
-
+-- SELECT @results;
 		CASE 
 			WHEN @results = fields_ THEN
 				CALL Fetch_Set_P(fieldvalues,n,NULL);
 
 				SET fieldvalues = @results,
-		
+		-- 				fieldvalues = Fetch_Set_Pop(fieldvalues,1,'\''),
 						resultvalues = SUBSTR(fieldvalues,CHAR_LENGTH(FIELDS_ )+4);
-					
+					-- 	resultvalues = SUBSTR(resultvalues,CHAR_LENGTH(resultvalues)+1);
 					
 				LEAVE label1;
 			WHEN @results is NULL THEN 
@@ -4204,7 +5066,7 @@ BEGIN
 				SET n= n+1;
 		END CASE ;
 	END LOOP;
-
+-- SELECT resultvalues,n,fieldvalues ;
 END
 ;;
 DELIMITER ;
@@ -4218,7 +5080,7 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `Fetch_Sub`(`y` text,`v` longtext) RE
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 
 	DECLARE rs LONGTEXT DEFAULT NULL;
 	DECLARE r LONGTEXT DEFAULT NULL;
@@ -4241,7 +5103,7 @@ BEGIN
 		
 		SET i := i+1,
 				r := preg_capture(CONCAT('/(?<=\")(\'',i,'.*?)(?=\",\"\'',i+1,'\')/'),v);
- 
+ -- RETURN v;
 		IF r IS NULL THEN 
 			SET r := preg_capture(CONCAT('/(?<=\")\'',i,'\',(.*?)(?=\"$)/'),v);
 		END IF;
@@ -4267,7 +5129,7 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `Fetch_Sub_l`(`y` text,`v` longtext) 
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 	DECLARE rs LONGTEXT DEFAULT NULL;
 	DECLARE r LONGTEXT DEFAULT NULL;
 	DECLARE i TINYINT DEFAULT 0 ;	
@@ -4303,7 +5165,7 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `Fetch_x`(`x` int(5),`v` longtext) RE
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 	DECLARE rs LONGTEXT DEFAULT NULL;
 
 
@@ -4341,7 +5203,7 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `Fetch_y`(`y` int(5),`v` longtext) RE
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 	DECLARE r LONGTEXT DEFAULT NULL;
 
   IF NOT IFNULL(y,0) >0  THEN
@@ -4374,7 +5236,7 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `Fetch_y_1`(`y` int(5),`v` longtext) 
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 		IF NOT IFNULL(y,0) >0  THEN
 			RETURN NULL;
 		END IF;
@@ -4395,7 +5257,7 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`%` FUNCTION `Fielter_Set`(`vstring` varchar(20000)) RETURNS varchar(400) CHARSET utf8mb3
     NO SQL
 BEGIN
-	
+	#Routine body goes here...
 	DECLARE i INT(5);
 	DECLARE results VARCHAR(500);
 	DECLARE w VARCHAR(30);
@@ -4435,8 +5297,8 @@ CREATE DEFINER=`root`@`%` FUNCTION `fileds_update_temp`(`fieldsName` varchar(400
     NO SQL
     DETERMINISTIC
 BEGIN
-	
-
+	#Routine body goes here...
+--  return concat(fieldsname,'----',fieldsvalue);
 	SET @fields_ = '',@d='';
 	IF  
 		sepera  IS NULL  THEN 
@@ -4446,7 +5308,7 @@ BEGIN
 	END IF;
 
   REPEAT
-
+-- 		SET @d = LEFT(fieldsName,1);
 
 		SET 
 			@d = SUBSTRING_INDEX(fieldsName,',',1), 
@@ -4468,7 +5330,8 @@ BEGIN
 								LEAVE fetch_value;
 							WHEN LENGTH(@char_1) = 0 THEN
 								LEAVE fetch_value;
-
+/*							WHEN @vp=10 then 
+								RETURN  @fields_; */
 							ELSE ITERATE fetch_value;
 			
 					END CASE;
@@ -4479,8 +5342,8 @@ BEGIN
 			ELSE
 				SET @d = 'NULL';
 			END IF;
-
-
+-- RETURN CONCAT(@d,'_',@fields_,'_',substr(fieldsvalue,@vp),'_',CONCAT(@fields_,'=',@d)) ;			
+-- skip 后 package char 			
 		SET fieldsValue = substr(fieldsvalue,@vp+1),  
 					@fields_ = CONCAT(@fields_,'=',@d);
 
@@ -4491,7 +5354,7 @@ BEGIN
 					SET fieldsValue = SUBSTR(fieldsValue,2),
 							@fields_ = CONCAT(@fields_,sepera);
  			END IF;
-
+-- RETURN CONCAT(fieldsname,'_',fieldsvalue);
 		END IF;
 
 		UNTIL LENGTH(fieldsName) = 0 or LENGTH(fieldsValue) = 0
@@ -4511,7 +5374,7 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `fillp`(`a` varchar(1000)) RETURNS va
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 	DECLARE a1 VARCHAR(5) DEFAULT NULL;
 	DECLARE a2 VARCHAR(5) DEFAULT NULL;
 	DECLARE i TINYINT(5) DEFAULT 0;
@@ -4522,7 +5385,7 @@ BEGIN
 	SET	i = 1,@r = NULL,a2 =c(preg_capture('/[^,]+/',a,0,1));
 
 	SET	@r = CONCAT_WS('',REPEAT('0,',a2-1),a2);
-
+/**/
  l:LOOP
 
 		SET a1 = preg_capture('/[^,]+/',a,0,i),
@@ -4551,7 +5414,7 @@ CREATE DEFINER=`root`@`%` FUNCTION `filter`(`k` blob,`t` longblob) RETURNS longt
     READS SQL DATA
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 	DECLARE k1 BLOB DEFAULT NULL;
 	DECLARE k2 BLOB DEFAULT NULL;
 	DECLARE k3 VARCHAR(1000) DEFAULT NULL;
@@ -4571,7 +5434,7 @@ BEGIN
 				SET	k3 = COLUMN_get(k1,3 AS CHAR),k2 = COLUMN_get(k1,2 AS CHAR),k1 = COLUMN_get(k1,1 AS CHAR);
 		END CASE;
 
-
+-- IF i =2 THEN RETURN k2;END if;
 		IF IFNULL(k1,'') ='' THEN  ITERATE loop1 ; END IF;
 
 		IF k2 IS NULL THEN SET k2 = ''; END IF;
@@ -4602,7 +5465,7 @@ BEGIN
 				WHEN k1 = 'j' THEN
 							IF k2 IS NOT NULL THEN
 
-								SET t = j(t,k2);
+								SET t = j0(t,k2);
 							END IF;
 				WHEN k1 = 'dom2j' THEN
 							SET t = dom2j(t);
@@ -4619,7 +5482,7 @@ BEGIN
 				WHEN k1 REGEXP '(?i)(repl)ace\\s*,\\s*sub(str)?' AND CONCAT(k2,k3) IS NOT NULL  THEN
 						SET t = REGEXP_replace(t,k3,REGEXP_substr(t,k2)) ;
 			ELSE 
-
+-- RETURN 'ok';
 	SET t = REGEXP_REPLACE(t,k1,k2); 
 
 		END CASE;
@@ -4639,12 +5502,12 @@ CREATE DEFINER=`root`@`%` FUNCTION `filter1`(`k` blob,`t` longblob) RETURNS long
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 	DECLARE k1 VARCHAR(1000) DEFAULT NULL;
 	DECLARE k2 VARCHAR(1000) DEFAULT NULL;
 	DECLARE k3 VARCHAR(1000) DEFAULT NULL;
 	DECLARE i INT(5) DEFAULT 0;
-
+-- RETURN t;
 	loop1:LOOP
 		SET k1 = preg_capture(CONCAT('/(?:(?:\\s*.+\\n){',i,'}\\s*)(.+)(?=[\\n]|$)/'),k,1);
 
@@ -4693,7 +5556,7 @@ CREATE DEFINER=`root`@`%` FUNCTION `filter2`(`k` blob,`t` longblob) RETURNS long
     READS SQL DATA
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 	DECLARE k1 VARCHAR(1000) DEFAULT NULL;
 	DECLARE k2 VARCHAR(1000) DEFAULT NULL;
 	DECLARE k3 VARCHAR(1000) DEFAULT NULL;
@@ -4725,7 +5588,7 @@ BEGIN
 								END IF;
 								
 								
-
+-- IF i=1 THEN  RETURN k2; END IF;
 						WHEN k1 REGEXP '^\\s*(?:\\--|\\{2})\s' THEN
 							SET i = i+1;
 							ITERATE loop1;
@@ -4738,7 +5601,7 @@ BEGIN
 						WHEN k1 = 'j' THEN
 							IF k2 IS NOT NULL THEN
 
-								SET t = j(t,k2);
+								SET t = j0(t,k2);
 							END IF;
 						WHEN k1 = 'dom2j' THEN
 							SET t = dom2j(t);
@@ -4756,19 +5619,73 @@ BEGIN
 						WHEN k1 REGEXP '(?i)(repl)ace\\s*,\\s*sub(str)?' AND CONCAT(k2,k3) IS NOT NULL  THEN
 
 						SET t = REGEXP_replace(t,k3,REGEXP_substr(t,k2)) ;
-
+-- RETURN CONCAT_WS(',',QUOTE(k3),QUOTE(k2));;
 					ELSE 	
 
  SET t = REGEXP_REPLACE(t,k1,k2); 
-
+-- RETURN k1;
 				END CASE;
 			END IF;
 
-
+--  RETURN k1;
 		SET i = i+1;
 		ITERATE loop1;
 	END loop;
 	RETURN t;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `fini`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `fini`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `fini`(`p` blob) RETURNS blob
+    NO SQL
+    DETERMINISTIC
+BEGIN
+	#Routine body goes here...
+DECLARE k TINYblob DEFAULT NULL;DECLARE r blob DEFAULT p;DECLARE i INT DEFAULT 0;
+	SET r = REGEXP_replace(p,',?"[ab]\\d+":(null|"[^"]?"),?|"b\\d+":|,?}|["{]','')
+		,r = REGEXP_replace(r,'b(\\d+)\\[(\\d+)\\]','"\\2":"\\1"')
+		,r = CONCAT('{',r,'}')
+		
+;
+    IF NOT json_valid(r) THEN RETURN p;END IF;
+SET p = r,k = json_keys(r),r='{}';
+l: LOOP
+    
+		 IF i>=json_length(k) THEN LEAVE l;END IF;
+		-- IF i>2 THEN LEAVE l;END IF;
+		SET r = JSON_MERGE(r
+							,json_object(json_value(k,CONCAT('$[',i,']'))+1,json_extract(p
+								,CONCAT('$**.',json_value(k,CONCAT('$[',i,']')))
+							))
+						)
+;SET i=i+1;
+END LOOP ;
+
+	RETURN JSON_COMPACT(
+REGEXP_replace(REGEXP_replace(REGEXP_replace(r,'("\\d+")(?!:)','\\1:"1"'),'\\[','{'),']','}')
+);
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `fkey`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `fkey`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` FUNCTION `fkey`(`b` blob) RETURNS blob
+    NO SQL
+    DETERMINISTIC
+BEGIN
+	#Routine body goes here...
+	DECLARE reg BLOB  DEFAULT R('`seafilter`'); DECLARE rep VARCHAR(200) DEFAULT '[a-f47]';
+
+	RETURN REGEXP_replace(b,reg,'');
 END
 ;;
 DELIMITER ;
@@ -4780,95 +5697,70 @@ DROP PROCEDURE IF EXISTS `flow`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `flow`(IN `p` blob)
 flowl:BEGIN
-	
+	#Routine body goes here...
+/*
+  0,3 选择岗位;
+	2 显示流程
+*/
+	DECLARE `p2` BLOB DEFAULT j0(`p`,'p2'); DECLARE `funcid` VARCHAR(60) DEFAULT j0(`p2`,'funcid');DECLARE `b` BLOB DEFAULT NULL;
+
+  DECLARE EXIT HANDLER FOR  SQLSTATE '23000', SQLSTATE	'42000' , SQLSTATE	'42S22'	errl:BEGIN CALL `ERRORS`(COLUMN_create(
+	'm',CONCAT_WS(':','Error flow',j0(`p2`,'funcid')),'SQL',@`sql_body`,'pp',`p`
+	));END;
+/*
+-- start TRANSACTION;
+CALL Audit_3(COLUMN_create('m',CONCAT_WS(':','flow :' ,j0(`p`,'funcid')),'SQL','','pp',`p`));COMMIT;
+-- INSERT INTO plogs (Function_Name,parameter) VALUES ('flow',`p`);LEAVE flowl; */
 
 
 
-	DECLARE `p2` BLOB DEFAULT j(`p`,'p2');
-	DECLARE `funcid` VARCHAR(60) DEFAULT j(`p2`,'funcid');
-
-
-	SET @sql_body = NULL;
-
+	IF IFNULL(`p2`,'')= '' OR IFNULL(@courseNo := j0(`p`,"courseNo"),'')= '' THEN 
+			CALL `ERROR`('sp:no p2 or courseNo');
+		ELSE SET @flow_body = NULL;
+	END IF;
 
 	CASE 
-			WHEN  `funcid` = 0 THEN 
+			WHEN  `funcid` = 0 OR `funcid` = 3 THEN 
 			BEGIN
-				DECLARE `p2` BLOB DEFAULT j(`p`,'p2');
 
-				IF IFNULL(`p2`,'')= '' OR IFNULL(@courseNo := j(`p`,"courseNo"),'')= '' THEN CALL Error('sp:no p2 or courseNo');END IF;
-
-				SET	@sql_body := r4('gangwei'),
-						@sql_body = CONVERT(r5( 
-IF((@roleids := j(p,'roleids')) IS  NULL, @sql_body,REGEXP_replace(@sql_body
+				SET	@flow_body := r4('gangwei'),
+						@flow_body = CONVERT(r5( 
+IF((@roleids := j0(p,'roleids')) IS  NULL, @flow_body,REGEXP_replace(@flow_body
 ,@r:='(?is)\\((?=\'enterlis\')(.*?)(?<=CAST\\()(.*?)(?=\\)AS\\s+CHAR\\)as\\sroleli)'
 ,CONCAT_WS('',"('roleids','",@roleids,"',\\1REGEXP_replace(\\2 ),CONCAT_WS('','(?i)\\\\\\\\s(?=roleid=\"(",@roleids,")\")'),' checked '")
 ))
 ,`p`)USING gbk);
 
 
+
 			END;
 
 
+			WHEN `funcid` = 2 THEN 
 
-			WHEN `funcid` = 2 THEN
+			SET @flow_body := r5(r4('flowp1$'),''),
+		 			@flow_body := CONCAT_WS(''	,"CONCAT_WS('','"
+																		,REGEXP_replace(REGEXP_replace(REGEXP_replace(REGEXP_replace(@flow_body
+																				,'(?i)(?<=>)(@`.*?`)',@flow_body:=CONCAT("\',regexp_replace(\\1,",QUOTE(CONCAT(REPEAT('\\',2),'n')),",'<br>')",",'"))
+ 																				,'(?i)(?<=title=)(@`.*?`)',REGEXP_replace(@flow_body,"(?<=',)(.+?)(?=,'$)",'QUOTE(\\1)'))
+ 	 																			,'(?i)(@`c\\d+`)',"',QUOTE(CONCAT_WS('','c',@`flow`)),'")
+																			 	,'(?m)[\\n\\r]+',CONCAT(REPEAT('\\',4),'n'))
+																		,"')AS d"),
+					@flow_body := CONCAT_WS('\n',REGEXP_replace(r5(r4('newflow$'),p2),'(?im)^(FROM|\\t{2}FROM\\(\\t)(?=\\s+)',CONCAT('\n,',@flow_body,'\n\\1'))),
+					@flow_body = CONCAT_WS('\n',"SELECT\nCAST(COLUMN_json(COLUMN_create('processLine',GROUP_CONCAT(a.d SEPARATOR ",QUOTE(R4('flowl$'))
+															,")AS CHAR)) AS CHAR)AS dblob","FROM(",@flow_body
+															,")AS a")/**/
+;
 
-SELECT
-a.missionId,
-a.seal_no,
-a.is_seal,
-a.p_write,
-b.seal_name,
-a.seal_id,
-b.roleID,
-@post := IF((@role := c.role) REGEXP '^(?!.*/)',
-CASE 
-WHEN (@duty:= c.duty) REGEXP '银行' THEN 
-		CASE WHEN @duty REGEXP '业务|柜员' THEN '柜员'
-				WHEN @duty REGEXP '经理' THEN '客服经理'
-				 WHEN @duty REGEXP '负责人|行政签章|经理' THEN '柜台主管'
-				ELSE '银行'
-		END
-WHEN @duty REGEXP '会计师' THEN '会计师'
-WHEN @duty REGEXP '法人' THEN '总经理'
-WHEN @duty REGEXP '财务签章|财务专用章|财务主管' THEN '财务经理'
-WHEN @duty REGEXP '发票' THEN '开票'
-WHEN @duty REGEXP '出纳' THEN '出纳'
-WHEN @duty REGEXP '会计' THEN '会计' 
-WHEN @duty REGEXP '制单' THEN '制单' 
-WHEN @duty REGEXP '制单' THEN '制单'
-WHEN @duty REGEXP '审核' THEN '审核'
-WHEN @duty REGEXP '记账' THEN '记账'
-END
-,REGEXP_substr(@role,'(?<=/).+$')
-) AS post,
-CAST(CASE (@action:=b.action)<>'' 
-WHEN a.seal_no = 1 AND a.p_write = 1 THEN
-			CASE  WHEN @action REGEXP (@r:='签章|^会计$') THEN  REGEXP_replace(@action,@r,'制单')
-			ELSE @action
-			END 
-ELSE @action
-END AS CHAR) AS action
-,b.action
-FROM
-acc_mission_seal AS a
-INNER JOIN acc_enter_seal AS b ON a.seal_id = b.sealID
-INNER JOIN acc_enter_role AS c ON b.roleID = c.roleID
-WHERE a.missionid = j(p2,'missionid')
-GROUP BY
-a.missionId,
-a.seal_no,
-b.roleID,
-b.sealID;
-SELECT @sql_body; LEAVE flowl;
-
-		ELSE SET @sql_body = 'someting wrong!';
+		ELSE CALL Error('flow:someting wrong!');
 	END CASE;
 
 
-	PREPARE sql_stmt from  @sql_body;
-	EXECUTE sql_stmt ;
-	DEALLOCATE PREPARE sql_stmt ;
+-- SELECT  'ok',@flow_body; LEAVE flowl;
+
+	PREPARE flow_stmt from  @flow_body;
+	EXECUTE flow_stmt ;
+	DEALLOCATE PREPARE flow_stmt ;/**/
 
 END
 ;;
@@ -4881,7 +5773,7 @@ DROP PROCEDURE IF EXISTS `funcSysLongin`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `funcSysLongin`(IN `func_id` TINYINT (2),IN `userName`  Text,IN `userPassWd` Text)
 BEGIN
-	
+	#Routine body goes here...
   CALL `mysq1_schema`.`funcSysLongin`(func_id,userName,userPassWd);
 END
 ;;
@@ -5007,7 +5899,7 @@ BEGIN
 									LEFT  JOIN acc_standard_n AS b ON a.missionId = b.missionId
 									LEFT  JOIN acc_standard_blur_n AS c ON b.missionId = c.missionId AND b.rowNo = c.rowno
 									where  CONCAT_WS(',',",Temp_Func("ab(b.b??,a.init_b??,c.blur_b??)",1,50,','),") != ''");
-			 
+			 /*SELECT @answer_stmtbody;*/
 					PREPARE stmt_insert_answer FROM @answer_stmtbody;
 					EXECUTE stmt_insert_answer ;
 					DEALLOCATE PREPARE stmt_insert_answer;
@@ -5060,46 +5952,6 @@ END
 DELIMITER ;
 
 -- ----------------------------
---  Procedure definition for `FUNC_QUERY`
--- ----------------------------
-DROP PROCEDURE IF EXISTS `FUNC_QUERY`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `FUNC_QUERY`(IN `keyword` longtext)
-BEGIN
-	
-SET KEYWORD = CONCAT('%',KEYWORD,'%');
-SELECT
-b0.courseName AS `课程`,
-b1.node_courseNo AS `课程编号`,
-CAST(CONCAT_WS('.',b1.node_No,b2.typesort) AS CHAR) AS `任务号`,
-a.missionId AS `任务id`,
-a.missionLabel AS `任务标题`,
-a.mission_ask AS `任务要求`,
-c1.billname AS `表单名称`,
-a.Vdate AS `虚拟日期`,
-c1.billId AS `表单编号`,
-c2.billTypeSay AS `表单类型`
-FROM
-acc_mission AS a
-INNER JOIN exp_courses_node_content AS b2 ON a.missionId = b2.missionid
-INNER JOIN exp_courses_node AS b1 ON b2.contentNo = b1.contentNo
-INNER JOIN exp_courses AS b0 ON b1.node_courseNo = b0.courseNo
-INNER JOIN mysq1_schema.bill_list AS c1 ON a.billId = c1.billId
-INNER JOIN mysq1_schema.bill_type AS c2 ON c1.billType = c2.billType
-WHERE 
-CASE
-	WHEN CAST(CONCAT_WS('',b1.node_courseNo,b0.courseName,b1.node_No,'.',b2.typesort,b0.courseName,b1.node_courseNo) AS CHAR) LIKE keyword THEN 1
-	WHEN a.missionLabel LIKE keyword THEN 1
-	WHEN a.mission_ask LIKE keyword THEN 1
-	WHEN c1.billname LIKE keyword THEN 1
-	WHEN a.Vdate LIKE keyword THEN 1
-	WHEN c2.billTypeSay  LIKE keyword THEN 1
-END;
-END
-;;
-DELIMITER ;
-
--- ----------------------------
 --  Procedure definition for `Func_Query_Mission`
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `Func_Query_Mission`;
@@ -5107,13 +5959,16 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `Func_Query_Mission`(IN `keyword` longtext)
 BEGIN
 SET `keyword` = trim(`keyword`);
-	SELECT
+SELECT
 CONCAT_WS(' : ',d.courseName,c.node_courseNo) AS `课程`,
 CONCAT_WS('.',c.node_No,b.typesort) AS `任务编号`,
 a.missionId,
 a.missionLabel,
-e1.billname,e1.billId,e2.billTypeSay,
-a.mission_ask
+e1.billname,
+e1.billId,
+e2.billTypeSay,
+a.mission_ask,
+GROUP_CONCAT(a.missionId) AS  bkid
 FROM
 acc_mission AS a
 INNER JOIN exp_courses_node_content AS b ON a.missionId = b.missionid
@@ -5123,7 +5978,8 @@ LEFT JOIN mysq1_schema.bill_list AS e1 ON e1.billId = a.billId
 LEFT JOIN mysq1_schema.bill_type AS e2 ON e1.billType = e2.billType
 WHERE 
 CASE
-		WHEN a.missionId REGEXP  keyword THEN 1
+
+		WHEN a.missionId  REGEXP  keyword THEN 1
 		WHEN CONCAT_WS('.',c.node_No,b.typesort) REGEXP  keyword THEN 1
 		WHEN CONCAT_WS(':',c.node_courseNo,d.courseName) REGEXP  keyword THEN 1
 		WHEN a.missionLabel  REGEXP  keyword THEN 1
@@ -5131,6 +5987,7 @@ CASE
 		WHEN CONCAT_WS('',e1.billname,e1.billId,e2.billTypeSay) REGEXP keyword THEN 1
 		ELSE 0
 END	
+
 ;
 
 END
@@ -5154,7 +6011,7 @@ b.deptNo,
 b.teaNo,
 b.`status`,
 e.classNo,
-e.cclassName,
+e.className,
 e2.courseNo,
 d.expNo
 FROM
@@ -5166,55 +6023,9 @@ LEFT JOIN exp_experimentclass AS e ON d.classNo = e.classNo
 LEFT JOIN exp_experimentclass_course AS e1 ON e1.classNo = e.classNo
 LEFT JOIN exp_courses AS e2 ON e2.courseNo = e1.courseNo
 WHERE 
-	CASE
-			WHEN a.stuNo LIKE CONCAT('%',keyword,'%') THEN 1
-			WHEN d.classNo  LIKE CONCAT('%',keyword,'%') THEN 1
-			WHEN e.className   LIKE CONCAT('%',keyword,'%') THEN 1
-			WHEN d.expNo   LIKE CONCAT('%',keyword,'%') THEN 1
-
-		ELSE 0
-	END
+CONCAT_WS(',',a.stuNo ,d.classNo,e.className,d.expNo) REGEXP keyword
 ;
 
-END
-;;
-DELIMITER ;
-
--- ----------------------------
---  Procedure definition for `Func_Sys`
--- ----------------------------
-DROP PROCEDURE IF EXISTS `Func_Sys`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `Func_Sys`(IN `template1` varchar(200),IN `type` varchar(50),in `template2` varchar(200))
-BEGIN
-	
-	
-	SET @sb = CONCAT("SELECT
-a.",type,"_SCHEMA,
-a.",type,"_NAME,
-GROUP_CONCAT('",REPLACE(template1,'??',TYPE),"', a.",type,"_NAME ,'",IFNULL(template2,''),"' SEPARATOR ';\n')
-FROM
-`",type,"S` AS a
-WHERE
-a.",type,"_SCHEMA = ",QUOTE(DATABASE()));
-SELECT  @sb;
-
-END
-;;
-DELIMITER ;
-
--- ----------------------------
---  Procedure definition for `func_z`
--- ----------------------------
-DROP FUNCTION IF EXISTS `func_z`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `func_z`(`w` tinytext) RETURNS tinytext CHARSET utf8mb3
-    NO SQL
-    DETERMINISTIC
-BEGIN
-	
-
-	RETURN preg_replace('/(?<=\.|^)0\\d?(?=[0-9])/','',w);
 END
 ;;
 DELIMITER ;
@@ -5263,202 +6074,1247 @@ END
 DELIMITER ;
 
 -- ----------------------------
---  Procedure definition for `ganerate_answer`
+--  Procedure definition for `f_copy1`
 -- ----------------------------
-DROP PROCEDURE IF EXISTS `ganerate_answer`;
+DROP FUNCTION IF EXISTS `f_copy1`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ganerate_answer`()
-BEGIN
+CREATE DEFINER=`root`@`localhost` FUNCTION `f_copy1`(`p` longtext,k text) RETURNS longtext CHARSET utf8mb3
+    DETERMINISTIC
+p:BEGIN
+	#Routine body goes here...
+	DECLARE `rs` LONGTEXT DEFAULT NULL;DECLARE `jrs` LONGTEXT DEFAULT NULL;
+	DECLARE `arr` TEXT DEFAULT NULL;
+	DECLARE `r` TEXT DEFAULT '^\\[?(("\\w+"|[\\d\\-]+)(?:,(?-1))*?)]?$';
+	DECLARE i VARCHAR(100) DEFAULT 0;
+	DECLARE `l` INT(5) DEFAULT 20;
+	DECLARE `jl` varchar(100) DEFAULT -1;	
 	
-SET @stmtbody = '';
-DROP TEMPORARY TABLE IF EXISTS cura1;
-SET
-@stmtbody :=concat("CREATE TEMPORARY TABLE cura1
-AS
-SELECT a.missionId,a.billid,
-0 as a_t,",
-Temp_Func("
-ab(b.a??,a.init_a??,c.blur_a??) as a??
-",1,100,','),"
-FROM
-acc_mission AS a
-INNER JOIN acc_standard_1 AS b ON a.missionId = b.missionId
-INNER JOIN acc_standard_blur_1 AS c ON a.missionId = c.missionId
-");
+	DECLARE `t` VARCHAR(20) DEFAULT NULL;DECLARE `kword` varchar(200) DEFAULT NULL;DECLARE addr  INT(5) DEFAULT 0;
+	
+/*
+	DECLARE CONTINUE HANDLER FOR  SQLSTATE '21S01', SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22' ,SQLSTATE '21000', SQLSTATE	'HY000'-- ,SQLSTATE	'22007'
+	bl:BEGIN GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;SET  @`sqlstate` = JSON_OBJECT('sqlstate',@`sqlstate`,'errno',@errno,'text',CONCAT(i,@text));
+
+				SET @`errsql` = p,@funcid =  NULL;
+				SET @funcid = CONCAT_WS(' ','Error: ',(SELECT CONCAT_WS(', ',a.note,CONCAT_WS('',UPPER(SUBSTR(a.`name`,1,1)),LOWER(substr(a.`name`,2))),a.id) FROM mysq1_schema.qs AS a WHERE a.`name` = `funcid`)
+									, ' 执行' ),
+				@pp = QUOTE(p);
+				CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp,'SQL',@`errsql`,'err',@`sqlstate`,'l',1,"继续执行",'0'));END;
 
 
-PREPARE stmt1 FROM @stmtbody;
-EXECUTE stmt1; 
+START TRANSACTION;
+SET @funcid = CONCAT_WS(' ',(SELECT CONCAT_WS(', ',a.note,CONCAT_WS('',UPPER(SUBSTR(a.`name`,1,1)),LOWER(substr(a.`name`,2))),a.id) FROM mysq1_schema.qs AS a WHERE a.`name` = `funcid`)
+							, ' 执行' ),
+		@pp = QUOTE(`p`);
+
+CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp));COMMIT;*/
+	IF IFNULL(`p`,'') = '' THEN RETURN NULL;END IF; 
+
+/*  IF !json_valid(k) && IFNULL(k,'')!=''  THEN 
+   SET k = JSON_OBJECT('k','','t',2,'done',k) ;
+ END IF ;
+ */
+	 IF k REGEXP  r THEN
+			SET k := REGEXP_replace(k,r,'\\1'),k=JSON_OBJECT('t',2,'done',JSON_EXTRACT(CONCAT('[',k,']'),'$'));
+
+	 END IF;
+
+	IF json_valid(k) THEN 
+
+		SET t = Json_value(k,'$.t')
+       ,kword = JSON_value(k,'$.k[0]');
+	end IF ;
 
 
-
-DROP TEMPORARY TABLE IF EXISTS cura2;
-SET @stmtbody2=concat("CREATE TEMPORARY TABLE cura2
-AS
-SELECT  
-a.missionId,a.billid,
-a_t, 
-sum(",
-Temp_Func("IF(a.a?? IS NOT NULL,1,0)",1,100,'+'),
-") AS a_n,
-concat_ws(',',",
-Temp_Func("IF(a.a?? IS NOT NULL,'??',null)",1,100,','),
-") AS a_fs,
-concat_ws(',',",
-Temp_Func("IF(a.a?? IS NOT NULL,LPAD('??',2,'0'),null)",1,100,','),
-") AS a_fn,",
-Temp_Func("a.a??",1,100,','),
-"
-FROM cura1 as a
-group by a.missionid");
-
-PREPARE stmt2 FROM @stmtbody2;
-
-EXECUTE stmt2; 
+ IF  json_value(`k`,'$.start') is NOT NULL THEN SET i =  json_value(`k`,'$.start') ; END IF;
+ SET `arr` = CAST(JSON_EXTRACT(`k`,'$.done') AS char) ; 
 
 
 
+  l:LOOP
 
+		IF `jrs`is NOT NULL  AND json_length(`jrs`) = 0 THEN SET i= iF(jl REGEXP '^[\\d\\-\\.]+$',jl+1,CONCAT_WS('',jl,'+1')),jl=-1,jrs = NULL;END if; 
 
-DROP TEMPORARY TABLE IF EXISTS curb1;
-SET
-@stmtbody :=concat("
-CREATE TEMPORARY TABLE curb1
-AS
-SELECT a.missionId,a.billid,
-b.rowno as a_t,",
-Temp_Func("
-ab(b.b??,a.init_b??,c.blur_b??) as a??
-",1,50,','),"
-FROM
-acc_mission AS a
-INNER JOIN acc_standard_n AS b ON a.missionId = b.missionId
-INNER JOIN acc_standard_blur_n AS c ON a.missionId = c.missionId AND b.rowNo = c.rowno
-where concat_ws(",Temp_Func("b.b??",1,50,','),") != '' 
-");
+		IF i>=l+1 AND jrs IS NULL THEN LEAVE l;END if;
 
-
-PREPARE stmt3 FROM @stmtbody;
-EXECUTE stmt3; 
+		IF `jrs`is  NULL AND   arr IS NOT NULL  AND json_valid(arr) THEN 
+			IF JSON_length(arr)>0 THEN 
+				SET i = JSON_VALUE(arr , '$[0]'),arr = json_REMOVE(arr,'$[0]');	
+				ELSE LEAVE l;
+			END IF;
+		END IF;
 
 
 
 
-DROP TEMPORARY TABLE IF EXISTS curb2;
-SET @stmtbody2=concat("CREATE TEMPORARY TABLE curb2
-AS
-SELECT  
-a.missionId,a.billid,
-a_t, 
-sum(",
-Temp_Func("IF(a.a?? IS NOT NULL,1,0)",1,50,'+'),
-") AS a_n,
-concat_ws(',',",
-Temp_Func("IF(a.a?? IS NOT NULL,'??',null)",1,50,','),
-") AS a_fs,
-concat_ws(',',",
-Temp_Func("IF(a.a?? IS NOT NULL,LPAD('??',2,'0'),null)",1,50,','),
-") AS a_fn,",
-Temp_Func("a.a??",1,50,','),
-"
-FROM curb1 as a
-group by a.missionId,a.a_t");
+		CASE 	
+		
+					WHEN `Jl` >-1 AND json_length(`jrs`)>0  THEN 
+						SET `rs` = JSON_EXTRACT(`jrs`,'$[0]'),jrs=JSON_REMOVE(jrs,'$[0]');
 
-PREPARE stmt4 FROM @stmtbody2;
-
-EXECUTE stmt4; 
-
-
-DROP TEMPORARY TABLE IF EXISTS cura1;
-SET @stmtbody3=concat("CREATE TEMPORARY TABLE cura1
-AS
-SELECT * from cura2
-UNION
-SELECT *,",Temp_Func("null",51,50,','),
-" FROM  curb2");
-
-PREPARE stmt5 FROM @stmtbody3;
-EXECUTE stmt5; 
-
-DROP TABLE IF EXISTS answer;
-
-CREATE TABLE answer
-AS
-
-SELECT
-a.*
-,Temp_Func_C("a??",a.a_fs,',') as a_fnz
-
-,CASE when a.a_t = 0 THEN
-concat("SELECT ",
-Temp_Func_C("(acc_1.a?? REGEXP answer.a??)",a.a_fs,'+'),
-" into @sb
-FROM acc_1 INNER JOIN answer  ON acc_1.missionId = answer.missionId 
-WHERE acc_1.expID = ? AND answer.missionId = '",a.missionId,"' AND answer.a_t = ",a.a_t) 
-ELSE 
-concat("SELECT ",
-Temp_Func_C("(acc_nn.b?? REGEXP answer.a??)",a.a_fs,'+'),
-" into @sb
-FROM ?? AS acc_nn INNER JOIN answer  ON acc_nn.missionId = answer.missionId 
-WHERE acc_nn.expID = ? AND answer.missionId = '",a.missionId,"' AND answer.a_t = ",a.a_t) 
-END AS a_row_sq
-FROM cura1 AS a
-ORDER BY a.missionid,a.a_t;
-
-
-ALTER TABLE `answer`
-MODIFY COLUMN `a_fn`  varchar(400) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL AFTER `a_n`;
-ALTER TABLE `answer`
-MODIFY COLUMN `a_t`  decimal(10,0) NOT NULL DEFAULT 0 AFTER `missionId`,
-ADD PRIMARY KEY (`missionId`, `a_t`),
-ADD UNIQUE INDEX `answer-1` USING BTREE (`missionId`, `billid`, `a_t`, `a_n`) ;
-
-ALTER TABLE `answer`
-ADD UNIQUE INDEX `answer-2` USING BTREE (`missionId`, `a_t`, `a_n`) ;
-ALTER TABLE `answer`
-ADD  INDEX `answer-3` USING BTREE (`a_t`, `a_fn`) ;
+					WHEN `t` = 1 then SET `rs` =   r4b1(json_array(i,JSON_EXTRACT(`k`,'$.k[*]')));
+					WHEN `t` REGEXP '^(?:react|2)$' then SET `rs` =   r4b2(json_array(i,cast(JSON_EXTRACT(`k`,'$.k[*]')as char)));
+					WHEN `t` = 3 then SET `rs` =   r4b3(json_array(i,JSON_EXTRACT(`k`,'$.k[*]')));
+					WHEN `t` = 4 then SET `rs` =   r4b_json(json_array(i,JSON_EXTRACT(`k`,'$.k[*]')));
+					WHEN `t` in ('r4b_time','`r4b_time`') then SET `rs` =   r4b_time(json_array(i,JSON_EXTRACT(`k`,'$.k[*]')));
+					
+			 ELSE 	SET `rs` =  r4b(json_array(i,json_value(`k`,'$[0]')));
+		END case ;
 
 
 
+		IF IFNULL(`rs`,'')='' THEN SET i = i-1;LEAVE l;END IF;
 
-DEALLOCATE PREPARE stmt1;
-DEALLOCATE PREPARE stmt2;
-DEALLOCATE PREPARE stmt3;
-DEALLOCATE PREPARE stmt4;
-DEALLOCATE PREPARE stmt5;
+		IF json_length(`rs`)>0 AND JSON_DEPTH(`rs`)=3 AND jl = -1  THEN 
 
-DROP TEMPORARY TABLE IF EXISTS cura1;
-DROP TEMPORARY TABLE IF EXISTS cura2;
-DROP TEMPORARY TABLE IF EXISTS curb1;
-DROP TEMPORARY TABLE IF EXISTS curb2;
+				SET jl= i,jrs=JSON_REMOVE(rs,'$[0]'),`rs` = JSON_EXTRACT(`rs`,'$[0]');
 
+		END if;
+
+		IF json_value(`rs`,'$[2]') = '' THEN RETURN 'i';END IF;
+
+
+
+		CASE 
+		WHEN json_extract( rs,'$[0]') IN('"-1"','"跳"') THEN SET @i = null; 
+		WHEN json_extract( rs,'$[0]') = '-3' THEN RETURN 'p'; 
+		WHEN CONVERT(json_value(`rs`,'$[1]')USING gbk) REGEXP '(?i)^(react|多多|c$)'   THEN BEGIN DECLARE `brs`  LONGBLOB DEFAULT NULL;DECLARE `res`  LONGBLOB DEFAULT NULL;DECLARE `trs`  LONGBLOB DEFAULT NULL;DECLARE `tr` LONGTEXT DEFAULT NULL;
+
+
+					SET @rr0 := cast(json_value(`rs`,'$[2]')as  CHAR),`res`= NULL;
+SET @i = 1;
+					l0:LOOP
+
+ -- if @i = 1 THEN RETURN  QUOTE(json_value(`rs`,'$[2]'));END IF;	
+							SET addr =  REGEXP_instr(CAST(p AS CHAR),@rr0);		
+								
+							IF addr <= 0 OR IFNULL(p,'') = '' THEN LEAVE l0;END IF;
+
+
+							SET `res` := CONCAT_WS('',`res`
+													,IF(@rr0 REGEXP '\\Q(?#抓取)\\E' ,NULL,substr(p,1,addr-1))
+										)
+										,`brs`=json_remove(rs,'$[0]','$[0]')
+									,`trs` = REGEXP_substr(p  ,@rr0);
+							-- 移除头
+						
+
+
+							SET p = SUBSTR(p,addr+char_LENGTH(trs));
+							-- 处理
+-- f @i = 4 THEN RETURN p;END IF;	
+							BEGIN
+
+								l2:LOOP
+
+												IF json_length(`brs`)<=1 THEN LEAVE l2;END if;
+
+												SET  @rr1 :=CAST(json_value(`brs`,'$[1]') AS CHAR),@rr1s :=CAST(json_value(`brs`,'$[2]') AS CHAR)
+
+														,@`res`=NULL,`brs`  = JSON_REMOVE(`brs`,'$[1]','$[1]');	
+
+
+												IF  CAST(`trs` AS CHAR) NOT REGEXP  @rr1 THEN ITERATE l2;END IF;
+
+									l3:loop   
+
+												l4:LOOP 
+
+
+														SET addr = REGEXP_instr(cast(`trs`AS CHAR),@rr1);
+
+
+
+														IF IFNULL(addr,0) <1 THEN LEAVE l4;END IF;
+
+														SET @`res` := CONCAT_WS('',@`res`
+														           ,IF(@rr1 REGEXP '\\Q(?#抓取)\\E' ,NULL, substr(cast(`trs`AS CHAR),1,addr-1))
+																			 );
+														-- 处
+
+														set tr = REGEXP_substr(CAST(`trs` AS char),@rr1);
 
 
 
 
+														SET trs = substr(CAST(`trs` AS char),addr+char_length(tr)) ;
+
+														CASE 
+																 WHEN  @rr1s REGEXP '(?i)`json(:\\w+)?`' THEN 
+
+																	IF IFNULL(@rr1s,'')!='' AND NOT json_valid(@rr1s) THEN
+
+																		SET @rr11 = REGEXP_replace(REGEXP_replace(tr,@rr1,'\\1'),'^:','') ;
+
+																		IF @rr11 ='' THEN SET @rr11 = REGEXP_substr(@rr1s,'(?i)`json:\\K\\w+\\b');
+																		END if;
+
+																		SET @rr11 = json_extract(k,CONCAT('$.p.',@rr11));
+																	END IF; 
+
+																-- 	,',\\s?(?=[\"}])','\r\n')"
+	
+																	SET  @rr11 := REGEXP_replace(REGEXP_replace(REGEXP_replace(@rr11,'^\\{|\\}','')
+																										,',\\s?(?=["}])','\r\n')
+																										,'"((?:(?=\\\\).{2}|(?:(?=[^\\\\"]).))*?)"','\\1')
+																			,@rr11 := REGEXP_replace(@rr1s,'(?i)`json:(\\w+)`',@rr11) ;
+																			
+
+																	
+															ELSE
+																SET @rr11 = @rr1s;
+														END CASE;
+
+
+												
+													SET tr =  REGEXP_replace(tr,REGEXP_replace(@rr1 , '\\Q(?<=\\E[^)]+?\\)|\\Q(?=\\E[^)]+?\\)','') ,@rr11);
+
+												CASE 
+															 WHEN  @rr1 REGEXP '(?i)\\Q(?#UPPER)\\E' THEN 
+
+																set tr = UPPER(tr);
+																														
+															 WHEN  @rr1s REGEXP '(?i)`载入:(.*?)`' THEN 
+																	
+																			SET @rr11 := REGEXP_substr(tr,'(?i)`载入:\\K(.*?)(?=`)');
+
+																			SET @rr11s := LOAD_FILE(@rr11),@rr11 = IF (@rr11s IS NULL ,CONCAT_WS(' ','无法载入',@rr11), @rr11s);
+
+																			SET tr =  REGEXP_replace(tr,'(?i)`载入:.+?`',@rr11); 
+															ELSE SET tr = tr ; 
+												END CASE;
+														-- 放回
+
+
+														SET  @`res` = CONCAT_WS('',@`res`,tr);
+																-- @`@rss` = json_remove(@`@rss`,'$[1]','$[1]'); 
+
+
+SET @i =@i+1;
+
+												END loop;
+
+											SET `trs` = CAST(CONCAT_WS('',@`res`,IF(@rr1 REGEXP '\\Q(?#抓取)\\E' ,NULL,trs)) AS CHAR),@`res`=NULL;
+
+
+											IF  IF(json_value(rs,'$[0]')='l3', `trs` NOT REGEXP  @rr1 ,1) THEN 	leave l3;END IF;
+
+
+									END loop l3;
+
+							END loop;
+
+							END;
+
+							-- 放回
+
+							SET `res` = CONCAT_WS('',`res`,trs);
+
+					END loop;
+
+				SET p = CONCAT_WS('',`res`,IF(@rr0 REGEXP '\\Q(?#抓取)\\E' ,NULL,p));
+				
+
+				-- SET i =i +1;ITERATE l;
+
+		END;
+
+
+		 WHEN CONVERT(json_value(`rs`,'$[1]')USING gbk) REGEXP '^多(?!多)'   THEN
+					BEGIN DECLARE `trs`  LONGBLOB DEFAULT NULL;DECLARE `tr` LONGTEXT DEFAULT NULL;
+
+
+
+
+				IF p REGEXP  CONVERT(json_value(`rs`,'$[2]')using gbk) AND p NOT REGEXP CONVERT(CONCAT_WS('','(?ims)(',json_value(`rs`,'$[2]'),').*?(?1)')USING gbk)  THEN 
+
+
+					SET `trs` = REGEXP_replace(p ,json_value(`rs`,'$[2]'),json_value(`rs`,'$[3]')) ,`rs` = json_remove(rs,'$[0]','$[0]','$[1]'); 
+
+					l1:LOOP
+
+						IF json_length(`rs`) <= 1 THEN LEAVE l1;END IF;
+
+					if JSON_VALID(JSON_EXTRACT(`rs`,'$[1]')) AND JSON_EXTRACT(`rs`,'$[1]') REGEXP '^\\[' THEN
+							SET @ddr =  CONVERT(JSON_value(`rs`,'$[1][0]')using gbk),@ddre = CONVERT(JSON_value(`rs`,'$[1][1]')using gbk),`rs` = json_remove(rs,'$[1]');
+					 ELSE SET @ddr = CONVERT(JSON_value(`rs`,'$[1]')using gbk),@ddre = CONVERT(JSON_value(`rs`,'$[2]')using gbk),`rs` = json_remove(rs,'$[1]','$[1]');
+					END if;
+
+						IF `trs` REGEXP @ddr THEN 
+
+							SET `trs` = REGEXP_replace(`trs`,@ddr,@ddre) ;
+						END IF;
+
+
+					END loop;
+
+					SET p = REGEXP_replace(p ,CONVERT(json_value(`rs`,'$[0]') USING gbk),`trs`);
+				END IF;
+
+				-- SET i =i +1;ITERATE l;
+
+		END;
+
+		WHEN CONVERT(json_value(`rs`,'$[1]')USING gbk) REGEXP '^抓(?!取)'   THEN BEGIN DECLARE `trs`  LONGBLOB DEFAULT NULL;DECLARE `tr` LONGTEXT DEFAULT NULL;
+
+				IF p REGEXP  CONVERT(json_value(`rs`,'$[2]')using gbk) AND p NOT REGEXP CONVERT(CONCAT_WS('','(?ims)(',json_value(`rs`,'$[2]'),').*?(?1)')USING gbk)  THEN 
+
+ 
+					SET `trs` = REGEXP_substr(p ,json_value(`rs`,'$[2]')) ,`rs` = json_remove(rs,'$[0]','$[0]');
+
+					l1:LOOP
+						IF json_length(`rs`) = 1 THEN LEAVE l1;END IF;
+
+						IF `trs` REGEXP CONVERT(json_value(`rs`,'$[1]')using gbk) THEN 
+
+							SET `trs` = REGEXP_replace(`trs`,CONVERT(json_value(`rs`,'$[1]')using gbk),CONVERT(json_value(`rs`,'$[2]')using gbk)) ;
+						END IF;
+
+						SET `rs` = json_remove(rs,'$[1]','$[1]');	
+
+					END loop;
+
+					SET p = REGEXP_replace(p ,CONVERT(json_value(`rs`,'$[0]') USING gbk),`trs`);
+				END IF;
+
+		END;
+		
+
+		WHEN CONVERT(json_value(`rs`,'$[1]')USING gbk) REGEXP '^抓取' THEN
+
+			SET p= REGEXP_replace(p
+									,CONCAT_WS('','(?sm)^.*?(',CONVERT(json_value(`rs`,'$[2]')using gbk),').*?(?=(?1)|(?-m)$)')
+									,'\\1'
+								);
+
+		 ELSE 
+
+		  lend:LOOP 
+
+
+					IF JSON_LENGTH(`rs`)<3 THEN LEAVE lend; end if;
+
+					SET @rr1 := cast(json_value(`rs`,'$[2]')AS CHAR),@rr1s := cast(json_value(`rs`,'$[3]')AS CHAR);
+-- if json_value(rs,'$[0]')= '生成数组' THEN RETURN @rr1;END IF ;
+					SET	 p = REGEXP_replace(p,@rr1,@rr1s)
+					 ,rs = JSON_REMOVE(rs,'$[2]','$[2]')
+							;
+
+			END LOOP ;
+
+		END case;
+
+		IF IFNULL(p,'') THEN RETURN NULL;END IF;
+
+		SET  i = IF(i REGEXP '^[\\d\\-\\.]+$',i+1,CONCAT_WS('',i,'+1'));
+
+	END LOOP;
+
+
+
+RETURN cast(p AS CHAR);
+	RETURN  REGEXP_replace( p ,'<!DOCTYPE[^>]+>',CONCAT_WS('','\\0\n<!--',i,'-->'));
 
 END
 ;;
 DELIMITER ;
 
 -- ----------------------------
---  Procedure definition for `generateckey`
+--  Procedure definition for `f_copy2`
 -- ----------------------------
-DROP FUNCTION IF EXISTS `generateckey`;
+DROP FUNCTION IF EXISTS `f_copy2`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `generateckey`(`userid` varchar(20),`remark` varchar(10),`pkid` int(10)) RETURNS varchar(160) CHARSET utf8mb3
-    NO SQL
-BEGIN
-	IF IFNULL(remark,'') = '' THEN SET remark = '' ;END IF;
+CREATE DEFINER=`root`@`localhost` FUNCTION `f_copy2`(`p` LONGText,k text) RETURNS longblob
+    DETERMINISTIC
+p:BEGIN
+	#Routine body goes here...
+	DECLARE `rs` LONGTEXT DEFAULT NULL;DECLARE `jrs` LONGTEXT DEFAULT NULL;
+	DECLARE `arr` TEXT DEFAULT NULL;
+	DECLARE `r` TEXT DEFAULT '^\\[?(("\\w+"|[\\d\\-]+)(?:,(?-1))*?)]?$';
+	DECLARE i VARCHAR(100) DEFAULT 0;
+	DECLARE `l` INT(5) DEFAULT 20;
+	DECLARE `jl` varchar(100) DEFAULT -1;	
+	
+	DECLARE `t` VARCHAR(20) DEFAULT NULL;DECLARE `kword` varchar(200) DEFAULT NULL;DECLARE addr  INT(5) DEFAULT 0;
+	
+/*
+	DECLARE CONTINUE HANDLER FOR  SQLSTATE '21S01', SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22' ,SQLSTATE '21000', SQLSTATE	'HY000'-- ,SQLSTATE	'22007'
+	bl:BEGIN GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;SET  @`sqlstate` = JSON_OBJECT('sqlstate',@`sqlstate`,'errno',@errno,'text',CONCAT(i,@text));
+
+				SET @`errsql` = p,@funcid =  NULL;
+				SET @funcid = CONCAT_WS(' ','Error: ',(SELECT CONCAT_WS(', ',a.note,CONCAT_WS('',UPPER(SUBSTR(a.`name`,1,1)),LOWER(substr(a.`name`,2))),a.id) FROM mysq1_schema.qs AS a WHERE a.`name` = `funcid`)
+									, ' 执行' ),
+				@pp = QUOTE(p);
+				CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp,'SQL',@`errsql`,'err',@`sqlstate`,'l',1,"继续执行",'0'));END;
+
+
+START TRANSACTION;
+SET @funcid = CONCAT_WS(' ',(SELECT CONCAT_WS(', ',a.note,CONCAT_WS('',UPPER(SUBSTR(a.`name`,1,1)),LOWER(substr(a.`name`,2))),a.id) FROM mysq1_schema.qs AS a WHERE a.`name` = `funcid`)
+							, ' 执行' ),
+		@pp = QUOTE(`p`);
+
+CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp));COMMIT;*/
+	IF IFNULL(`p`,'') = '' THEN RETURN NULL;END IF; 
+
+/*  IF !json_valid(k) && IFNULL(k,'')!=''  THEN 
+   SET k = JSON_OBJECT('k','','t',2,'done',k) ;
+ END IF ;
+ */
+	 IF k REGEXP  r THEN
+			SET k := REGEXP_replace(k,r,'\\1'),k=JSON_OBJECT('t',2,'done',JSON_EXTRACT(CONCAT('[',k,']'),'$'));
+
+	 END IF;
+
+	IF json_valid(k) THEN 
+
+		SET t = Json_value(k,'$.t')
+       ,kword = JSON_value(k,'$.k[0]');
+	end IF ;
+
+
+ IF  json_value(`k`,'$.start') is NOT NULL THEN SET i =  json_value(`k`,'$.start') ; END IF;
+ SET `arr` = CAST(JSON_EXTRACT(`k`,'$.done') AS char) ; 
+
+
+
+  l:LOOP
+
+		IF `jrs`is NOT NULL  AND json_length(`jrs`) = 0 THEN SET i= iF(jl REGEXP '^[\\d\\-\\.]+$',jl+1,CONCAT_WS('',jl,'+1')),jl=-1,jrs = NULL;END if; 
+
+		IF i>=l+1 AND jrs IS NULL THEN LEAVE l;END if;
+
+		IF `jrs`is  NULL AND   arr IS NOT NULL  AND json_valid(arr) THEN 
+			IF JSON_length(arr)>0 THEN 
+				SET i = JSON_VALUE(arr , '$[0]'),arr = json_REMOVE(arr,'$[0]');	
+				ELSE LEAVE l;
+			END IF;
+		END IF;
+
+
+
+
+		CASE 	
+		
+					WHEN `Jl` >-1 AND json_length(`jrs`)>0  THEN 
+						SET `rs` = JSON_EXTRACT(`jrs`,'$[0]'),jrs=JSON_REMOVE(jrs,'$[0]');
+
+					WHEN `t` = 1 then SET `rs` =   r4b1(json_array(i,JSON_EXTRACT(`k`,'$.k[*]')));
+					WHEN `t` REGEXP '^(?:react|2)$' then SET `rs` =   r4b2(json_array(i,cast(JSON_EXTRACT(`k`,'$.k[*]')as char)));
+					WHEN `t` = 3 then SET `rs` =   r4b3(json_array(i,JSON_EXTRACT(`k`,'$.k[*]')));
+					WHEN `t` = 4 then SET `rs` =   r4b_json(json_array(i,JSON_EXTRACT(`k`,'$.k[*]')));
+					WHEN `t` in ('r4b_time','`r4b_time`') then SET `rs` =   r4b_time(json_array(i,JSON_EXTRACT(`k`,'$.k[*]')));
+					
+			 ELSE 	SET `rs` =  r4b(json_array(i,json_value(`k`,'$[0]')));
+		END case ;
+
+
+
+		IF IFNULL(`rs`,'')='' THEN SET i = i-1;LEAVE l;END IF;
+
+		IF json_length(`rs`)>0 AND JSON_DEPTH(`rs`)=3 AND jl = -1  THEN 
+
+				SET jl= i,jrs=JSON_REMOVE(rs,'$[0]'),`rs` = JSON_EXTRACT(`rs`,'$[0]');
+
+		END if;
+
+		IF json_value(`rs`,'$[2]') = '' THEN RETURN 'i';END IF;
+
+RETURN 'rs';
+
+		CASE 
+		WHEN json_extract( rs,'$[0]') IN('"-1"','"跳"') THEN SET @i = null; 
+		WHEN json_extract( rs,'$[0]') = '-3' THEN RETURN 'p'; 
+		WHEN CONVERT(json_value(`rs`,'$[1]')USING gbk) REGEXP '(?i)^(react|多多|c$)'   THEN BEGIN DECLARE `brs`  LONGBLOB DEFAULT NULL;DECLARE `res`  LONGBLOB DEFAULT NULL;DECLARE `trs`  LONGBLOB DEFAULT NULL;DECLARE `tr` LONGTEXT DEFAULT NULL;
+
+
+					SET @rr0 := cast(json_value(`rs`,'$[2]')as  CHAR),`res`= NULL;
+
+SET @i = 1;
+					l0:LOOP
+
+ -- if @i = 1 THEN RETURN  QUOTE(json_value(`rs`,'$[2]'));END IF;	
+							SET addr =  REGEXP_instr(CAST(p AS CHAR),@rr0);		
+								
+							IF addr <= 0 OR IFNULL(p,'') = '' THEN LEAVE l0;END IF;
+
+
+							SET `res` := CONCAT_WS('',`res`
+													,IF(@rr0 REGEXP '\\Q(?#抓取)\\E' ,NULL,substr(p,1,addr-1))
+										)
+										,`brs`=json_remove(rs,'$[0]','$[0]')
+									,`trs` = REGEXP_substr(p  ,@rr0);
+							-- 移除头
+						
+
+
+							SET p = SUBSTR(p,addr+char_LENGTH(trs));
+							-- 处理
+-- f @i = 4 THEN RETURN p;END IF;	
+							BEGIN
+
+								l2:LOOP
+
+												IF json_length(`brs`)<=1 THEN LEAVE l2;END if;
+
+												SET  @rr1 :=CAST(json_value(`brs`,'$[1]') AS CHAR),@rr1s :=CAST(json_value(`brs`,'$[2]') AS CHAR)
+
+														,@`res`=NULL,`brs`  = JSON_REMOVE(`brs`,'$[1]','$[1]');	
+
+
+												IF  CAST(`trs` AS CHAR) NOT REGEXP  @rr1 THEN ITERATE l2;END IF;
+
+									l3:loop   
+
+												l4:LOOP 
+
+
+														SET addr = REGEXP_instr(cast(`trs`AS CHAR),@rr1);
+
+
+
+														IF IFNULL(addr,0) <1 THEN LEAVE l4;END IF;
+
+														SET @`res` := CONCAT_WS('',@`res`
+														           ,IF(@rr1 REGEXP '\\Q(?#抓取)\\E' ,NULL, substr(cast(`trs`AS CHAR),1,addr-1))
+																			 );
+														-- 处
+
+														set tr = REGEXP_substr(CAST(`trs` AS char),@rr1);
+
+
+
+
+														SET trs = substr(CAST(`trs` AS char),addr+char_length(tr)) ;
+
+														CASE 
+																 WHEN  @rr1s REGEXP '(?i)`json(:\\w+)?`' THEN 
+
+																	IF IFNULL(@rr1s,'')!='' AND NOT json_valid(@rr1s) THEN
+
+																		SET @rr11 = REGEXP_replace(REGEXP_replace(tr,@rr1,'\\1'),'^:','') ;
+
+																		IF @rr11 ='' THEN SET @rr11 = REGEXP_substr(@rr1s,'(?i)`json:\\K\\w+\\b');
+																		END if;
+
+																		SET @rr11 = json_extract(k,CONCAT('$.p.',@rr11));
+																	END IF; 
+
+																-- 	,',\\s?(?=[\"}])','\r\n')"
+	
+																	SET  @rr11 := REGEXP_replace(REGEXP_replace(REGEXP_replace(@rr11,'^\\{|\\}','')
+																										,',\\s?(?=["}])','\r\n')
+																										,'"((?:(?=\\\\).{2}|(?:(?=[^\\\\"]).))*?)"','\\1')
+																			,@rr11 := REGEXP_replace(@rr1s,'(?i)`json:(\\w+)`',@rr11) ;
+																			
+
+																	
+															ELSE
+																SET @rr11 = @rr1s;
+														END CASE;
+
+
+												
+													SET tr =  REGEXP_replace(tr,REGEXP_replace(@rr1 , '\\Q(?<=\\E[^)]+?\\)|\\Q(?=\\E[^)]+?\\)','') ,@rr11);
+
+												CASE 
+															 WHEN  @rr1 REGEXP '(?i)\\Q(?#UPPER)\\E' THEN 
+
+																set tr = UPPER(tr);
+																														
+															 WHEN  @rr1s REGEXP '(?i)`载入:(.*?)`' THEN 
+																	
+																			SET @rr11 := REGEXP_substr(tr,'(?i)`载入:\\K(.*?)(?=`)');
+
+																			SET @rr11s := LOAD_FILE(@rr11),@rr11 = IF (@rr11s IS NULL ,CONCAT_WS(' ','无法载入',@rr11), @rr11s);
+
+																			SET tr =  REGEXP_replace(tr,'(?i)`载入:.+?`',@rr11); 
+															ELSE SET tr = tr ; 
+												END CASE;
+														-- 放回
+
+
+														SET  @`res` = CONCAT_WS('',@`res`,tr);
+																-- @`@rss` = json_remove(@`@rss`,'$[1]','$[1]'); 
+
+
+SET @i =@i+1;
+
+												END loop;
+
+											SET `trs` = CAST(CONCAT_WS('',@`res`,IF(@rr1 REGEXP '\\Q(?#抓取)\\E' ,NULL,trs)) AS CHAR),@`res`=NULL;
+
+
+											IF  IF(json_value(rs,'$[0]')='l3', `trs` NOT REGEXP  @rr1 ,1) THEN 	leave l3;END IF;
+
+
+									END loop l3;
+
+							END loop;
+
+							END;
+
+							-- 放回
+
+							SET `res` = CONCAT_WS('',`res`,trs);
+
+					END loop;
+
+				SET p = CONCAT_WS('',`res`,IF(@rr0 REGEXP '\\Q(?#抓取)\\E' ,NULL,p));
+				
+
+				-- SET i =i +1;ITERATE l;
+
+		END;
+
+
+		 WHEN CONVERT(json_value(`rs`,'$[1]')USING gbk) REGEXP '^多(?!多)'   THEN
+					BEGIN DECLARE `trs`  LONGBLOB DEFAULT NULL;DECLARE `tr` LONGTEXT DEFAULT NULL;
+
+
+
+
+				IF p REGEXP  CONVERT(json_value(`rs`,'$[2]')using gbk) AND p NOT REGEXP CONVERT(CONCAT_WS('','(?ims)(',json_value(`rs`,'$[2]'),').*?(?1)')USING gbk)  THEN 
+
+
+					SET `trs` = REGEXP_replace(p ,json_value(`rs`,'$[2]'),json_value(`rs`,'$[3]')) ,`rs` = json_remove(rs,'$[0]','$[0]','$[1]'); 
+
+					l1:LOOP
+
+						IF json_length(`rs`) <= 1 THEN LEAVE l1;END IF;
+
+					if JSON_VALID(JSON_EXTRACT(`rs`,'$[1]')) AND JSON_EXTRACT(`rs`,'$[1]') REGEXP '^\\[' THEN
+							SET @ddr =  CONVERT(JSON_value(`rs`,'$[1][0]')using gbk),@ddre = CONVERT(JSON_value(`rs`,'$[1][1]')using gbk),`rs` = json_remove(rs,'$[1]');
+					 ELSE SET @ddr = CONVERT(JSON_value(`rs`,'$[1]')using gbk),@ddre = CONVERT(JSON_value(`rs`,'$[2]')using gbk),`rs` = json_remove(rs,'$[1]','$[1]');
+					END if;
+
+						IF `trs` REGEXP @ddr THEN 
+
+							SET `trs` = REGEXP_replace(`trs`,@ddr,@ddre) ;
+						END IF;
+
+
+					END loop;
+
+					SET p = REGEXP_replace(p ,CONVERT(json_value(`rs`,'$[0]') USING gbk),`trs`);
+				END IF;
+
+				-- SET i =i +1;ITERATE l;
+
+		END;
+
+		WHEN CONVERT(json_value(`rs`,'$[1]')USING gbk) REGEXP '^抓(?!取)'   THEN BEGIN DECLARE `trs`  LONGBLOB DEFAULT NULL;DECLARE `tr` LONGTEXT DEFAULT NULL;
+
+				IF p REGEXP  CONVERT(json_value(`rs`,'$[2]')using gbk) AND p NOT REGEXP CONVERT(CONCAT_WS('','(?ims)(',json_value(`rs`,'$[2]'),').*?(?1)')USING gbk)  THEN 
+
  
-  set @keyword = CONCAT(userid , '-',remark,DATE_FORMAT(NOW(),'%y%m%d%H%i%s'),
-									if(pkid is NULL ,RIGHT(RAND(),5),
-										 concat(
-														pkid, RIGHT(RAND(),5-LENGTH(pkid))
-														)
-									)
-							);
-	RETURN @keyword;
+					SET `trs` = REGEXP_substr(p ,json_value(`rs`,'$[2]')) ,`rs` = json_remove(rs,'$[0]','$[0]');
+
+					l1:LOOP
+						IF json_length(`rs`) = 1 THEN LEAVE l1;END IF;
+
+						IF `trs` REGEXP CONVERT(json_value(`rs`,'$[1]')using gbk) THEN 
+
+							SET `trs` = REGEXP_replace(`trs`,CONVERT(json_value(`rs`,'$[1]')using gbk),CONVERT(json_value(`rs`,'$[2]')using gbk)) ;
+						END IF;
+
+						SET `rs` = json_remove(rs,'$[1]','$[1]');	
+
+					END loop;
+
+					SET p = REGEXP_replace(p ,CONVERT(json_value(`rs`,'$[0]') USING gbk),`trs`);
+				END IF;
+
+		END;
+		
+
+		WHEN CONVERT(json_value(`rs`,'$[1]')USING gbk) REGEXP '^抓取' THEN
+
+			SET p= REGEXP_replace(p
+									,CONCAT_WS('','(?sm)^.*?(',CONVERT(json_value(`rs`,'$[2]')using gbk),').*?(?=(?1)|(?-m)$)')
+									,'\\1'
+								);
+
+		 ELSE 
+
+		  lend:LOOP 
+
+
+					IF JSON_LENGTH(`rs`)<3 THEN LEAVE lend; end if;
+
+					SET @rr1 := cast(json_value(`rs`,'$[2]')AS CHAR),@rr1s := cast(json_value(`rs`,'$[3]')AS CHAR);
+-- if json_value(rs,'$[0]')= '生成数组' THEN RETURN @rr1;END IF ;
+					SET	 p = REGEXP_replace(p,@rr1,@rr1s)
+					 ,rs = JSON_REMOVE(rs,'$[2]','$[2]')
+							;
+
+			END LOOP ;
+
+		END case;
+
+		IF IFNULL(p,'') THEN RETURN NULL;END IF;
+
+		SET  i = IF(i REGEXP '^[\\d\\-\\.]+$',i+1,CONCAT_WS('',i,'+1'));
+
+	END LOOP;
+
+
+
+RETURN cast(p AS CHAR);
+	RETURN  REGEXP_replace( p ,'<!DOCTYPE[^>]+>',CONCAT_WS('','\\0\n<!--',i,'-->'));
+
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `f_else`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `f_else`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `f_else`(`p` LONGBLOB ) RETURNS longblob
+    DETERMINISTIC
+BEGIN
+	DECLARE `kword`  VARCHAR ( 200 ) DEFAULT NULL;
+	DECLARE	`计数`,`计数0` INT ( 5 ) DEFAULT 0;
+	DECLARE	addr,`次数` INT ( 11 ) DEFAULT NULL;
+	DECLARE 	`当前表达式`text  DEFAULT NULL;
+	DECLARE 	`当前替换`text  DEFAULT null;
+	DECLARE `res`	,	`ts`LONGBLOB DEFAULT NULL;
+	DECLARE brs LONGBLOB DEFAULT NULL ;
+
+	
+	DECLARE CONTINUE HANDLER FOR SQLEXCEPTION
+		bl : BEGIN
+
+			GET DIAGNOSTICS CONDITION 1 @`sqlstat` = RETURNED_SQLSTATE,
+			@errno = MYSQL_ERRNO,
+			@TEXT = MESSAGE_TEXT;
+			SET  @`sqlstate` = CONCAT_WS(',','f_else', @`sqlstat` ,@`sqlstate`);
+
+			RETURN  JSON_MERGE(JSON_OBJECT( 'RETURNED_SQLSTATE', CAST(@`sqlstate` AS CHAR)),JSON_OBJECT( 'MYSQL_ERRNO', @errno, 'MESSAGE_TEXT', @TEXT ));
+		END ;
+
+IF IFNULL(p,'')=''  ||  NOT json_valid(p) || JSON_length(p)<2 || JSON_depth(p)<2 THEN RETURN p ; END IF ;
+
+SET  brs = json_value(p,'$[1]');
+
+
+IF IFNULL(json_value(p,'$[0]'),'')=''  || IFNULL(brs,'') = ''|| NOT json_valid(brs) || JSON_DEPTH(brs)<2 || JSON_length(brs)<2 THEN 
+RETURN _s(json_array(1234,'f_react 错误 brs'));
+END IF ;
+SET  p = 	 json_value(p,'$[0]');
+SET @`sqlstate` =null;
+
+SET @状态2 = state(NULL,0);
+
+重要的else :LOOP
+
+						IF json_length(`brs`)<3 || JSON_LENGTH( `brs` )< 4 && 
+							IF (json_value(brs,'$[3]')<=>NULL, json_value(brs,'$[2]')  NOT  REGEXP '\\Q(?#抓取\\E[^)]*?\\)\\s*\\S+' ,1) 
+							||JSON_DEPTH(JSON_EXTRACT(brs ,'$[2]'))>1 
+							THEN
+								LEAVE 重要的else;END IF;
+
+
+						SET `当前表达式` := cast( json_value( `brs`, '$[2]' ) AS CHAR ),
+						`当前替换` := cast( json_value( `brs`, '$[3]' ) AS CHAR );
+
+			-- 			IF `当前表达式` = 'done' && `当前替换` IS NOT NULL THEN ITERATE l; 	END IF;
+
+						SET brs = JSON_REMOVE( brs, '$[2]', '$[2]' );
+
+					CASE
+								
+								WHEN `当前表达式` REGEXP '\\Q(?#抓取\\E[^)]*?\\)\\s*\\S+' 	 THEN
+					
+
+
+	
+									SET kword := REGEXP_substr ( `当前表达式`, '\\Q(?#抓取\\E\\K\\d+' ),
+									
+											brs = IF(当前替换 IS NOT null ,JSON_ARRAY_INSERT(brs, '$[2]', 当前替换),brs);
+	
+									SET  次数 =
+								IF
+									(
+										kword = '',
+									NULL,kword),计数 = 0,
+									`res` = NULL;
+
+								SET addr = REGEXP_instr ( p, `当前表达式` );
+
+								抓取 :WHILE addr > 0 && IF (次数 IS NULL, 1,计数 < 次数 ) DO
+										
+										SET `ts` := REGEXP_substr ( p, `当前表达式` );
+
+									SET `res` = CONCAT_WS( '', res, ts ),
+									`p` = substr(
+										`p`,
+									addr + CHAR_LENGTH( `ts` ));
+
+									SET 计数 = 计数 + 1,
+									addr = REGEXP_instr ( p, `当前表达式` );
+
+								END WHILE 抓取;
+
+								SET p = `res`,
+								`res` = NULL;
+
+								WHEN `当前表达式` REGEXP '\\Q(?#result2)\\E' 
+								AND p REGEXP `当前表达式` THEN
+									BEGIN
+										DECLARE
+											result LONGBLOB DEFAULT NULL;
+										result2 :
+										LOOP
+											IF
+												p NOT REGEXP `当前表达式` THEN
+													LEAVE result2;
+												
+											END IF;
+											
+											SET p = CONCAT_WS(
+												',',
+												result,
+											CONCAT_WS( '', '[', REGEXP_replace ( p, '\\[("\\w+").*?]', '\\1' ), ']' ));
+											
+										END LOOP;
+										
+										SET p = result;
+										
+									END;
+									
+									WHEN `当前表达式` REGEXP '\\Q(?#result)\\E' 
+									AND p REGEXP `当前表达式` THEN
+										BEGIN
+											DECLARE
+												result LONGBLOB DEFAULT NULL;
+											
+											SET p := REGEXP_replace ( p, '("\\w+")(?:,\\g-1)++', '[\\0]' );
+											resultl :
+											LOOP
+												IF
+													p NOT REGEXP '(?<=\\[)("\\w+")(?:,|])' THEN
+														LEAVE resultl;
+													
+												END IF;
+												
+												SET result = CONCAT_WS(
+													',',
+													result,
+												CONCAT_WS( '', '[', REGEXP_replace ( p, '\\[("\\w+").*?]', '\\1' ), ']' )),
+												p = REGEXP_replace ( REGEXP_replace ( REGEXP_replace ( p, '(?<=\\[)("\\w+")(?:,|])', '' ), '\\[,', '' ), ',\\[$', '' );
+												
+											END LOOP;
+											
+											SET p = result;
+											
+										END;
+ELSE 
+
+									IF  CHAR_length(`当前表达式` ) = length(`当前表达式` ) THEN 
+											SET p = REGEXP_replace ( p, `当前表达式`, `当前替换` );
+									ELSE 
+											SET p = REGEXP_replace ( CAST( p AS CHAR), `当前表达式`, `当前替换` );
+										
+									END if;
+
+									END CASE;
+
+						SET 计数0=计数0 + 1;
+SET  @状态2 = state(@状态2,0); 
+						END LOOP  重要的else	;-- 重要的else			
+
+
+SET  @状态2 =CONCAT_WS('\np:\n',state(@状态2,-1),p);
+
+	RETURN JSON_OBJECT('p',p,'rs',brs);
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `f_react`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `f_react`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `f_react`(p LONGBLOB ) RETURNS longblob
+    DETERMINISTIC
+BEGIN
+	DECLARE 	`rs` text DEFAULT JSON_value(p,'$[1]');
+
+
+
+	DECLARE 	`brs`text  DEFAULT NULL;
+	DECLARE 	`result`longblob  DEFAULT NULL;
+	DECLARE 	`当前表达式` ,	`当前替换` ,调试,rr0  text  DEFAULT NULL;
+	DECLARE 	`次数`,addr,num,	`计数器1`,trs计数器 INT ( 5 ) DEFAULT 0;
+	DECLARE 	`trs`	,	`res`,`tr`, `ress`,`sqlstate`	 longblob DEFAULT NULL ;
+
+
+	DECLARE cb  CONDITION FOR 666;
+	DECLARE CONTINUE HANDLER FOR cb
+BEGIN
+-- RETURN 调试(json_extract(brs,'$[1]'));
+								set trs  = f_else(JSON_ARRAY(trs,brs));
+								
+								IF  json_valid(trs) && JSON_EXTRACT(trs,'$.RETURNED_SQLSTATE') is NOT NULL || JSON_EXISTS(trs,'$.tiaoShi') THEN 
+									SET 调试 = JSON_value(trs,'$.tiaoShi');
+	
+								  SET @RETURNED_SQLSTATE = CONCAT('j_react:',json_value(trs,'$.RETURNED_SQLSTATE')),
+											@MYSQL_ERRNO =  json_value(trs,'$.MYSQL_ERRNO'),
+											@MESSAGE_TEXT = json_value(trs,'$.MESSAGE_TEXT');
+
+									RETURN _S(json_array(@MYSQL_ERRNO,@MESSAGE_TEXT));
+
+								
+									ELSE 
+
+									SET p = json_value(trs,'$.p');
+									SET	 rs = CAST(IF(JSON_EXISTS(trs, '$.rs'),json_value(trs,'$.rs'),brs) AS CHAR);
+								END IF; 
+END;
+
+	DECLARE CONTINUE HANDLER FOR SQLEXCEPTION
+		bl : BEGIN
+			GET DIAGNOSTICS CONDITION 1 @`sqlstat` = RETURNED_SQLSTATE,
+			@errno = MYSQL_ERRNO,
+			@TEXT = MESSAGE_TEXT;
+			SET  `sqlstate` = CONCAT_WS('\n', @`sqlstat`,`sqlstate`);
+			RETURN  JSON_OBJECT( 'RETURNED_SQLSTATE', `sqlstate`, 'MYSQL_ERRNO', @errno, 'MESSAGE_TEXT', @TEXT ,"计数器",计数器1);
+
+		END ;
+
+
+	SET @i=1,	`p` = JSON_value(p,'$[0]') ;
+	
+SET @状态1:=  state(NULL,0);
+
+	SET `rr0` := json_value( cast( `rs` AS CHAR ), '$[2]' ),
+	`res` = NULL -- ,`rs` = json_remove(rs,'$[2]')
+	,计数器1 = 0
+	;
+		/*   提升*/
+		IF  JSON_DEPTH(rs) >2	then 
+				SET rs = rEGEXP_replace(rs ,o(',\\s*\\[\\s*(?&v)(?:(?:\\s*,\\s*)(?&v)){1}|(?&v)\\K\\](?=\\s*[,\\]]) j'),'');
+		END IF; 
+
+	l0 :LOOP
+
+
+		SET addr = REGEXP_instr ( p, `rr0` );
+
+
+		IF 	addr <= 0 || IFNULL( p, '' ) = '' THEN
+
+				IF ( `rr0` REGEXP '\\Q(?#抓取\\E') THEN  
+						SET p = IF(@统计 is null || @统计 ,CONCAT('\n',计数器1),null);
+				END IF; 
+
+				LEAVE l0;
+
+		END IF;
+
+		SET `res` := CONCAT_WS( '', `res`, IF ( `rr0` REGEXP '\\Q(?#抓取\\E', NULL, substr( p, 1, addr - 1 )) ),
+		`brs` = json_remove( rs, '$[0]', '$[0]' ),
+		`trs` = REGEXP_substr ( p, `rr0` );
+
+		SET p = SUBSTR(		p, addr + char_LENGTH( trs )) ,trs计数器=trs计数器+1;
+SET @状态1 = state(@状态1,0);
+
+		CASE WHEN json_value( `rs`, '$[1]' ) REGEXP '(?i)^(react|多多|c$)'  THEN 
+
+
+			l2 :LOOP
+SET @tmp = NULL;
+				IF	 IF ( `rr0` REGEXP '\\Q(?#抓取\\E', json_length( `brs` )< 1 ,json_length( `brs` )<=1)THEN	LEAVE l2;END IF;
+
+				IF json_length(json_extract( `brs`, '$[1]'))>2 THEN  return _s(json_array(666,'here '));END IF ;
+
+				SET 当前表达式 := CAST( json_value( `brs`, '$[1]' ) AS CHAR ),
+				当前替换 := CAST( json_value( `brs`, '$[2]' ) AS CHAR ),
+				`ress` = NULL,
+				`brs` = JSON_REMOVE( `brs`, '$[1]', '$[1]' );
+
+
+
+				IF IFNULL(当前表达式 ,'')='' || `trs` NOT REGEXP 当前表达式  THEN
+
+					CASE 										
+								WHEN  当前表达式 REGEXP '^抓取结束$' THEN
+											
+											SET trs = CONCAT_WS('\n'
+											
+											,CONCAT_WS('','抓取开始 ',trs,' 抓取结束')
+											,result);
+											
+								WHEN  当前表达式 REGEXP '^抓取开始$' THEN
+
+											SET result  =  trs;
+							
+				
+											ITERATE l2;
+					
+								WHEN  IFNULL(当前表达式 ,'') = '' THEN
+										SET res  =  CONCAT_WS('',res,trs);
+										ITERATE l0;
+								RETURN		_s(json_array(777,'当前表达式'));
+										
+								WHEN 当前表达式 REGEXP '\\Q(?#抓取)\\E' THEN
+
+									SET trs = NULL;
+
+								WHEN 当前表达式 REGEXP '\\Q(?#作为参数)\\E' THEN
+
+								SET 当前表达式 = 当前表达式;
+								
+						ELSE 	SET 当前表达式 = 当前表达式;
+
+					END CASE;
+
+set @i=@i +1;
+					ITERATE l2;
+
+				END IF;
+
+
+				l3 :LOOP
+
+						l4 :LOOP
+
+
+
+							SET addr = REGEXP_instr ( `trs`, 当前表达式 );
+							
+							
+
+							IF IFNULL( addr, 0 ) < 1  THEN LEAVE l4; END IF;
+
+							SET `ress` := CONCAT_WS( '', `ress`, IF (  当前表达式 REGEXP '\\Q(?#抓取)\\E', NULL, substr( `trs`, 1, addr - 1 )) );
+
+							SET `sqlstate` = CONCAT_WS('; ',`sqlstate`,'1 done'); 
+
+
+
+							CASE 
+
+										 
+											
+
+							
+									WHEN  当前替换 REGEXP '`\\?\\d`' THEN
+
+										SET `sqlstate` = CONCAT_WS('; ',`sqlstate`,'3 当前替换'); 
+										IF  trs REGEXP o('(?&cyear) date') THEN
+											SET num := num(trs),trs = num;
+										END IF ;	
+										
+										SET trs= trs + REGEXP_substr(当前替换,'\\d');
+
+										IF  num IS NOT NULL THEN
+											SET trs = num(trs),num = null;
+										END IF ;	
+
+									-- RETURN 'trs' ;
+								WHEN 当前表达式 REGEXP '\\Q反复应用\\E|\\Q(?#\\E(?:直接)' THEN
+									SET `sqlstate` = CONCAT_WS('; ',`sqlstate`,'3 反复应用'); 
+									IF '\\Q(?#\\E(?:直接)' THEN
+											
+											SET `次数` = 1;
+										
+									END IF;
+
+									直接应用 :LOOP
+										IF 	CASE 
+												when trs NOT REGEXP 当前表达式  THEN 1
+												WHEN 次数 IS NULL THEN 1 
+												WHEN 次数 < 1 THEN 1
+												ELSE 0  END
+												THEN LEAVE 直接应用;	END IF;
+														
+										SET trs = REGEXP_replace ( trs, 当前表达式, 当前替换 ),
+										次数 =
+										IF (次数 IS NULL, NULL,次数- 1 );
+										
+									END LOOP 直接应用;
+								
+									SET `次数` = NULL;
+							-- RETURN trs ;
+
+								WHEN 当前表达式 REGEXP '\\Q分裂数组1\\E' THEN
+														SET `sqlstate` = CONCAT_WS('; ',`sqlstate`,'3 Q分裂数组1'); 
+									BEGIN
+										DECLARE  字段头 TINYTEXT DEFAULT NULL;
+										DECLARE 长度 INT ( 11 ) DEFAULT 0;
+										DECLARE 字段 TEXT DEFAULT NULL;
+										DECLARE 表达式 TINYTEXT DEFAULT NULL;
+										DECLARE 中间结果 TEXT DEFAULT NULL;
+										DECLARE 结果 TEXT DEFAULT NULL;
+										
+										SET 长度 := REGEXP_substr ( JSON_SEARCH( trs, 'one', REPLACE ( REGEXP_substr ( trs, '"\\K[abt]\\w+(?=")' ), '"', '' )), '\\d+(?=]"$)' ),
+										表达式 = CONCAT_WS( '', '("(?:(?=\\\\).{2}|[^\\\\"])*?"|null|\\-?[\\d+,](?:\\.\\d+)?)(?:,\\s?(?-1)){',长度- 1, '}' );
+										
+										SET 字段 = REGEXP_replace ( trs, CONCAT( '(?<=^\\[)',表达式, ',?+' ), '' );
+
+										`l5` :LOOP
+														IF  IFNULL(字段头, '' )= ''  
+															OR ! json_valid(字段头) 
+															OR JSON_LENGTH(字段头)< 1 THEN
+																
+																SET 字段头 = CONCAT( '[', REGEXP_substr ( trs,表达式), ']' );
+															
+														END IF;
+														IF
+															IFNULL(字段, '' )= '' 
+															OR ! json_valid(字段) 
+															OR JSON_LENGTH(字段)< 1 THEN
+																LEAVE `l5`;
+															
+														END IF;
+
+														SET 中间结果 = JSON_MERGE(
+															JSON_EXTRACT(字段头, '$[0]' ),
+														JSON_EXTRACT(字段, '$[0]' )),字段头 = json_remove(字段头, '$[0]' ),字段 = json_remove(字段, '$[0]' );
+														IF
+															IFNULL(中间结果, '' )!= '' THEN
+																
+																SET 结果 = CONCAT_WS(
+																',',结果,中间结果);
+															
+														END IF;
+
+										END LOOP `l5`;
+										
+										SET tr = 结果,
+										trs = 字段;
+										
+									END;
+							ELSE 
+
+
+								SET `sqlstate` = CONCAT_WS('; ',`sqlstate`,'3 else'); 
+
+
+								SET tr = REGEXP_substr( `trs`, 当前表达式 );
+			
+
+								IF IFNULL( tr, '' )= '' THEN  LEAVE l4; 	END IF;
+
+								SET trs = substr(	`trs`,	addr + char_length( tr ));
+								
+								SET `sqlstate` = CONCAT_WS('; ',`sqlstate`,'4 else'); 
+								
+
+		/*________*/CASE 
+
+								WHEN 当前替换 REGEXP '(?i)`json(:\\w+)?`' THEN  
+								IF IFNULL( 当前替换, '' )!= '' AND NOT json_valid( 当前替换 ) THEN
+									SET @rr11 = REGEXP_replace ( REGEXP_replace ( tr, 当前表达式, '\\1' ), '^:', '' );
+									IF 	@rr11 = '' THEN
+											
+											SET @rr11 = REGEXP_substr ( 当前替换, '(?i)`json:\\K\\w+\\b' );
+										
+									END IF;
+
+								SET @rr11 = json_extract(k,CONCAT( '$.p.', @rr11 ));
+
+										END IF;-- 	,',\\s?(?=[\"}])','\r\n')"
+										
+										SET @rr11 := REGEXP_replace ( REGEXP_replace ( REGEXP_replace ( @rr11, '^\\{|\\}', '' ), ',\\s?(?=["}])', '\r\n' ), '"((?:(?=\\\\).{2}|(?:(?=[^\\\\"]).))*?)"', '\\1' ),
+										@rr11 := REGEXP_replace ( 当前替换, '(?i)`json:(\\w+)`', @rr11 );
+										
+										WHEN 当前表达式 REGEXP '\\Q(?#作为参数\\E\\s+\\w+' THEN
+										
+										SET brs = REGEXP_replace ( brs, CONCAT( '`参', REGEXP_substr ( 当前表达式, '\\Q(?#作为参数\\E\\s+\\K\\w+' ), '`' ), tr );
+
+										ELSE 
+
+											SET @rr11 = 当前替换;
+											SET `sqlstate` = CONCAT_WS('; ',`sqlstate`,'2 done'); 
+
+									END CASE;
+
+									SET tr = REGEXP_replace ( tr, CASE WHEN `rr0` = 当前表达式 THEN REGEXP_replace ( 当前表达式, '\\Q(?<=\\E[^)]+?\\)|\\Q(?=\\E[^)]+?\\)', '' ) ELSE 当前表达式 END, @rr11 );
+
+								CASE
+
+									WHEN 当前表达式 REGEXP '(?i)\\Q(?#\\E(quote)' THEN
+
+
+									SET tr = JSON_QUOTE(CAST(tr AS CHAR));
+
+									WHEN 当前表达式 REGEXP '(?i)\\Q(?#\\E(UPPER|LOWER)' THEN
+
+									SET tr = IF(当前表达式 REGEXP '(?i)\\Q(?#\\E(UPPER)',UPPER(CAST(tr AS CHAR) ),LOWER(CAST(tr AS CHAR) ));
+
+									WHEN 当前替换 REGEXP '(?i)`载入:(.*?)`' THEN
+									
+									SET @rr11 := REGEXP_substr ( tr, '(?i)`载入:\\K(.*?)(?=`)' );
+									
+									SET @rr11s := LOAD_FILE( @rr11 ),
+									@rr11 =
+									IF
+			( @rr11s IS NULL, CONCAT_WS( ' ', '无法载入', @rr11 ), @rr11s );
+									
+									SET tr = REGEXP_replace ( tr, '(?i)`载入:.+?`', @rr11 );
+									ELSE  SET tr = tr;
+									
+								END CASE;-- 放回
+
+							END CASE;
+
+
+						SET `ress` = CONCAT_WS( '', `ress`, tr );
+
+					END LOOP;-- l4 LOOP
+					
+					SET `trs` = CONCAT_WS(
+						'',
+						`ress`,
+						IF	( 当前表达式 REGEXP '\\Q(?#抓取)\\E', NULL, trs )
+						
+						),
+						`ress` = NULL;
+
+					SET 计数器1 = 计数器1 +  1 ;SET @状态1 = state(JSON_MERGE( @状态1,JSON_OBJECT('rs',NULL)),0);
+
+					IF  -- 判断是否循环
+							CASE	WHEN 当前表达式 REGEXP '\\Q(?#循环)\\E' && `trs` REGEXP 当前表达式 THEN 0
+										ELSE 1  END 
+							THEN
+
+							LEAVE l3;
+						
+					END IF;
+
+				END LOOP l3;-- l3 loop
+
+			END LOOP l2;--  LOOP
+
+			else  
+
+			RETURN _s(json_array('123','空 else'));
+			END case;-- IF @hree = 'hree' THEN  	RETURN  CONCAT_WS('_____','hree',brs,jrs);END if; 
+
+
+				
+
+
+    SET trs = REGEXP_replace(trs,'trs计数器',trs计数器);
+		SET `res` = CONCAT_WS( '', `res`, trs );
+	END LOOP l0 ;-- l0
+	
+
+
+	
+	SET rs = json_extract(rs,'$[0]','$[1]');
+	SET p = CONCAT_WS(	'',`res`, p);-- SET i =i +1;ITERATE l;
+
+
+-- return state(JSON_MERGE( @状态1,JSON_OBJECT('rs',NULL)),0);
+-- RETURN @状态1;
+
+	RETURN JSON_MERGE(json_object('p',p),JSON_OBJECT('rs',rs));
 END
 ;;
 DELIMITER ;
@@ -5485,123 +7341,6 @@ END
 DELIMITER ;
 
 -- ----------------------------
---  Procedure definition for `generatekeyc`
--- ----------------------------
-DROP FUNCTION IF EXISTS `generatekeyc`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `generatekeyc`(`userid` varchar(20),`pkid` int(10)) RETURNS varchar(160) CHARSET utf8mb3
-    NO SQL
-BEGIN
-	
-  set @keyword = CONCAT(userid , '-',DATE_FORMAT(NOW(),'%y%m%d%H%i%s'),
-									if(pkid is NULL ,RIGHT(RAND(),5),
-										 concat(
-														pkid, RIGHT(RAND(),5-LENGTH(pkid))
-														)
-									)
-							);
-	RETURN @keyword;
-END
-;;
-DELIMITER ;
-
--- ----------------------------
---  Procedure definition for `generate_back_file`
--- ----------------------------
-DROP PROCEDURE IF EXISTS `generate_back_file`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `generate_back_file`(IN `path1` varchar(300),`path2` varchar(300),`filetype` varchar(10),`filecontent` longtext)
-BEGIN
-	
-
-END
-;;
-DELIMITER ;
-
--- ----------------------------
---  Procedure definition for `generate_one`
--- ----------------------------
-DROP PROCEDURE IF EXISTS `generate_one`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `generate_one`(IN `missionid_` varchar(60),`rowids` varchar(300),OUT status_ varchar(600),out rownum int(5))
-la:BEGIN
-	
-
-
-		SET missionid_ = TRIM(missionid_),
-				@answer_stmtbody = NULL;
-
-		SELECT a.statu INTO @answer_stmtbody FROM acc_mission AS a WHERE a.missionId = missionid_;
-
-		IF FOUND_ROWS() != 0 AND IFNULL(@answer_stmtbody,'') != '3'  THEN
-
-
-			DELETE a.* from answer AS a  WHERE a.missionid = missionid_;
-			SET @answer_stmtbody :=concat("REPLACE INTO answer(missionId,billid,a_t,a_fnz,a_n,a_fs,",
-							Temp_Func("a??",1,100,NULL),")
-							SELECT a.missionId,a.billid,
-							0,@g :=CONCAT_WS(',',",
-							Temp_Func("IF(ab(b.a??,a.init_a??,c.blur_a??) IS NULL,NULL,'a??')",1,100,','),"),
-							func_get_string_count(@g,'a') AS a_n,REPLACE(@g,'a',''),"
-							,Temp_Func("ab(b.a??,a.init_a??,c.blur_a??)",1,100,','),"
-							FROM acc_mission AS a
-							LEFT  JOIN acc_standard_1 AS b ON a.missionId = b.missionId
-							LEFT  JOIN acc_standard_blur_1 AS c ON a.missionId = c.missionId
-							WHERE a.missionid =",QUOTE(missionid_),"
-							AND CONCAT_WS(',',",Temp_Func("ab(b.a??,a.init_a??,c.blur_a??)",1,100,','),") != ''");
-
-					PREPARE stmt_insert_answer FROM @answer_stmtbody;
-					EXECUTE stmt_insert_answer ;
-
-		 
-					SET @answer_stmtbody :=concat("INSERT INTO answer(missionId,billid,a_t,a_fnz,a_n,a_fs,",
-								Temp_Func("a??",1,50,NULL),")
-									SELECT a.missionId,a.billid,b.rowno,@g :=CONCAT_WS(',',",
-									Temp_Func("IF(ab(b.b??,a.init_b??,c.blur_b??) IS NULL,NULL,'a??')",1,50,','),"),
-									func_get_string_count(@g,'a') AS a_n,REPLACE(@g,'a',''),
-									",Temp_Func("ab(b.b??,a.init_b??,c.blur_b??)",1,50,','),"
-									FROM acc_mission AS a
-									LEFT  JOIN acc_standard_n AS b ON a.missionId = b.missionId
-									LEFT  JOIN acc_standard_blur_n AS c ON b.missionId = c.missionId AND b.rowNo = c.rowno
-									where a.missionid = ",QUOTE(missionid_)," 
-									AND CONCAT_WS(',',",Temp_Func("ab(b.b??,a.init_b??,c.blur_b??)",1,50,','),") != ''");
-			 
-
-					PREPARE stmt_insert_answer FROM @answer_stmtbody;
-					EXECUTE stmt_insert_answer ;
-					DEALLOCATE PREPARE stmt_insert_answer;
-
-					UPDATE acc_mission AS a 
-							SET a.statu = 3
-					WHERE a.missionId = missionid_ AND IFNULL(a.statu,'') !=3 ;
-
-		END IF;
-
-			SET rowids =CONCAT("'",REPLACE(rowids,',',"','"),"'"),
-					@rownnum = NULL,@a_t=NULL,
-					@answer_stmtbody = CONCAT("SELECT  \n",
-									"COUNT(a.a_t) as rownum,\n",
-									"CAST(GROUP_CONCAT(a.a_t) as char) as a_t,\n",
-									"CAST(GROUP_CONCAT(DISTINCT a.a_fs SEPARATOR ',') AS CHAR) \n",
-									",a.a_fnz as a_sss\n",
-									"INTO @rownum ,@a_t,@answer_stmtbody,@a_sss \n",
-									"FROM  answer as a \n",
-									"WHERE A.MISSIONID =", QUOTE(missionid_),
-									IF(FIND_IN_SET("'0'",rowids)>0,"AND a.a_t = 0 \n", " AND a.a_t > 0 \n"),
-									"GROUP BY a.missionId");
-
-		PREPARE stmt from  @answer_stmtbody ;
-		SET @answer_stmtbody = NULL;
-		EXECUTE stmt;
-		DEALLOCATE PREPARE stmt;
-
-		SET	 status_ =Fielter_Set(@answer_stmtbody),
-				 rownum =@rownum ;
-END
-;;
-DELIMITER ;
-
--- ----------------------------
 --  Procedure definition for `Generate_One_En`
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `Generate_One_En`;
@@ -5609,15 +7348,24 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `Generate_One_En`(IN `missionid_` varchar(60),`rowids` varchar(600),OUT field_names varchar(600),out rownum varchar(400),out `jans` longtext)
 la:BEGIN
 	
- 
+/*
+CALL Audit_1('Generate_One_En',
+CONCAT_WS(',',QUOTE(`missionid_`),QUOTE(`rowids`),'@a','@b','@c'),NULL);
+START TRANSACTION;
+				SET @funcid = CONCAT_WS(' ', 'Generate_One_En'),
+				@pp =CONCAT_WS(',',QUOTE(`missionid_`) ,QUOTE(`rowids`) , '@field_names' ,'@rownum' ,'@`jans`');
+INSERT INTO plogs (Function_Name,parameter) VALUES (@funcid,@pp);
+#CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp));COMMIT;
+COMMIT;
+/*,'l','1'*/
 
 
 		SET missionid_ = TRIM(missionid_),
 				@answer_stmtbody = NULL;
 
-
+-- SELECT @answer_stmtbody ;LEAVE la;
 		CALL Generate_One_En_test(`missionid_`);
-
+-- SELECT @answer_stmtbody ;LEAVE la;
 		SET rowids =CONCAT("'",REPLACE(rowids,',',"','"),"'"),
 				@a_fnz = NULL,@a_fds =NULL ,@a_billid = NULL ,@a_billtype = NULL,
 				@answer_stmtbody = CONCAT(
@@ -5630,15 +7378,16 @@ la:BEGIN
 						IF(FIND_IN_SET("'0'",rowids),"\nAND a.a_t = 0 \n", "\nAND a.a_t > 0 \n"),
 						"GROUP BY a.missionId");
 
+
 		PREPARE stmt from  @answer_stmtbody ;
     EXECUTE stmt;	
 
 		IF @a_fnz IS NULL THEN
 			 LEAVE la;
 		END IF;
-		
 
 
+-- SELECT @a_fnz;	
 		SET 	@a_fnz = Fielter_Set(@a_fnz),
 					@rownnum = NULL,@a_t=NULL,@a_jans=NULL,@a_fds =NULL ,@a_billid = NULL ,@a_billtype = NULL,
 					@answer_stmtbody = CONCAT("SELECT  \n",
@@ -5655,79 +7404,10 @@ la:BEGIN
 									"WHERE A.MISSIONID =", QUOTE(missionid_),
 									 IF(FIND_IN_SET("'0'",rowids),"\n AND a.a_t = 0 \n", "\nAND a.a_t > 0 \n"),
 									"GROUP BY a.missionId");
-
-
+-- SELECT @a_fnz;	
 		PREPARE stmt from  @answer_stmtbody ;
 		SET @answer_stmtbody = NULL,@rownum = NULL;
-		EXECUTE stmt;
-		DEALLOCATE PREPARE stmt;
 
-		SET	 field_names =REPLACE(@a_fnz,'a',''),
-				 rownum = fillp(@a_t),
-				 jans = @a_jans;
-
-END
-;;
-DELIMITER ;
-
--- ----------------------------
---  Procedure definition for `Generate_One_En_copy`
--- ----------------------------
-DROP PROCEDURE IF EXISTS `Generate_One_En_copy`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `Generate_One_En_copy`(IN `missionid_` varchar(60),`rowids` varchar(600),OUT field_names varchar(600),out rownum varchar(400),out `jans` longtext)
-la:BEGIN
-	
- 
-
-
-		SET missionid_ = TRIM(missionid_),
-				@answer_stmtbody = NULL;
-
-
-		CALL Generate_One_En_test(`missionid_`);
-
-		SET rowids =CONCAT("'",REPLACE(rowids,',',"','"),"'"),
-				@a_fnz = NULL,@a_fds =NULL ,@a_billid = NULL ,@a_billtype = NULL,
-				@answer_stmtbody = CONCAT(
-						"SELECT \n",
-						"CAST(GROUP_CONCAT(DISTINCT a.a_fnz SEPARATOR ',') AS CHAR), \n", 
-						"a.fds,a.billid,a.billtype\n",
-						"INTO @a_fnz,@a_fds,@a_billid , @a_billtype\n",
-						"FROM  answer as a \n",
-						"WHERE A.MISSIONID =", QUOTE(missionid_),
-						IF(FIND_IN_SET("'0'",rowids),"\nAND a.a_t = 0 \n", "\nAND a.a_t > 0 \n"),
-						"GROUP BY a.missionId");
-
-		PREPARE stmt from  @answer_stmtbody ;
-    EXECUTE stmt;	
-
-		IF @a_fnz IS NULL THEN
-			 LEAVE la;
-		END IF;
-		
-
-
-		SET 	@a_fnz = Fielter_Set(@a_fnz),
-					@rownnum = NULL,@a_t=NULL,@a_jans=NULL,@a_fds =NULL ,@a_billid = NULL ,@a_billtype = NULL,
-					@answer_stmtbody = CONCAT("SELECT  \n",
-									"COUNT(a.a_t) as rownum,\n",
-									"CAST(GROUP_CONCAT(a.a_t) as char) as a_t,\n",
-									"CAST(GROUP_CONCAT(DISTINCT a.a_fs SEPARATOR ',') AS CHAR) \n", 
-									" ,CAST(GROUP_CONCAT(\"\\\"\",",
-									"CONCAT_WS(',',QUOTE(a.a_t),",
-									Temp_Func_C("QUOTE(IF(a.?? is NULL,'null',a.??))",@a_fnz,NULL),"),\"\\\"\" SEPARATOR ',')",
-									" AS CHAR) AS jans ,\n",
-									"a.fds,a.billid,a.billtype\n",
-									"INTO @rownum ,@a_t,@answer_stmtbody ,@a_jans,@a_fds ,@a_billid , @a_billtype\n",
-									"FROM  answer as a \n",
-									"WHERE A.MISSIONID =", QUOTE(missionid_),
-									 IF(FIND_IN_SET("'0'",rowids),"\n AND a.a_t = 0 \n", "\nAND a.a_t > 0 \n"),
-									"GROUP BY a.missionId");
-
-
-		PREPARE stmt from  @answer_stmtbody ;
-		SET @answer_stmtbody = NULL,@rownum = NULL;
 		EXECUTE stmt;
 		DEALLOCATE PREPARE stmt;
 
@@ -5747,14 +7427,29 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `Generate_One_En_test`(IN `missionid_` varchar(60))
 la:BEGIN
 
-		SELECT IF(b.missionId is NULL,'', a.statu),
+  DECLARE CONTINUE HANDLER FOR  SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22' , SQLSTATE	'HY000'-- ,SQLSTATE	'22007'
+	BEGIN GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;SET  @`sqlstate` = JSON_OBJECT('sqlstate',@`sqlstate`,'errno',@errno,'text',@text);
+				SET @`errsql` = @answer_stmtbody;
+				SET @funcid = CONCAT_WS(' ','Error: ', ' Generate_One_En_test' ,`statu`,ELT(`statu`,'','对比','保存','提示' , '？5')),
+				@pp =CONCAT_WS(',',quote(`statu`),quote( `key_names`),quote( `key_values`),quote( `field_names`),quote( `field_values`),quote( `rowids` ),quote( dblob));
+				CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp,'SQL',@`errsql`,'err',@`sqlstate`));
+	END;
+/*
+START TRANSACTION;
+				SET @funcid = CONCAT_WS(' ', ' 3in1' ,`statu`,ELT(`statu`,'','对比','保存','提示' , '？5')),
+				@pp =CONCAT_WS(',',quote(`statu`),quote( `key_names`),quote( `key_values`),quote( `field_names`),quote( `field_values`),quote( `rowids` ),quote( dblob));
+CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp,'l','1'));COMMIT;
+*/
+
+	 	SET @answer_stmtbody = CONCAT_WS('',"SELECT IF(b.missionId is NULL,'', a.statu),
 					CAST(CONCAT_WS(',',IFNULL(A.need_input_a,0),IFNULL(A.need_input_b,0)) AS CHAR) 
 			INTO @answer_stmtbody,@A_S
 			FROM acc_mission AS a 
 			LEFT JOIN answer AS b ON a.missionId = b.missionId
-			WHERE a.missionId = missionid_
-			GROUP BY a.missionId;
-
+			WHERE a.missionId = ",QUOTE(missionid_),"
+			GROUP BY a.missionId");
+-- SELECT @answer_stmtbody; LEAVE la;
+EXECUTE immediate @answer_stmtbody;
 		IF FOUND_ROWS() != 0 AND IFNULL(@answer_stmtbody,'') != '3'  THEN
 
 			SET @i = NULL,@bi= NULL;
@@ -5781,7 +7476,7 @@ WHERE a.missionid =",QUOTE(missionid_)," AND\n",
 Temp_Func('IF(IFNULL(init_b??,"")="",NULL,\'"??":"1"\')',1,50,NULL),
 "),'}')),NULL,NULL),\n",
 Temp_Func("ab(b.a??,a.init_a??,c.blur_a??)",1,100,','),") != ''");
-
+-- SELECT @answer_stmtbody;-- LEAVE la;
 					PREPARE stmt_insert_answer FROM @answer_stmtbody;
 					EXECUTE stmt_insert_answer ;
 
@@ -5829,8 +7524,7 @@ Temp_Func("@ab?? := ab(b.b??,je(@bio,??),c.blur_b??)",1,50,','),") != ''");
 
 					END IF;
 
-
-
+-- SELECT @answer_stmtbody;LEAVE la;
 					PREPARE stmt_insert_answer FROM @answer_stmtbody;
 					EXECUTE stmt_insert_answer ;
 
@@ -5844,126 +7538,11 @@ Temp_Func("@ab?? := ab(b.b??,je(@bio,??),c.blur_b??)",1,50,','),") != ''");
 							 a.need_input_b = b.in_b ,
 							 a.statu  = 3
 					WHERE  a.missionId = b.missionid  AND IFNULL(a.statu,'') !='3' ;
- 
+ -- SELECT @answer_stmtbody; LEAVE la;
 
 		END IF;
 
- 
-
-END
-;;
-DELIMITER ;
-
--- ----------------------------
---  Procedure definition for `Generate_One_En_test_copy`
--- ----------------------------
-DROP PROCEDURE IF EXISTS `Generate_One_En_test_copy`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `Generate_One_En_test_copy`(IN `missionid_` varchar(60))
-la:BEGIN
-
-		SELECT IF(b.missionId is NULL,'', a.statu),
-					CAST(CONCAT_WS(',',IFNULL(A.need_input_a,0),IFNULL(A.need_input_b,0)) AS CHAR) 
-			INTO @answer_stmtbody,@A_S
-			FROM acc_mission AS a 
-			LEFT JOIN answer AS b ON a.missionId = b.missionId
-			WHERE a.missionId = missionid_
-			GROUP BY a.missionId;
-
-		IF FOUND_ROWS() != 0 AND IFNULL(@answer_stmtbody,'') != '3'  THEN
-
-			SET @i = NULL,@bi= NULL;
-			DELETE a.* from answer AS a  WHERE a.missionid = missionid_;
-			SET @answer_stmtbody :=concat("INSERT INTO answer(missionId,billid,billtype,fds,a_t,a_fnz,a_n,a_fs,",
-Temp_Func("a??",1,100,NULL),")
-SELECT\n", 
-
-"a.missionId,a.billid,a1.billType,\n",
-"CONCAT_WS(',',",
-Temp_Func("IF(IFNULL(a.key_b??,'') ='',NULL,'??')",1,50,','),") AS fds ,\n",
-"0,@g :=CONCAT_WS(',',",
-Temp_Func("IF(ab(b.a??,a.init_a??,c.blur_a??) IS NULL,NULL,'a??')",1,100,','),") AS a_fnz,
-func_get_string_count(@g,'a') AS a_n,REPLACE(@g,'a','') AS a_fs,\n",
-Temp_Func("ab(b.a??,a.init_a??,c.blur_a??)AS a??",1,100,','),"\n",
-"FROM acc_mission AS a
-LEFT JOIN `mysq1_schema`.bill_list AS a1 ON a.billId = a1.billId
-LEFT  JOIN acc_standard_1 AS b ON a.missionId = b.missionId
-LEFT  JOIN acc_standard_blur_1 AS c ON a.missionId = c.missionId
-WHERE a.missionid =",QUOTE(missionid_)," AND\n",
-"CONCAT_WS(',',",
-"IF(@i := IF(CHAR_LENGTH(IFNULL(init_b1,''))>3,1,0),NULL,NULL),\n",
-"IF(@bi := IF(@i,init_b1,CONCAT('{',CONCAT_WS(',',",
-Temp_Func('IF(IFNULL(init_b??,"")="",NULL,\'"??":"1"\')',1,50,NULL),
-"),'}')),NULL,NULL),\n",
-Temp_Func("ab(b.a??,a.init_a??,c.blur_a??)",1,100,','),") != ''");
-
-					PREPARE stmt_insert_answer FROM @answer_stmtbody;
-					EXECUTE stmt_insert_answer ;
-
-			IF  @i IS NULL OR not @i  THEN 
-					SET @answer_stmtbody :=concat("INSERT INTO answer(missionId,billid,billType,fds,a_t,a_fnz,a_n,a_fs,",
-	Temp_Func("a??",1,50,NULL),"
--- ,i_fnz,i_fnv
-)
-SELECT a.missionId,a.billid,a1.billType,\n",
-"CONCAT_WS(',',",
-Temp_Func("IF(IFNULL(a.key_b??,'') ='',NULL,'??')",1,50,','),") AS fds ,\n",
-"b.rowno AS a_t,@g :=CONCAT_WS(',',",
-Temp_Func("IF(ab(b.b??,a.init_b??,c.blur_b??) IS NULL,NULL,'a??')",1,50,','),") AS a_fnz,
-func_get_string_count(@g,'a') AS a_n,REPLACE(@g,'a','') AS a_fs,
-",Temp_Func("ab(b.b??,a.init_b??,c.blur_b??)AS a??",1,50,','),
-"\nFROM acc_mission AS a
-LEFT JOIN `mysq1_schema`.bill_list AS a1 ON a.billId = a1.billId
-LEFT  JOIN acc_standard_n AS b ON a.missionId = b.missionId
-LEFT  JOIN acc_standard_blur_n AS c ON b.missionId = c.missionId AND b.rowNo = c.rowno
-where a.missionid = ",QUOTE(missionid_)," 
-AND CONCAT_WS(',',",
-Temp_Func("ab(b.b??,a.init_b??,c.blur_b??)",1,50,','),") != ''");
-
-				ELSE
-
-					SET @answer_stmtbody :=concat("INSERT INTO answer(missionId,billid,billType,fds,a_t,a_fnz,a_n,a_fs,",
-	Temp_Func("a??",1,50,NULL),"
--- ,i_fnz,i_fnv
-)
-SELECT a.missionId,a.billid,a1.billType,\n",
-"CONCAT_WS(',',",
-Temp_Func("IF(IFNULL(a.key_b??,'') ='',NULL,'??')",1,50,','),") AS fds ,\n",
-"b.rowno AS a_t,@g :=CONCAT_WS(',',",
-Temp_Func("IF(@ab?? IS NULL,NULL,'a??')",1,50,','),") AS a_fnz,
-func_get_string_count(@g,'a') AS a_n,REPLACE(@g,'a','') AS a_fs,
-",Temp_Func("@ab?? AS a??",1,50,','),
-"\nFROM acc_mission AS a
-LEFT JOIN `mysq1_schema`.bill_list AS a1 ON a.billId = a1.billId
-LEFT  JOIN acc_standard_n AS b ON a.missionId = b.missionId
-LEFT  JOIN acc_standard_blur_n AS c ON b.missionId = c.missionId AND b.rowNo = c.rowno
-where a.missionid = ",QUOTE(missionid_)," AND\n",
-"IF1(@bio := je1(@bi,b.rowno)) AND\n",
-"CONCAT_WS(',',",
-Temp_Func("@ab?? := ab(b.b??,je(@bio,??),c.blur_b??)",1,50,','),") != ''");
-
-					END IF;
-
-
-
-					PREPARE stmt_insert_answer FROM @answer_stmtbody;
-					EXECUTE stmt_insert_answer ;
-
-					DEALLOCATE PREPARE stmt_insert_answer;
-
-					UPDATE acc_mission AS a,(SELECT  missionid_  AS missiondid,
-																	IF(b.a_t = 0,b.a_n,0) AS in_a ,Sum(IF(b.a_t>0,b.a_n,0)) AS in_b 
-																	FROM answer AS b 
-																	WHERE  b.missionId = missionid_ )AS b
-					SET  a.need_input_a = b.in_a ,
-							 a.need_input_b = b.in_b ,
-							 a.statu  = 3
-					WHERE  a.missionId = b.missiondid  AND IFNULL(a.statu,'') !=3 ;
-
-
-		END IF;
-
-
+ -- SELECT @answer_stmtbody; LEAVE la;
 
 END
 ;;
@@ -6004,17 +7583,18 @@ END
 DELIMITER ;
 
 -- ----------------------------
---  Procedure definition for `if0`
+--  Procedure definition for `gkey2`
 -- ----------------------------
-DROP FUNCTION IF EXISTS `if0`;
+DROP FUNCTION IF EXISTS `gkey2`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` FUNCTION `if0`(`i` varchar(20000)) RETURNS varchar(1) CHARSET utf8mb3
+CREATE DEFINER=`root`@`%` FUNCTION `gkey2`(`b` blob) RETURNS text CHARSET utf8mb3
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
+	DECLARE reg BLOB  DEFAULT R('`seafilter`'); DECLARE rep VARCHAR(200) DEFAULT '[a-z]';
 
-	RETURN '0';
+	RETURN REGEXP_REPLACE(MD5(REGEXP_replace(b,reg,'')),rep,'');
 END
 ;;
 DELIMITER ;
@@ -6028,7 +7608,7 @@ CREATE DEFINER=`root`@`%` FUNCTION `if1`(`i` varchar(20000)) RETURNS varchar(1) 
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 
 	RETURN '1';
 END
@@ -6036,35 +7616,17 @@ END
 DELIMITER ;
 
 -- ----------------------------
---  Procedure definition for `ifn`
+--  Procedure definition for `immediate`
 -- ----------------------------
-DROP FUNCTION IF EXISTS `ifn`;
+DROP FUNCTION IF EXISTS `immediate`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` FUNCTION `ifn`(`i` varchar(20000)) RETURNS varchar(1) CHARSET utf8mb3
+CREATE DEFINER=`root`@`::1` FUNCTION `immediate`() RETURNS int(11)
     NO SQL
-    DETERMINISTIC
-BEGIN
-	
-
-	RETURN NULL;
-END
-;;
-DELIMITER ;
-
--- ----------------------------
---  Procedure definition for `ifnulll`
--- ----------------------------
-DROP FUNCTION IF EXISTS `ifnulll`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`%` FUNCTION `ifnulll`(`P` blob,v blob) RETURNS blob
     DETERMINISTIC
 BEGIN
 	#Routine body goes here...
 
-	RETURN CASE 
-        WHEN P =''THEN v
-
-else ifnull(p ,v) end;
+	RETURN 'immediate';
 END
 ;;
 DELIMITER ;
@@ -6093,25 +7655,8 @@ BEGIN
 					@min = @max,
 					@max = @tmp ;
 	end if ;
-
+-- 	set thescore = IFNULL(thescore,0);  ^[0-9]+
   RETURN IF(@score >= @min and @score < @max,1,0);
-END
-;;
-DELIMITER ;
-
--- ----------------------------
---  Procedure definition for `isnu`
--- ----------------------------
-DROP FUNCTION IF EXISTS `isnu`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `isnu`(`m0` blob) RETURNS double
-    NO SQL
-    DETERMINISTIC
-BEGIN
-	#Routine body goes here...
-  
-	RETURN CASE WHEN m0 IS NULL || m0 ='0' || m0='' THEN 0
-	ELSE m0 END;
 END
 ;;
 DELIMITER ;
@@ -6125,7 +7670,7 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `Is_amount`(`amount`  varchar(5000)) 
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 	DECLARE front_  text DEFAULT null;
 	DECLARE rear_  text DEFAULT null;
 	DECLARE frag_  text DEFAULT null;
@@ -6153,17 +7698,17 @@ BEGIN
 											rear_ 	:= CONCAT(frag_ + 0 ,rear_,'(%|％)?','$'),
 											amount := CONCAT_WS('|', front_ ,amount ,rear_ ),
 											amount := CONCAT('^',amount);
-
+-- REPLACE(amount,'\.','[.]')
 				WHEN amount REGEXP '^([-]?(0|[1-9][0-9]{0,2})(\\.[0-9]+)?)(%|％)$' THEN 
-							set frag_ := PREG_CAPTURE('/^([-]?(0|[1-9][0-9]{0,2})(\\.[0-9]+)?)(%|％)$/',amount ,0);
+							set frag_ = REGEXP_SUBSTR(amount ,'^([-]?(0|[1-9][0-9]{0,2})(\\.[0-9]+)?)(?=[%％]|$)');
 
-					
+		
 							SET 	 	rear_ := IF(frag_/100 REGEXP '[.]','[0-9]*', '([.][0-9]+)?'),
 											front_ := CONCAT(frag_/100,rear_,'$'),
 											rear_ := IF(frag_ + 0 REGEXP '[.]','[0-9]*', '([.][0-9]+)?'),
 											rear_ 	:= CONCAT(frag_ + 0 ,rear_,'(%|％)?','$'),
 										amount := CONCAT_WS('|',front_ ,rear_ ),
-										amount := CONCAT('^',amount);
+										amount := CONCAT('^',amount)/**/ ;
 
 				WHEN amount REGEXP '^[-]?([0-9](,?[0-9]{3}){0,})+(\\.?[0-9]+)?$' THEN
 
@@ -6177,7 +7722,7 @@ BEGIN
 							front_	= SUBSTRING_INDEX(amount,'.',1),
 							rear_ 	= SUBSTRING_INDEX(amount,'.',-1);
 
-
+-- RETURN rear_;
 					IF rear_ <> front_ THEN 
 								IF rear_ = 0 THEN
 												SET amount ='([.]0+)?$';
@@ -6190,7 +7735,7 @@ BEGIN
 					IF front_ = 0 THEN
 							SET amount = CONCAT('0',amount);
 
-
+/**/
 					ELSE 
 							SET  front_ = REVERSE(front_);
 
@@ -6223,49 +7768,101 @@ END
 DELIMITER ;
 
 -- ----------------------------
---  Procedure definition for `Is_Text`
--- ----------------------------
-DROP FUNCTION IF EXISTS `Is_Text`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`%` FUNCTION `Is_Text`(`t` longtext) RETURNS longtext CHARSET utf8mb3
-    NO SQL
-    DETERMINISTIC
-BEGIN
-	
-	IF t IS NOT NULL THEN
-		SET t = preg_replace('/(?=\\(|\\+|\\*|\\.|\\$)/','\\\\\\',t),
-				t = preg_replace('/(,|，|。|:|：|\\s{1,})/','.{0,6}',t);
-	END IF;
-
-	RETURN t;
-END
-;;
-DELIMITER ;
-
--- ----------------------------
 --  Procedure definition for `j`
 -- ----------------------------
 DROP FUNCTION IF EXISTS `j`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `j`(`j` longblob,k varchar(255)) RETURNS longtext CHARSET utf8mb3
+CREATE DEFINER=`root`@`localhost` FUNCTION `j`(`j` longblob) RETURNS longblob
     NO SQL
     DETERMINISTIC
-BEGIN
- 	IF k IS NULL  THEN RETURN NULL;END IF;
+j : BEGIN
+	DECLARE
+		`eno` INT ( 10 ) DEFAULT NULL;
+	DECLARE
+		`err` VARCHAR ( 120 ) DEFAULT NULL;
+	DECLARE
+		`r0`,
+		`r`,
+		`r1`,
+		`r2`,
+		`k`,`mod`
+		TEXT DEFAULT CONCAT( '(?(DEFINE)(?ixsm)
+			(?<k>"[\\w\\.\\$]+"|(?:\\$\\.)?\\b[\\w]+\\b|`.+`)(?=\\s*:)
+			(?<v>(?:"(?s)(?:[^\\\\"]|\\\\.)*" |\\-?\\d+(?:\\.\\d+)?|null|(?&kvs)|(?&a)|(?&k)))
+			(?<a>\\[\\s*(?&v)(?:(?:\\s*,\\s*)(?&v))*?\\s*])
+			(?<kv>(?&k)\\s*:\\s*(?&v))
+			(?<kvs>\\{\\s*(?&kv)(?:\\s*,\\s*(?&kv))*?\\s*})
+			(?<j>(?:(?&kvs)|(?&a)))
+		)' );
+	DECLARE
+		`res` LONGBLOB DEFAULT NULL;
+		SET `r` := CONCAT( '(?x)^\\s*(?&j)(?=(?:\\s*(?:,\\s*(?:(?&k)|(?&kv)))*?)$)', `r0` );
+RETURN  CONCAT('(?ixsm)^(?&v)+$',r0 );
+ SET j = IF( CONCAT_WS('','[',j,']') REGEXP CONCAT('(?ixsm)^(?&v)+$',r0 ),CONCAT_WS('','[',j,']') ,j);
 
-  SET k = clearj(CONCAT('(?i)(?<=(?:"',k,	'":))','(?J)((?>(?:"(?<c>(?:[^\\\\"]|\\\\.)*)")|(?<a>(?:\\s*)\\{(?:\\s*)(?<c>(?<k>(?:"(?<c>(?:[^\\\\"]|\\\\.)*)")(?:\\s*):(?:\\s*)(?:"(?&c)"|(?&a)))?(?:(?:\\s*),(?:\\s*)(?&k))*)\\})))')),
-			j = REGEXP_substr(j,k);
 
-	IF j = '' THEN SET j= NULL;END IF;
-	IF j REGEXP '^[{]' THEN 
-		SET j = REGEXP_REPLACE(j,'^[{]|[}]+$',''); 
-		ELSE 
+	WHILE
+			! json_valid( `j` ) && IFNULL(k,'')!='' && `j` REGEXP `r`  DO--  `初始化jk`
+			SET -- `r` := CONCAT( '(?x)^\\s*(?&j)(?=(?:\\s*,\\s*(?:(?&k)|(?&kv)))*?$)', `r0` ) ,-- 表达式,-- 	`j` := '[{"撒旦":2,yu:"ol"},"yu",5],78,$.pp,"45p"' 校验字符串,	`j` REGEXP `r` `is`,
+			`res` := REGEXP_substr ( `j`, `r` ),--  `取JSON`,
+			`k` = substr( `j`, CHAR_length( `res` )+1 ),
+			`k` = IF(`k` REGEXP '^\\s*$',NULL,CONCAT( REGEXP_replace ( `k`, '^\\s*,\\s*', '[' ), ']' ));-- `取k`,
 
- 			SET j = REGEXP_REPLACE(j,'^[\'"]|(?<=[^\\\\])\\\\|[\'"]*$','\\1'); 
-		RETURN j;	
-	END IF;
+			SET `r1` := CONCAT( '(?!")(?&k)(?=\\s*:\\s*(?&v))', `r0` ),-- `表达式1`,	`res` REGEXP `r1` j校验,
+			`res` := REGEXP_replace (CAST( `res` AS CHAR), `r1`, '"\\0"' ),-- json_valid( `re s` ) j校验,
+			`r2` := CONCAT( '(?&k)(?=\\s*[:,]\\s*(?:(?&k)|&j)])', `r0` ),--  `表达式2`,	`k` REGEXP `r2` KEY校验,
+			`k` := REGEXP_replace ( `k`, `r2`, '"\\0"' )-- json_valid( `k` ) -- KEY校验
+			;
 
-	RETURN j;
+	END WHILE;
+
+	SET `j` = `res`;
+	
+
+
+	CASE
+			
+			WHEN  IFNULL( `j`,0 )!=0 && IFNULL( `k`, 0 )!=0 THEN
+
+			SET `j` = `k`;
+		
+		WHEN  IFNULL( `k`, 0)!=0 && IFNULL( `j`, '') =0 THEN
+		
+		SET `j` = `res`;
+		
+		WHEN ! json_valid( `j` ) THEN-- SIGNAL SQLSTATE 'HY000' SET MYSQL_ERRNO =eno , MESSAGE_TEXT = `err`
+		
+		SET `err` = '无效j',
+		`eno` = 1001;
+		
+		WHEN ! json_valid( `k` ) THEN
+		
+		SET `err` = '无效k',
+		`eno` = 1002;
+		ELSE l :
+		LOOP
+			IF
+				! ifnull( `k`, 0 )|| ! json_valid( `k` ) || ! JSON_DEPTH( `k` )> 1 THEN
+					LEAVE l;
+				
+			END IF;
+			
+			SET `MOD` = JSON_value( `j`, '$[0]' ),
+			`k` = json_remove( `j`, '$[0]' );
+			CASE
+					
+					WHEN `mod` REGEXP '(?i)"(?:\\$\\.)?\\w+(?=")' THEN
+					
+					SET `MOD` := REGEXP_replace ( `mod`, '(?i)"(?:\\$\\.)?\\K\\w+(?=")', '$**.\\0' ),
+					`res` = JSON_value( `j`,`MOD` ); ELSE 
+					SET `res` = `res`;
+				
+			END CASE;
+			
+		END LOOP l;
+		
+	END CASE;
+	RETURN `j`;
 
 END
 ;;
@@ -6333,8 +7930,8 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `j1`(`j` longtext,k varchar(255)) RET
     NO SQL
     DETERMINISTIC
 BEGIN
-	
-  SET j = j(j,k);
+	#Routine body goes here...
+  SET j = j0(j,k);
 
 	RETURN IF(j IS NULL,'NULL',j);
 END
@@ -6350,7 +7947,7 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `j1n`(`j` MEDIUMBLOB) RETURNS mediumt
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 	DECLARE `c` MEDIUMBLOB DEFAULT NULL;
 	DECLARE `c0` VARCHAR(5) DEFAULT NULL;
 	DECLARE `r` MEDIUMBLOB DEFAULT NULL;		
@@ -6372,7 +7969,10 @@ BEGIN
 	ll:LOOP
 
 		SET `c` = REGEXP_substr(j,CONCAT('(?<=',r,',)',r0));
-
+/*
+IF i=13 THEN
+RETURN CONCAT('(?<=',r,',)',r0);
+END IF;*/
 		IF IFNULL(`c`,'') = '' THEN LEAVE ll;END IF;
 
 		SET `c0` = REGEXP_replace(c,r0,'\\1'),
@@ -6396,11 +7996,11 @@ DELIMITER ;
 -- ----------------------------
 DROP FUNCTION IF EXISTS `j2`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `j2`(`j` longtext,k varchar(255)) RETURNS longtext CHARSET utf8mb3
+CREATE DEFINER=`root`@`localhost` FUNCTION `j2`(`j` longblob,k varchar(255)) RETURNS longblob
     NO SQL
 BEGIN
-	
-  SET j = j(j,k);
+	#Routine body goes here...
+  SET j = j0(j,k);
 
 	RETURN IF( IFNULL(j,'') =  '','NULL',quotd(j));
 END
@@ -6408,24 +8008,347 @@ END
 DELIMITER ;
 
 -- ----------------------------
---  Procedure definition for `j2f`
+--  Procedure definition for `j2a`
 -- ----------------------------
-DROP FUNCTION IF EXISTS `j2f`;
+DROP FUNCTION IF EXISTS `j2a`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` FUNCTION `j2f`(`ja` longtext) RETURNS longtext CHARSET utf8mb3
+CREATE DEFINER=`root`@`::1` FUNCTION `j2a`(`p` LONGTEXT,`k` TEXT) RETURNS longtext CHARSET utf8mb3
+    NO SQL
+    DETERMINISTIC
+BEGIN #DECLARE i INT(5) DEFAULT 0;
+ 
+
+	 CASE 
+	 WHEN  JSON_VALID(p)  AND CAST(json_value(p,'$.功能')AS CHAR) = '简单记录' THEN
+	
+		set k = REGEXP_substr(json_value(p,'$.字段'),'^([^,\\s]+)(?:,[^,\\s]+)*?(?=,\\1,|$)'),
+		p = CAST(JSON_SET(p , "$.字段"
+		,CONCAT_WS(',',CASE 
+				WHEN JSON_VALUE(p, '$.表') REGEXP '(?i)standard_1$' THEN  'missionId'
+				WHEN JSON_VALUE(p, '$.表') REGEXP '(?i)backbill_1$' THEN  'missionId'
+				WHEN JSON_VALUE(p, '$.表') REGEXP '(?i)standard_n$' THEN  'missionId,rowNo'
+				WHEN JSON_VALUE(p, '$.表') REGEXP '(?i)backbill_n$' THEN  'missionId,rowid'
+				ELSE NULL END,
+				REGEXP_substr(json_value(p,'$.字段'),'^([^,\\s]+)(?:,[^,\\s]+)*?(?=,\\1,|$)'))
+		)AS CHAR);
+
+	SET  p = CONCAT_WS(IF(IFNULL(jSON_VALUE(k, '$.链接符') ,'') = '','\t',jSON_VALUE(k, '$.链接符'))
+,CONCAT("SELECT")
+,CONCAT_WS(',',CONCAT(QUOTE(JSON_VALUE(p, '$.辅助信息')),'AS f')
+,JSON_VALUE(p, '$.字段'))
+,CONCAT("FROM " , JSON_VALUE(p, '$.表')," AS a ")
+,CONCAT("WHERE a.missionId IN (",json_value(p,'$.关键字'),")")
+,CONCAT("AND IFNULL(CONCAT_WS('',",k,"),'')!=''")
+);
+	return p;
+	
+	
+	
+
+
+
+	 WHEN  JSON_VALID(k)  AND JSON_VALUE(k,'$[0]') = 'SELECT' THEN
+BEGIN  DECLARE i int(5) DEFAULT 0;DECLARE x int(5) DEFAULT 0; DECLARE y int(5) DEFAULT 0;DECLARE `rs` LONGTEXT DEFAULT null;
+
+IF JSON_DEPTH(p) >2  AND JSON_LENGTH(P)>0 THEN SET x = JSON_LENGTH(JSON_QUERY(p, '$[0]')) ,y= JSON_LENGTH(p);
+
+ELSE SET  x = JSON_LENGTH(p),p = CONCAT('[',p,']') ;
+END IF;
+	SET x = JSON_LENGTH(JSON_QUERY(p, '$[0]')) ,y= JSON_LENGTH(p);
+
+	l1: LOOP
+	IF i>=x  THEN 	LEAVE l1; END IF; #RETURN JSON_EXTRACT(p,CONCAT('$[0][',CONCAT(i,''),']'));
+	  SET rs  = CONCAT_WS(',',rs 
+								,CONCAT_WS(' AS ',JSON_EXTRACT(p,CONCAT('$[0][',CONCAT(i,''),']')),JSON_VALUE(k, CONCAT('$[',i+1,']')))
+						),
+
+				i = i+1;
+
+				
+	END LOOP l1;
+	SET i = 1,
+			rs =CONCAT_WS(' ','SELECT',rs);
+
+	l2: LOOP
+	IF i>y  THEN 	LEAVE l2; END IF;
+
+	  SET rs = CONCAT_WS(' UNION\n',RS,CONCAT("SELECT ",REGEXP_replace(JSON_query(p, CONCAT('$[1]')),'^\\[|\\]$',''))),
+				p = JSON_REMOVE(p,'$[1]'),
+				i = i+1;
+-- return rs ;
+	END LOOP l2;
+	
+RETURN rs;
+END;
+	WHEN k REGEXP '(?i)^(?:转|2)(?:arr(?:ay)?|数组)' AND  p REGEXP '[\\w_`,\\s]+' THEN  
+		SET p = CONCAT('[',REGEXP_replace(p,'([^\\s,]+)','"\\1"'),"]"); RETURN p;
+	WHEN k REGEXP '引号' THEN SET p =  REGEXP_REPLACe(p,'(?<!\\\\)\\\\|(?<!\\\\)"|^[\\[\\{]++|[\\]\\}]++','');
+	WHEN k REGEXP 'low' THEN  SET  p = REGEXP_replace(json_KEYS(p),'("[^"]+")','\\1:\\1');set p = REGEXP_replace(p,'^[\\[\\{]++|[\\]\\}]++','');
+	RETURN CONCAT('{',p ,'}');
+WHEN  k  REGEXP '转变量'THEN  SET p = REGEXP_replace(p,'"([^"]+)":',CONCAT_WS('.',REGEXP_substr(k,'(?<=,)\\s*\\w'),'\\1='));
+WHEN k REGEXP '转等式'  THEN  SET p = REGEXP_replace(p,'"([^"]+)"',CONCAT(CONCAT_WS('.','a.\\1='),CONCAT_WS('.','b.\\1')));
+WHEN k REGEXP '^\\-?\\d++$'THEN   SET k = REGEXP_substr(k,'\\-?\\d++');
+SET k = CONCAT('$[',IF (k <0 , JSON_LENGTH(p )+k,k), ']');
+SET p =   JSON_VALUE(p ,k);
+ 
+	ELSE SET p = '错';
+END CASE;
+RETURN REGEXP_replace(p,'^[\\[\\{]++|[\\]\\}]++','');
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `j2j`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `j2j`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `j2j`(`j` longblob) RETURNS longtext CHARSET utf8mb3
+    DETERMINISTIC
+BEGIN
+DECLARE res longtext DEFAULT NULL;
+
+
+	RETURN CASE json_valid(j) AND JSON_DEPTH(j) 
+	WHEN 1 THEN  CONCAT_WS('','[',j,']') 
+	WHEN 2 THEN j
+	WHEN 3 THEN json_extract(j,'$[*][*]') 
+	ELSE j END  ;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `j2s`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `j2s`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `j2s`(`v` longblob,`k` blob) RETURNS longtext CHARSET utf8mb3
     NO SQL
     DETERMINISTIC
 BEGIN
-	DECLARE `r` VARCHAR(2000) DEFAULT NULL;	DECLARE `f` VARCHAR(2000) DEFAULT NULL;
+	#Routine body goes here...
+	DECLARE `KEYs` TEXT DEFAULT NULL;DECLARE `KEY` TINYTEXT DEFAULT NULL;DECLARE `i` INT(5) DEFAULT 0;	DECLARE `l` INT(5) DEFAULT 0;	DECLARE 页面 VARCHAR(200) DEFAULT json_extract(CAST(`k` AS CHAR),'$.页面');	DECLARE `r` TEXT DEFAULT 			'(?ix)(?:(?:"(?:(?=\\\\\).{2}|[^"\\\\]++)*?")|llun|[.\\d\\,\\-]+)\\s*:("[^"]+"),(?=(?:"(?:(?=\\\\\).{2}|[^"\\\\]++)*?"|[^\\]"]++)*?(?=\\g{-1}))';
 
-	IF IFNULL(`ja`,'')=''  THEN RETURN NULL; END IF;
-	SET	`r`='(?:"(?<a>(?:\\\\.|[^"])*)(?:":"(?&a)")(?:,"\\g{a}(?:":"(?&a)"))*)'
-,`f` = regexp_replace(`ja`,r,'\\1'),
-`f` = CONCAT_WS(',',IF(`f` REGEXP ',$',NULL,'')
-,REVERSE(`f`)) ,`r`='(?xX)(?<o>,[^,]+)(?=(?&o)*?\\g{o})' 
-,`f` = REVERSE(REGEXP_replace(regexp_replace(`f`,r,''),'^,',''));
+	DECLARE `排除页面` LONGTEXT DEFAULT json_array('bill/kjdz_cbhzbdl/V3/kjdz_cbhzbdl.jsp');
+	DECLARE `不记录页面` LONGTEXT DEFAULT json_array('bill/odot_gdzckp/V3/odot_gdzckp.jsp','bill/odot_tyjsb/V4/odot_tyjsb.jsp');
+	DECLARE `替补页面` LONGTEXT DEFAULT CONCAT_WS('','[',CONCAT_WS(','	
+,json_object("页面",'bill/odot_gdzckp/V3/odot_gdzckp.jsp','行','10','方向','4')
 
-RETURN f;
+,json_object("页面",'bill/odsm_clzlt0/V2/odsm_clzlt0.jsp','行','13','方向','2'),json_object("页面",'bill/kjdz_fzscfyfpb_fzscfyfpb/V3/kjdz_fzscfyfpb_fzscfyfpb.jsp','行','26','方向','2')	,json_object("页面",'bill/kjdz_cbhzb_cbhzb/V2/kjdz_cbhzb_cbhzb.jsp','行','14','方向','2')	),']');
+
+	DECLARE `re` LONGTEXT DEFAULT NULL;	DECLARE `kk` LONGTEXT DEFAULT NULL;	DECLARE `v0` LONGTEXT DEFAULT NULL;
+
+	IF IFNULL(@记录参数,'') THEN 
+				REPLACE INTO plogs(Function_Name,parameter)
+				VALUE('j2s 记录参数',CONCAT_WS('',QUOTE(`v`),QUOTE(`k`)));
+	END IF;
+SET `KEYS` = json_extract(`k`,'$.键'),`KEY` = json_extract(CAST(`k` AS CHAR),'$.关键字');
+
+	IF IFNULL(v,'')='' THEN IF IFNULL(@调试,'') != '' THEN	REPLACE INTO plogs(Function_Name,parameter) 	VALUES('j2s',CONCAT_WS('__',`v`,`k`));	END IF;
+				RETURN  NULL;
+	END IF;
+
+	IF !json_valid(`k`)  THEN 				CASE 					WHEN json_valid(CONCAT('{',`k`,'}')) THEN SET `k` = CONCAT('{',`k`,'}'); 					WHEN `k` REGEXP '^([^,"])+(?:,(?1))*?$' THEN SET `k` =  CONCAT_WS('','{"键":[',REGEXP_replace(`k`,'\\s*,\\s*','","'),'"]}');					WHEN `k` REGEXP '^("[^,"]+")(?:,(?1))*?$' THEN SET `k` =  CONCAT_WS('','{"键":[',`k`,'"]}');				ELSE RETURN NULL;			END case;			END IF;
+
+	IF json_valid(`k`) AND json_extract(`k`,'$.键') IS NOT NULL AND json_extract(`k`,'$.键')REGEXP '\\w+(,\\s*\\w+)+'  THEN 
+				SET `k` = REGEXP_replace(`k`,'"键":\\s*\\[?".*?"\\]?',CONCAT_WS('','"键":[',REGEXP_replace(REGEXP_replace(json_extract(`k`,'$.键'),',\\s*+','","'),'^\\[|\\]$',''),']'));
+	END IF;
+
+	IF `v` REGEXP '"\\w+":' THEN 
+
+		IF IFNULL(json_extract(`k`,'$.键'),'')='' THEN
+
+			SET `k` = json_merge(
+				`k`
+				,CONCAT_WS('','{"键":',json_keys(CONCAT_WS('','{', REGEXP_substr(`v`,'(("\\w+").*?(?=,\\g2|,?$))'),'}')),'}')
+			);
+		END IF;
+
+
+
+		SET  v  = REGEXP_replace(REGEXP_replace(v,'(?-m),$','')
+								,'(("\\w+").*?(?=,\\g2|,?$))','[\\1]');	--  REGEXP_replace(REGEXP_replace(v,'(?-m),$',''),'(("\\w+").*?(?=,\\g2|,?$))','{\\1}');
+
+
+			IF  ! INSTR(`排除页面`,`页面`) AND REVERSE(v) REGEXP r  THEN 
+
+					CASE WHEN json_unquote(`页面`) = 'bill/kjdz_sjfsmxb_sjfsmxb/V2/kjdz_sjfsmxb_sjfsmxb.jsp' THEN
+
+										SET `v` = REGEXP_replace(REGEXP_replace(`v`
+										,'((?!"b11":)"[^"]*?":\\s*(?:"(?:(?=\\\\).{2}|[^\\\\"]+)*?"|[null]+|[\\-"\\.,]+))(?=\\])','\\1,"b11":null')
+										,',("b11":\\s*(?:"(?:(?=\\\\).{2}|[^\\\\"]+)*?"|[null]+|[\\-"\\.,]+))(?=\\]$)'
+										,CONCAT_WS('','],[',REPEAT('"bb":null',1),REPEAT(',"bb":null',5),',\\1'));
+										SET k  = REGEXP_replace(k,'(?<!\\\\)"\\](?=,\\s*"|\\}$)','", "b11\\0');
+
+						ELSE 	SET v = REVERSE(REGEXP_replace(REVERSE(v),r,''));
+
+					END CASE ;
+
+					IF IFNULL(@调试,'') != ''  AND ! INSTR(`不记录页面`,`页面`)  THEN	REPLACE INTO plogs(Function_Name,summary,parameter,parameters) 	VALUE(CONCAT_WS(', ','j2s 重复',json_unquote(页面)),CONCAT_WS(', ',json_value(CAST(`k`  AS CHAR),'$.关键字.missionid'))	,REVERSE(REGEXP_replace(REVERSE(v),CONCAT_WS('','.*?(',r,'|$)'),'\\1'))	,CONCAT_WS('',QUOTE(`v`),QUOTE(`k`)));		END IF;
+
+			END IF;
+
+
+		SET v  =REGEXP_replace(v ,'"\\w+":\\s*','');
+
+  END IF;
+
+
+
+	IF json_depth(v) < 3 OR !json_valid(v) THEN 
+			SET v= CONCAT('[',v,']');
+			IF json_depth(v) < 3 OR !json_valid(v) THEN 
+				RETURN CONCAT_WS(' ','v 错1',v);
+			END IF;
+	END if; 
+
+	IF json_extract(`k`,'$.表') != '' THEN
+	SET `re` = REGEXP_replace(
+								REGEXP_replace(json_value(CAST(`k` AS CHAR),'$.表')
+									,'(?i)(?:replace|insert)\\s+into\\s+[\\.`\\w_]+'
+									,CONCAT('\\0('	,CONCAT_WS(',',json_keys(json_extract(`k`,'$.关键字')),json_extract(`k`,'$.键')),')')
+								)
+						,'[\\[\\]"]+','');
+ END if; 
+
+  SET `re` = CONCAT_WS('',CONCAT_WS('\n',`re`,'select')); 
+
+	IF IFNULL(json_extract(`k`,'$.关键字'),'') !=''  THEN
+
+
+
+
+				SET `k`= 	REGEXP_replace(`k`
+					,'("键":\\s*\\[)'
+					,CONCAT_WS(''
+							,'\\1'
+							,REGEXP_replace(json_keys(json_extract(`k`,'$.关键字')),'^\\[|\\]$','')
+							,','
+						)
+					);
+
+
+				SET		kk =REGEXP_replace(json_extract(`k`,"$.关键字"),'\\{|\\}|"\\w+":','')
+							,v = REGEXP_replace(v,'^\\[{2}'
+											, CONCAT_WS('','[['
+													,kk
+													,','
+											)
+									)
+							,kk = REGEXP_replace(kk,'("(@\\w+)\\s*:=)','\\1\\2 + ')
+ 		 				,v = REGEXP_replace(v,'(?<=\\],)\\s*\\[',CONCAT('[',kk,','))
+ ;
+
+
+
+	END IF;
+
+
+
+
+
+  SET `l` = JSON_LENGTH(JSON_extract(`k`,'$.键'))-1 -- json_length(json_query(v,'$[0]'))-1;
+			,I = 0;
+
+
+-- ;
+
+	l:LOOP
+
+
+		  IF i>l THEN LEAVE l;END IF;
+			SET re = CONCAT_WS(IF(i= 0,' ',',')
+								,re
+								,CONCAT_WS(' AS '
+										,IFNULL(json_extract(v,CONCAT('$[0][',i,']')),'NULL')
+										,JSON_VALUE(JSON_extract(`k`,'$.键'),CONCAT('$[',i,']'))
+								)
+						);
+
+	SET i=i+1;
+	END LOOP;
+
+
+	SET i=2; 
+  l0:LOOP
+			SET v = JSON_REMOVE(v,'$[0]');
+
+			SET `v0` = json_query(v,"$[0]");
+
+		  IF IFNULL(json_length(`v0`),0) =0 THEN LEAVE l0;END IF;
+
+			IF json_length(`v0`) -1 != l THEN 
+					SET r=NULL;
+
+					select a.方向 INTO r from json_table(`替补页面`, '$[*]'   columns(  页面  text path '$.页面', 行 text path '$.行', 方向  text path '$.方向'	)) as a	WHERE a.页面 = json_value(CAST(`k` AS CHAR),'$.页面') AND 行 = i ;
+
+					CASE
+							WHEN FOUND_ROWS() AND r =2   THEN
+							SET `v0` = REGEXP_replace(`v0` ,'(\\]$)', CONCAT_WS('',REPEAT(',null',l-json_length(`v0`)+1),']'));
+					
+							WHEN FOUND_ROWS() AND r =4   THEN
+							SET i= i+1; ITERATE l0;
+
+					ELSE
+
+							IF IFNULL(@调试,'') != 1 THEN  
+
+							REPLACE INTO plogs(Function_Name,summary,parameter,parameters) 
+							VALUES(
+	 								CONCAT_WS(' ','j2s 长度不等' ,IF(IFNULL(页面,'')!='',json_unquote(页面),'无')) 
+									,CONCAT_WS(',','json_object("页面"',页面,'"行"',i,'"方向","???")')
+									,CONCAT_WS(', '
+													,i
+													,json_value(CAST(`k` AS CHAR),'$.关键字.missionid')
+													,CONCAT_WS('行',i,CONCAT_WS('/',json_length(`v0`),l))
+										)
+									,CONCAT_WS('__',`v0`)
+							);	
+							END IF;
+
+						END CASE;
+
+			END IF;
+
+			SET re = CONCAT_WS(
+									CONCAT_WS('',' UNION ALL',IF(IFNULL(@优化,'')!='',@优化,' '), 'SELECT ')
+									,re
+									,REGEXP_REPLACE(`v0`,'^\\[|\\]$','')
+						);
+
+		SET i = i+1;
+	END LOOP l0;
+
+
+
+
+	IF   json_extract(`k`,'$.表') REGEXP '(?i)update' THEN
+			SET re = CONCAT_WS( IF(IFNULL(@优化,'')!='',@优化,' ')
+			,CONCAT_WS(CONCAT_WS('',',',IF(IFNULL(@优化,'')!='',@优化,' '))
+					,CONCAT_WS(' ',json_value(CAST(`k` AS CHAR),'$.表'),'as a')
+					,CONCAT_WS(IF(IFNULL(@优化,'')!='',@优化,' '),'('
+					,REGEXP_replace(re,'(?i-m)^.*?(?m)$\\s*+','')
+					,')as b')
+			)
+			,'SET'
+			,REGEXP_replace(`KEYS`,'\\[?"(\\w+)"\\]?','a.\\1 = b.\\1')
+			,CONCAT_WS(' ','where',REGEXP_replace(json_keys(`KEY`),'\\[?"([^"]+)"\\]?','a.\\1=b.\\1'))
+		);
+	END IF;
+
+
+	IF kk REGEXP "(['\"])(@\\w+\\s*:=.*?)\\g1" THEN
+		SET re = REGEXP_replace(re,"(['\"])(@\\w+\\s*:=.*?)\\g1",'\\2');
+	END IF;
+
+	SET re = CONCAT(CONCAT_WS(IF(IFNULL(@优化,'')!='',@优化,' ')	,re,json_value(CAST(k AS CHAR),'$.尾')),';');
+
+
+
+
+
+	RETURN re;
 END
 ;;
 DELIMITER ;
@@ -6439,7 +8362,7 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `j2v`(`j` MEDIUMBLOB) RETURNS mediumb
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 	DECLARE `0` MEDIUMBLOB DEFAULT NULL;
 	DECLARE `2` BLOB DEFAULT NULL;
 	DECLARE `B` VARCHAR(100)  DEFAULT NULL;
@@ -6447,17 +8370,17 @@ BEGIN
 
 	IF IFNULL(j,'') = '' THEN RETURN NULL; END IF;
 
-	SET `0` = j(`j`,'`0`'),
-			`2` = j(`j`,'`2`'),
-			`B` = IF(IFNULL(j(`2`,'`B`'),'') = '',"(",j(`2`,'`B`')),
-			`E` = IF(IFNULL(j(`2`,'`E`'),'') = '' AND `B` = "(",")",j(`2`,'`E`'));
+	SET `0` = j0(`j`,'`0`'),
+			`2` = j0(`j`,'`2`'),
+			`B` = IF(IFNULL(j0(`2`,'`B`'),'') = '',"(",j0(`2`,'`B`')),
+			`E` = IF(IFNULL(j0(`2`,'`E`'),'') = '' AND `B` = "(",")",j0(`2`,'`E`'));
 
   IF 	IFNULL(`0`,'') != '' THEN
-		SET `j` = j(j,'`1`');
+		SET `j` = j0(j,'`1`');
 
-		IF IFNULL(J(`2`,"`filter1`"),'') <> '' THEN
-
-			SET `j` = f2(J(`2`,"`filter1`"),`j`);RETURN J;
+		IF IFNULL(j0(`2`,"`filter1`"),'') <> '' THEN
+-- RETURN 'ok1';
+			SET `j` = f2(j0(`2`,"`filter1`"),`j`);RETURN J;
     END IF; 
 
 		SET	`0` = filter1(CONCAT(REG1('`kv-k`'),'\t\\1'),`0`);
@@ -6476,9 +8399,9 @@ CONCAT_WS('\n'
 )
 ,j);
 
-		IF IFNULL(J(`2`,"`filter2`"),'') <> '' THEN
-
-			SET `j` = f2(J(`2`,"`filter2`"),`j`);RETURN J;
+		IF IFNULL(j0(`2`,"`filter2`"),'') <> '' THEN
+-- RETURN 'ok2';
+			SET `j` = f2(j0(`2`,"`filter2`"),`j`);RETURN J;
     END IF; 
    
 
@@ -6497,10 +8420,10 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `j3`(`j` longtext,k varchar(255)) RET
     NO SQL
     DETERMINISTIC
 BEGIN
-	
-  SET j = j(j,k);
+	#Routine body goes here...
+  SET j = j0(j,k);
 
-	RETURN IF(j IS NULL,NULL,quotd(j));
+	RETURN IF(IFNULL(j,'') = '',NULL,quotd(j));
 END
 ;;
 DELIMITER ;
@@ -6514,26 +8437,10 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `j5`(`j` longtext,k varchar(255)) RET
     NO SQL
     DETERMINISTIC
 BEGIN
-	
-  SET j = j(j,k);
+	#Routine body goes here...
+  SET j = j0(j,k);
 
 	RETURN IF(IFNULL(j,'')='',NULL,j);
-END
-;;
-DELIMITER ;
-
--- ----------------------------
---  Procedure definition for `jc`
--- ----------------------------
-DROP FUNCTION IF EXISTS `jc`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`%` FUNCTION `jc`(`j` longblob,k varchar(255)) RETURNS longtext CHARSET utf8mb3
-    NO SQL
-    DETERMINISTIC
-BEGIN
-
-	RETURN j(j,k);
-
 END
 ;;
 DELIMITER ;
@@ -6545,7 +8452,7 @@ DROP PROCEDURE IF EXISTS `jd`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `jd`(inout v longblob)
 BEGIN
-	
+	#Routine body goes here...
 		set @dblob = v;
 		SET @dblob = CONCAT_WS('',"SET @dblob = column_CREATE('v',",v,")");
 
@@ -6566,7 +8473,7 @@ CREATE DEFINER=`root`@`%` FUNCTION `je`(`j` longtext,k varchar(255)) RETURNS lon
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 	IF j IS NULL THEN RETURN NULL; END IF;
 	RETURN json_extra(j,k);
 END
@@ -6582,7 +8489,7 @@ CREATE DEFINER=`root`@`%` FUNCTION `je1`(`j` longtext, `1` varchar(255)) RETURNS
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 	IF j IS NULL OR j = '' THEN RETURN NULL; END IF;
 
   IF IFNULL(`1`,'') <> ''  THEN
@@ -6606,11 +8513,11 @@ CREATE DEFINER=`root`@`%` FUNCTION `je2`(`j` longtext, `1` varchar(255), `2` var
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 	IF IFNULL(j,'')='' THEN RETURN NULL; END IF;
 
   IF IFNULL(`1`,'') <> ''  THEN
-   
+   --  SET preg_capture(CONCAT('/\"',a1.rowNo,'\":{/'),@bi);
 		
 		SET @d = "[\\\"\\\']", 
 				@`}`= "[\\}]", 
@@ -6621,36 +8528,6 @@ BEGIN
   IF IFNULL(`2`,'') <> ''  THEN
     SET j = json_extra(j,`2`);
 	END IF;
-
-	RETURN j;
-END
-;;
-DELIMITER ;
-
--- ----------------------------
---  Procedure definition for `je3`
--- ----------------------------
-DROP FUNCTION IF EXISTS `je3`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`%` FUNCTION `je3`(`j` longtext, `1` varchar(255), `2` varchar(255)) RETURNS longtext CHARSET utf8mb3
-    NO SQL
-    DETERMINISTIC
-BEGIN
-	
-	IF IFNULL(j,'')='' THEN RETURN NULL; END IF;
-
-  IF IFNULL(`1`,'') <> ''  THEN
-   
-		
-		SET @d = "[\\\"\\\']", 
-				@`}`= "[\\}]", 
-				@`{`= "[\\{]", 
-				j = preg_capture(CONCAT('/(?<=',@d,`1`,@d,':)',@`{`,'(\.+?)',	@`}`,'(?=[,]|}$)/'),j);
-	END IF;
-
-  IF `2` IS NULL OR `2` = 0 THEN RETURN j; END IF;
-	
-	SET j = json_extra(j,`2`);
 
 	RETURN j;
 END
@@ -6710,6 +8587,307 @@ END
 DELIMITER ;
 
 -- ----------------------------
+--  Procedure definition for `jk`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `jk`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `jk`(`t` tinytext,`k` text,`v` longtext) RETURNS text CHARSET utf8mb3
+    NO SQL
+BEGIN 
+	declare `blob` text DEFAULT NULL;declare `key` VARCHAR(100) DEFAULT NULL;declare i VARCHAR(10) DEFAULT NULL;declare isabt INT(1) DEFAULT 0;declare t0 VARCHAR(10) DEFAULT regexp_substr(`t`,'^\\d');declare res  longblob DEFAULT null;DECLARE `mod` blob DEFAULT null;
+	#Routine body goes here...
+	DECLARE `模式过滤器` TINYTEXT DEFAULT '\\w+\\K([,+]\\w*.*?)$'; declare `factors` TINYTEXT DEFAULT null;declare `factor` TINYTEXT DEFAULT null;declare `value` TINYTEXT DEFAULT null;
+	IF  IFNULL(V,'')='' OR !json_valid(`v`) THEN
+		RETURN NULL;
+	END if; 
+
+
+	IF (t NOT REGEXP '^\\d+$' OR length(t)>10) --  AND (k is NULL OR  json_valid(k) ) 
+	THEN
+
+		SET  `mod` = REGEXP_substr(t,`模式过滤器`),t= REGEXP_replace(t,`模式过滤器`,'');
+
+		SET  `factors` = REGEXP_substr(`mod`,',\\K.+$'),`mod` = REGEXP_replace(`mod`,',.*$','')
+					,`factors` = IF(IFNULL(factors,'')='', NULL,CONCAT('["',REGEXP_replace(factors,'[^"]\\s*\\K,(?!\\s*")','","'),'"]'))  ;
+
+		SET `key` = CASE WHEN k is NOT null AND json_valid(k) AND   k NOT REGEXP '^\\d$' and 0  THEN  REGEXP_substr(JSON_EXTRACT(k,CONCAT('$**.',t)),'\\w+')
+										 WHEN LENGTH(K)>100 THEN NULL 
+								ELSE k END;
+		
+
+		CASE	WHEN  `t` REGEXP 'remove' THEN
+						SET	k = CASE  
+											WHEN ifnull(k,'') = '' THEN NULL
+											WHEN !json_valid(k) THEN json_array(k)
+											WHEN json_valid(k) AND JSON_DEPTH(k) = 1  THEN concat('[',k,']')
+										else k END 
+								,res = v ;
+
+				`l0`:LOOP
+
+						IF IFNULL(k,'')='' OR !json_valid(k) or JSON_LENGTH(k)=0 OR JSON_DEPTH(k)<2 THEN leave `l0`;end IF;
+		
+						SET `blob` = JSON_EXTRACT(k,'$[0]');
+
+
+						SET `blob` = JSON_SEARCH(res,'all',json_value(k,'$[0]'))
+								,`k` = json_remove(k,'$[0]')
+								,i = 0 ;
+								
+						SET	`blob` = CASE  
+											WHEN ifnull(`blob`,'') = '' THEN NULL
+											WHEN !json_valid(`blob`) THEN json_array(`blob`)
+											WHEN json_valid(`blob`) AND JSON_DEPTH(`blob`) = 1  THEN concat('[',`blob`,']')
+										else `blob` END; 
+								
+
+						`l1`:loop
+								IF IFNULL(`blob`,'')='' OR !json_valid(`blob`) or JSON_LENGTH(`blob`)=0 OR JSON_DEPTH(`blob`)<2 THEN leave `l1`;end IF;
+
+								SET `key` = regexp_replace(json_value(`blob`,'$[0]'),']\\K\\[\\d+]$','');
+
+								SET `key` = CONCAT_WS('',REGEXP_substr(`key`,'^.+?(?=\\d+]$)'),REGEXP_substr(`key`,'\\d+(?=]$)')-i,']') ;
+
+								SET res = json_remove(`res`,`key`)
+										,`blob` = json_remove(`blob`,'$[0]')
+										,i = i+1;
+
+						END loop;
+
+				END loop;
+				WHEN factors REGEXP "赋值" THEN
+-- JSON_EXTRACT(v,'$[*][0]'); 
+
+
+
+					`l1`:loop
+
+					 IF  IFNULL(k,'') = '' or!json_valid(k) or json_length(k) =0  THEN leave `l1`; END IF;
+
+							SET	`KEY`  :=  JSON_value(k,CONCAT('$[0][',t,']')) 
+									,`KEY`  =  CONCAT('','$**.',`KEY`);
+									
+							SET  `BLOB` =  json_value(v,`KEY`);
+	
+							SET  `BLOB` =  JSON_EXTRACT(v,`KEY`);
+
+
+
+							SET  `BLOB`  = JSON_merge(json_remove(json_extract(k,'$[0]'),CONCAT('$[',t,']')),`BLOB`
+														,json_extract(k,CONCAT('$[0][',t,']')));
+
+							SET		`res` = CONCAT_WS(',',res,`BLOB`);
+							
+							SET k = JSON_REMOVE(k,'$[0]');
+					END LOOP;
+					SET res = CONCAT('[',res,']');
+		
+				WHEN JSON_DEPTH(v)>1 AND  ( k IS NULL or k REGEXP '^\\d$') or json_valid(k) AND  k is NOT null AND k NOT REGEXP '^\\d$'THEN
+
+					case 
+						WHEN	json_valid(k) AND  k is NOT null AND k NOT REGEXP '^\\d$' THEN 
+						
+							SET 	`KEY` := REGEXP_substr(JSON_EXTRACT(k,CONCAT('$**.',t)),'\\w+')
+										, t = ''
+										, v= JSON_EXTRACT(v,CONCAT('$**.',`key`)) 
+										, `mod` ='+';
+
+						WHEN  t REGEXP '^all'THEN 
+							SET t = '';
+						WHEN  k IS null THEN
+							SET v = json_extract(v, JSON_UNQUOTE(REGEXP_replace(JSON_SEARCH(v,'one',t),'\\d+(?=]")', REGEXP_substr(JSON_SEARCH(v,'one',t),'\\d+(?=]")')+1))) ; 
+
+
+
+						ELSE 
+
+							SET k :=REGEXP_replace(JSON_SEARCH(v, 'all',`t`),'\\d+(?=]")',`key`)
+									,k = IF(k is not NULL AND JSON_DEPTH(k) = 1 ,JSON_ARRAY(JSON_EXTRACT(k,'$')),k ) ;
+	
+					END case; 
+
+						SET  v = IF(json_depth(v) = 1 ,concat('[',v,']'),v); 
+SET @i = 0;
+					`l1`:loop
+
+					 IF  IF(k is null 
+						, IFNULL(v,'')='' or !json_valid(v) or json_length(v) =0
+						, IFNULL(v,'')='' or json_length(v) =0 OR !json_valid(k) or json_length(k) =0 ) THEN leave `l1`; END IF;
+
+					 SET `key` := IF(k IS null OR IFNULL(t,'') = '','$[0]', json_value(k,'$[0]'))
+								, `value` := JSON_extract(v,`key`);
+					SET `factor` = `factors`;
+
+								
+					`l2`:loop  
+
+						IF IFNULL(`factors`,'')='' OR !JSON_VALID(factors) OR json_length(`factor`) =0 THEN LEAVE `l2`; END if;
+
+						set `key` = JSON_VALUE(`factor`,'$[0]')
+								,`value` = CASE WHEN `key`  REGEXP '\\*[\\d\\.\\-]' THEN s2d(`value`)*s2d(`key`)
+																WHEN `key` REGEXP '/[\\d\\.\\-]' THEN s2d(`value`)/s2d(`key`)
+																WHEN `key` REGEXP '^\\d$' THEN ROUND(s2d(`value`),2)
+ 																WHEN `key` REGEXP '^\\+[\\-\\.\\d]+$' THEN s2d(`value`)+s2d(`key`)
+ 																WHEN `key` REGEXP '^\\-[\\-\\.\\d]+$' THEN s2d(`value`)+s2d(`key`)
+											 else `value` END 
+								,factor = json_remove(factor,'$[0]'); 
+
+
+					END loop;
+
+					set res = IF(IFNULL(`mod`,'') REGEXP '\\+'
+								,IFNULL(res,0)+ s2d(`value`)
+								,JSON_MERGE_preserve(IFNULL(res,'[]')	,	`value`));
+
+					IF k IS null OR ifnull(t,'') = ''THEN
+								SET v = json_remove(v,'$[0]');
+
+					ELSE SET k= json_remove(k,'$[0]');
+					END IF;
+	SET @i = @i +1;					 
+
+
+					END loop;
+
+
+			ELSE	
+
+			SET res := JSON_EXTRACT(v ,CONCAt('$**.',`key`));
+
+			IF IFNULL(res,'') !='' AND json_valid(res) THEN   
+					SET res := REGEXP_replace(res,'(,)?\\s*null(?(1)|,?)','')
+						,res = JSON_value(res,'$[0]');
+			END IF ;
+		END case;
+
+		RETURN IF(json_valid(res) AND json_depth(res)=2 AND JSON_length(res) = 1,json_value(res,"$[0]"),res)  ;
+	END IF;
+
+ IF k  IS null THEN RETURN null;end IF ;
+ 
+  IF k REGEXP '^\\s*(")?\\s*\\w+\\s*(\\s*,\\s*\\w+)*(?(1)\\s*"\\s*)$' THEN
+	 SET k:= REGEXP_replace(k,'^\\[?"?|"?]?$','')
+	 , k = CONCAT_WS('','["',REGEXP_replace(k,'"?\\s*,\\s*"?','","'),'"]') 
+	;
+	END IF ;
+  IF k REGEXP '^\\[("[abt]\\d+")(?:,\\s*(?-1))*]$' THEN SET  isabt = 1;END IF;
+	
+
+	l:LOOP
+
+		IF JSON_length(k) =0 or json_length(`v`)=0 THEN LEAVE l;END IF;
+
+		SET 	`key` :=json_value(k,'$[0]')
+					,i = IF(isabt,REGEXP_replace(`key` ,'^\\D*?(?=\\d+$)',''),1)
+					,k = JSON_REMOVE(k,'$[0]');
+
+		IF i  REGEXP '^\\d+$' AND i-1>=0 THEN
+
+			SET i = CONCAT_WS('','$[',i-1,']')
+ 
+					,res = CONCAT_WS(',',res,
+								CASE WHEN IFNULL(t0,0)=0 THEN JSON_EXTRACT(v,i)
+										WHEN t0=1 THEN CONCAT_WS('',json_quote(`key`),':',JSON_EXTRACT(v,i))
+										WHEN t0=2 THEN CONCAT_WS('','[',json_quote(`key`),',',JSON_EXTRACT(v,i),']')
+								ELSE '"未知"'END
+					)
+					,v = IF(isabt,v,json_remove(v,'$[0]'))
+					;
+		END IF;
+	END LOOP;
+	
+
+	SET `res` = IF(t0=1
+	,CONCAT_WS('','{',`res`,'}')
+	,CONCAT_WS('','[',`res`,']')
+	);
+
+	if length(t) >1 AND json_valid(`res`) THEN
+	 SET v = res ,t0 =REGEXP_replace(t,'^\\d',''),res = NULL; 
+
+	CASE WHEN t0 <4 THEN 
+			 SET res = (
+SELECT
+CASE WHEN t0 =0 THEN JSON_ARRAY(@jtv,a.v,a.k)
+WHEN t0 =1 THEN JSON_ARRAY(a.k,a.v)
+WHEN t0 =2 THEN @jtv
+WHEN t0 =3 THEN JSON_MERGE(JSON_ARRAY(@jtv,a.v,a.k),json_extract(v,'$[*][1]'))
+END
+FROM json_table(v,"$[*]"
+COLUMNS(
+	k VARCHAR(100) path '$[0]' NULL ON EMPTY,
+	v VARCHAR(100) path '$[1]' NULL ON EMPTY
+)) AS a
+WHERE ifnull(a.v,"")!=""
+
+ORDER BY if((@jtv:= REGEXP_substr(REGEXP_replace(REGEXP_substr(a.v,'\\-?[\\d,\\.]+'),'(?<=\\d),(?=\\d{3})|\\b20[0-2]\\d|\\d{7,}\\b',''),'(?x)\\-?\\d+(?:\\.\\d+)?'))='',0,@jtv+0) DESC 
+LIMIT 1
+);
+
+
+	ELSE 
+			 SET res = CONCAT_WS('\n'
+			 ,'SELECT  JSON_ARRAY(@jtv,a.v,a.k)'
+		   ,CONCAT_WS('','FROM json_table(',QUOTE(v),',"$[*]"')
+		,"COLUMNS(\n\tk VARCHAR(100) path '$[0]' NULL ON EMPTY,\n\tv VARCHAR(100) path '$[1]' NULL ON EMPTY"
+		,")) AS a"
+		,CONCAT_WS('','WHERE ifnull(a.v,"")!=""') 
+		,CONCAT_WS('',"ORDER BY if((@jtv:= REGEXP_substr(REGEXP_replace(REGEXP_substr(a.v,",QUOTE('\\-?[\\d,\\.]+'),"),",QUOTE('(?<=\\d),(?=\\d{3})|\\b20[0-2]\\d|\\d{7,}\\b'),",''),",QUOTE('(?x)\\-?\\d+(?:\\.\\d+)?'),"))='',0,@jtv+0) DESC \nLIMIT 1")
+		);
+	END case;
+	END IF; 
+	
+	RETURN `res`;
+
+
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `jk1`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `jk1`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `jk1`(`k` text,`v` longtext) RETURNS longtext CHARSET utf8mb3
+    NO SQL
+BEGIN 
+	declare `key` VARCHAR(100) DEFAULT NULL;declare i VARCHAR(10) DEFAULT NULL;declare res  longblob DEFAULT null;
+	#Routine body goes here...
+
+	IF IFNULL(K,'')=''  OR  IFNULL(V,'')='' OR !json_valid(`v`) THEN
+		RETURN NULL;
+	END if; 
+
+  IF k REGEXP '^\\s*(")?\\s*\\w+\\s*(\\s*,\\s*\\w+)*(?(1)\\s*"\\s*)$' THEN
+	 SET k = CONCAT_WS('','["',REGEXP_replace(k,'\\s*,\\s*','","'),'"]') ;
+	END IF ;
+
+
+
+	l:LOOP
+
+		IF JSON_length(k) =0  THEN LEAVE l;END IF;
+
+		SET 	`key` :=json_value(k,'$[0]')
+					,i = REGEXP_replace(`key` ,'^\\D*?(?=\\d+$)','')
+					,k = JSON_REMOVE(k,'$[0]');
+
+		IF i  REGEXP '^\\d+$' AND i-1>=0 THEN
+		
+			SET i = CONCAT_WS('','$[',i-1,']')
+					,res = CONCAT_WS(',',res,CONCAT_WS(':',json_quote(`key`),JSON_EXTRACT(v,i)));
+		END IF;
+
+
+	END LOOP;
+
+	RETURN CONCAT_WS('','[',REGEXP_REPLACE(`res`,'""','null'),']');
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
 --  Procedure definition for `jkv`
 -- ----------------------------
 DROP FUNCTION IF EXISTS `jkv`;
@@ -6718,7 +8896,7 @@ CREATE DEFINER=`root`@`%` FUNCTION `jkv`(`k` varchar(100),`i` varchar(20),`v1` v
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 
 	SET `v1` = IF(`i` ,`v1`,`v2`),
 			`v1` = IF(`v1` IS NULL,NULL,QUOTd(`v1`));
@@ -6730,20 +8908,17 @@ END
 DELIMITER ;
 
 -- ----------------------------
---  Procedure definition for `jkv_`
+--  Procedure definition for `jo`
 -- ----------------------------
-DROP FUNCTION IF EXISTS `jkv_`;
+DROP FUNCTION IF EXISTS `jo`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `jkv_`(`k` varchar(100),`v` varchar(20000)) RETURNS varchar(20500) CHARSET utf8mb3
+CREATE DEFINER=`root`@`::1` FUNCTION `jo`(`k` text,`v` longtext) RETURNS longtext CHARSET utf8mb3
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 
-	SET `v` = IF(IFNULL(`v`,'')='',NULL,quotd(`v`));
-
-	RETURN CONCAT(quotd(`k`),':',v);
-
+	RETURN CONCAT_WS(':',JSON_QUOTE(k),JSON_QUOTE(v));
 END
 ;;
 DELIMITER ;
@@ -6753,16 +8928,42 @@ DELIMITER ;
 -- ----------------------------
 DROP FUNCTION IF EXISTS `js`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `js`(`j` longtext,k varchar(255)) RETURNS longtext CHARSET utf8mb3
+CREATE DEFINER=`root`@`localhost` FUNCTION `js`(p LONGBLOB) RETURNS longblob
+    DETERMINISTIC
+BEGIN
+	DECLARE  k blob DEFAULT  REGEXP_substr(p,'^\\s*@?\\K[^\\.\\s,]+');
+	DECLARE  v longblob DEFAULT  REGEXP_substr(p,'[\\s\\.,]\\K[^\\.,\\s]+(?=\\s*$)');
+
+	RETURN 
+					CASE	WHEN  IFNULL(p,'') = ''  THEN NULL
+								WHEN  IFNULL(k,'') = ''  THEN p
+								WHEN  k = 'env'  THEN J0(@env, v) 
+								WHEN  k = 'env'  THEN JSON_VALUE(@env, CONCAT('$.',v) )
+						ELSE p
+					END ;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `json`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `json`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `json`(`p` blob) RETURNS blob
     NO SQL
     DETERMINISTIC
 BEGIN
+	#Routine body goes here...
 
-	
- 	IF k IS NULL  THEN RETURN NULL;END IF;
-  SET k = CONCAT('/(?<="',k,'":)(?>("([^\\\\"]|\\\\{2}|\\\\"|\\\\)*")|(\\{((?R1):((?R1)|(?R3)))?(,(?R4))*\\}))/');
-	RETURN preg_capture(k,j);
-
+	RETURN CONCAT(p,'(?(DEFINE)(?ixsm)
+		(?<k>"[\\w]+"|\\b[\\w]+\\b|`.+`)(?=\\s*:)
+		(?<v>(?:"(?s)(?:[^\\\\"]|\\\\.)*" |\\-?\\d+(?:\\.\\d+)?|null|(?&kvs)|(?&a)))
+		(?<a>\\[\\s*(?&v)(?:(?:\\s*,\\s*)(?&v))*?\\s*])
+		(?<kv>(?&k)\\s*:\\s*(?&v))
+		(?<kvs>\\{\\s*(?&kv)(?:\\s*,\\s*(?&kv))*?\\s*})
+		(?<j>(?:(?&kvs)|(?&a)))
+	)');
 END
 ;;
 DELIMITER ;
@@ -6776,29 +8977,7 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `json_add`(`d` longtext,`k` tinytext,
     NO SQL
     DETERMINISTIC
 BEGIN
-	
-	IF IFNULL(v,'') = '' AND IFNULL(d,'') = '' THEN RETURN NULL; END IF;
-	IF IFNULL(`k`,'') = '' THEN RETURN d; END IF;
-  SET  d = IF(IFNULL(d,'') = '','{}',d),
-			 d = preg_capture('/\.+(?=\\}$)/',d),
-			 v = CONCAT_WS(':',QUOTE_d(k),QUOTE_d(v)),
-       k = IF(preg_rlike('/(?<=^\\{)\\s*$/',d),'',','),
-			 d = CONCAT_WS('',d,k,v,'}');
-	RETURN d;
-END
-;;
-DELIMITER ;
-
--- ----------------------------
---  Procedure definition for `json_add2`
--- ----------------------------
-DROP FUNCTION IF EXISTS `json_add2`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `json_add2`(`d` longtext,`k` tinytext,`v` mediumtext) RETURNS longtext CHARSET utf8mb3
-    NO SQL
-    DETERMINISTIC
-BEGIN
-	
+	#Routine body goes here...
 	IF IFNULL(v,'') = '' AND IFNULL(d,'') = '' THEN RETURN NULL; END IF;
 	IF IFNULL(`k`,'') = '' THEN RETURN d; END IF;
   SET  d = IF(IFNULL(d,'') = '','{}',d),
@@ -6820,9 +8999,163 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `json_extra`(`j` longtext,k varchar(2
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 			
-	RETURN j(j,k);
+	RETURN j0(j,k);
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `jsp2HOC`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `jsp2HOC`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `jsp2HOC`(`p` blob) RETURNS text CHARSET utf8mb3
+    NO SQL
+`la`:BEGIN
+	#Routine body goes here...
+	DECLARE i varchar(100) DEFAULT NULL;DECLARE y INT(5) DEFAULT NULL;
+	DECLARE r  text DEFAULT NULL;
+	DECLARE c , c0, c1 ,c2 ,c3 TEXT DEFAULT null;
+	DECLARE sign VARCHAR(200) DEFAULT NULL;
+
+
+
+
+  IF NOT json_valid(p) THEN RETURN NULL;  END IF;
+
+	SET i = CAST(json_value(p,'$[0]') AS CHAR)
+			,`c` :=  JSON_EXTRACT( p,'$[1]')
+			,`c0` = IF(c IS NULL ||c= 'NULL',NULL,json_value(p,'$[1][0]'))
+			,`c1` = IF(c IS NULL ||c= 'NULL',NULL,json_value(p,'$[1][1]'))
+			,`c2` = IF(c IS NULL ||c= 'NULL',NULL,json_value(p,'$[1][2]'))
+			,`c3` = IF(c IS NULL ||c= 'NULL',NULL,json_value(p,'$[1][3]'));
+
+	-- SET sign = CONCAT_WS('','<!--',i,'-->\n'); -- 审计
+
+
+	RETURN o2(
+	
+  CASE 
+	WHEN `i` = 'jsp2HOC' THEN 
+
+	json_array('jsp2HOC',''
+
+			,json_array('1','去注释 等',CONCAT_WS('|'
+					,'(?ism)<!DOCTYPE\\s+[^>]*+>'
+					,'<%.*?%>'
+					,'(?:<!--.*?-->)|(?:/\\*.*?\\*/)'
+					,'(?is)\\<style\\s+type\\s*=\\s*[\'"]text/css[\'"]\\s*>\\s*\\<!--(.*)?-->\\s*</style>\\K\\s*'
+					,'\\Q${setseals}\\E'
+					,'</?\\Ks:'
+					,"<\?\\Kbody"
+				),''
+				,'(?m)^\\s*(?m)$',''
+ 				,'<(?:meta|link|input|br)[^>]*?[^/]\\s*\\K>','/>'
+ 				,'<(?:br)[^>/]*?\\K>','/>'
+
+ 				,'<script[^>]+?[^/]\\K\\s*>\\s*</script>','/>'
+
+  			,'(?si)<style[^>]*?>.+?</style>','' -- 去style
+				
+				
+				,'(?s)<script[^>]*?[^/]\\s*>.+?</script>',''
+				
+
+				
+-- 			,'(?m)//.*?$','{/**/}'
+ 			,'(?s)<html>(.+?)</html>',o(' rcc i')
+ 			,'占位符',c0
+			)
+
+			,json_array('','react -1 驼峰  ','style=(["])(?:(?=\\\\).{2}|(?:(?!\\g1|\\\\).)*?)*?\\g1'
+,JSON_ARRAY('','','ii','ii')
+ 					,'\\w+="\\w+:"',''
+ 					,';;',';'
+ 					,'";','"'
+ 				,'(?#UPPER)\\-([a-z])','\\1'
+ 				,'(["\'])((?:(?=\\\\).{2}|(?:(?!\\g1|\\\\).)*+)*?)\\g1','{{\\2}}'
+ 				,':\\s*([\\w_\\#!]++(?:\\s*[^;\\s]++)*)',':"\\1"'
+ 				,';',','
+,';',';'
+
+			)
+
+			,json_array('3','head 处理'
+					,'\\Q${pageContext.request.contextPath}\\E','http://localhost/j'
+					,'http\\-equiv','httpEquiv'
+					,"(?im)^(?:\\s*IMPORT.+?$)*","\\0\import Head from '@docusaurus/Head';"
+					,'(\\</?)head','\\1Head'
+
+			)
+
+			,json_array('4','驼峰'
+					,'\\bclass(?=\\s*=)','className'
+					,'\\bonclick(?=\\s*=)','onClick'
+			)
+
+			,json_array('table','  react 处理table '
+				,o('<(table)\\s*(?&inner)?>\\K(?&outer)*(?=</\\g1>) es6'),o1('addtbody')
+
+			)
+			,json_array('5',' 语法问题',
+
+					o('((?ix)onclick\\s*=\\s*)"\\w+\\s+(\\w+(?&r1));?" es6'),'\\1{(e)=>\\2}'
+			)
+
+			,json_array('6','react  table2box',o('<(table)\\s*(?&inner)?>(?&outer)*</\\g1> es6')
+				,'(<\)?table','\\1Box'
+
+
+
+			)
+/**/
+
+)
+			ELSE NULL 
+  END
+	)
+;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `jt`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `jt`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `jt`(`t` varchar(10),`p` longtext,`k` text) RETURNS longtext CHARSET utf8mb3
+    NO SQL
+BEGIN 
+	declare `key` VARCHAR(100) DEFAULT NULL;declare i VARCHAR(10) DEFAULT NULL;declare res  longblob DEFAULT null;
+	#Routine body goes here...
+
+	IF !json_valid(`p`) THEN
+		RETURN NULL;
+	END if; 
+
+SET res = (
+SELECT 
+k,v,
+@v
+from json_table(@a,'$[*]'
+COLUMNS(
+ k VARCHAR(100) path '$[0]' NULL ON EMPTY,
+v VARCHAR(100) path '$[1]' NULL ON EMPTY
+)
+) AS a 
+WHERE 
+ifnull(v,'')!='' 
+ORDER BY 
+(@v:= REGEXP_substr(REGEXP_replace(REGEXP_substr(v,'\\-?[\\d,\\.]+'),'(?<=\\d),(?=\\d{3})|\\b20[0-2]\\d\\b',''),'(?x)\\-?\\d+(?:\\.\\d+)?')+0) desc 
+LIMIT 1
+)
+;
+
+
+	RETURN p;
 END
 ;;
 DELIMITER ;
@@ -6849,6 +9182,387 @@ END
 DELIMITER ;
 
 -- ----------------------------
+--  Procedure definition for `j_search`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `j_search`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `j_search`(`j` longblob,`v` blob ) RETURNS text CHARSET utf8mb3
+    NO SQL
+    DETERMINISTIC
+BEGIN
+	DECLARE  rs text DEFAULT NULL;DECLARE `v0` blob DEFAULT NULL;DECLARE `v1` longblob DEFAULT NULL;DECLARE `v2` blob DEFAULT NULL;DECLARE `format` int(2) DEFAULT NULL;DECLARE `i` int(2) DEFAULT 0;DECLARE `mode`  varchar(10) DEFAULT NULL;
+	
+
+ CASE 
+
+		WHEN IFNULL(j,'') = '' OR IFNULL(v,'') = '' OR !json_valid(j) THEN 	SET rs  = nULL;
+		WHEN !json_valid(`v`) THEN  		SET RS=NULL; 
+	ELSE 
+
+	  IF v REGEXP '\\[\\d+(?=,)' THEN
+
+				SET `mode` = json_value(v,'$[0]'),v =json_remove(v,'$[0]'); 
+		END IF;
+		
+		SET v = REGEXP_replace(cast(v AS CHAR),'(,)?\\s*(null|"0\\.00"|(?<=\\D)0\\.00+(?=\\D))(?(1)|,?)',''),
+				v2 = REGEXP_replace(JSON_SEARCH(v,'one','可替代'),'^"|\\[\\d]"','');		
+
+		IF v = '0' OR v ='[]'THEN return  NULL;END IF ;
+
+		IF  v2  is NOT  NULL THEN
+
+				SET v1 := json_remove(JSON_EXTRACT(v, v2),'$[0]')
+						,v = json_remove(v, v2);
+
+				set v1 = case JSON_DEpTH(v1)
+								WHEN  3 then JSON_EXTRACT(v1 ,'$[*][*]')
+								-- WHEN 2 THEN JSON_EXTRACT(v1 ,'$[*]')
+								ELSE v1 END ;
+		
+		end IF;
+
+    SET v1 = IF (v1 IS NOT NULL ,JSON_MERGE(j2j(jSON_EXTRACT(v, '$[1]')),v1),jSON_EXTRACT(v, '$[1]'));
+
+		SET  v = s2j(1,JSON_MERGE(json_extract(v ,'$[0]'),json_merge( 
+			IF(v1 is NOT NULL, json_extract(v1,'$'),'null')
+			,IF(JSON_REMOVE(JSON_REMOVE(v,'$[0]') ,'$[0]')IS NOT NULL,JSON_REMOVE(JSON_REMOVE(v,'$[0]') ,'$[0]'),'null' )))); 
+
+		SET  v = s2j(1,v)
+				,v1 = s2j(1, v1);
+
+		l:loop
+
+				IF  IFNULL(v,'')= ''or !json_valid(v) or  json_valid(v) AND (JSON_LENGTH(`v`)<2 or IFNULL(rs,'')!='' ) THEN LEAVE l;END IF;
+				
+				SET `v0` = json_value(`v`,'$[1]');
+				SET rs  = REGEXP_substr(JSON_SEARCH(REGEXP_replace(j,'(?<=")\\s+',''),'one',CONCAT_WS('','',`v0`)),'[abt]\\d+');
+
+				IF ifnull(rs,'') != '' THEN
+					SET `v2` = `v0`; 
+
+				ELSE
+					SET `v0` = IF(CAST(`v0` AS CHAR) REGEXP CONVERT('￥?\\-?[\\d,]+(\\.\\d*)?$' USING gbk) AND CAST(`v0` AS CHAR) NOT REGEXP '^\\(\\?'
+															,CONCAT_WS('','￥?'
+																	,REGEXP_replace(
+																	REGEXP_replace(REGEXP_replace(REGEXP_replace(
+																				FORMAT(s2d(`v0`),2)
+																			,',',',?')
+
+																			,'\\.','.?')
+																			,'\\.\\?0*$','(\\0)?')
+																			,'\\.\\?[1-9]\\K0+','\\0?')
+																			)
+											,REGEXP_replace(IF(ifnull(v0,'')!='',CONCAT_WS('','\\s*',`v0`,'\\s*'),v0)
+																				,'元|圆','(?:元|圆)')
+											
+											);
+
+					IF IFNULL(v0,'')= '' THEN SET `v` = json_remove(`v`,'$[1]'); ITERATE `l`;END IF; 
+
+					SET v2 = REGEXP_substr(cast(j as char),IFNULL(CAST(v0 AS CHAR),null)) ,`v0`= CONCAT_WS('','\\w+(?=":\\s*"?',`v0`,')');
+
+					 SET rs = REGEXP_substr(CAST(j AS CHAR) ,CAST(`v0` AS CHAR));
+
+					IF IFNULL(rs,'')= '' AND IFNULL(json_value(`v`,'$[1]'),'')!='' AND cast(json_value(`v`,'$[1]')AS CHAR)REGEXP '^￥?\\-?[\\d,]+(?:\\.\\d*)?$' THEN
+
+						SET `v0` = s2d(json_value(`v`,'$[1]')) + 0.01;
+
+					SET `v0` = IF(CAST(`v0` AS CHAR) REGEXP CONVERT('￥?\\-?[\\d,]+(\\.\\d*)?$' USING gbk) AND CAST(`v0` AS CHAR) NOT REGEXP '^\\(\\?'
+															,CONCAT_WS('','￥?'
+																	,REGEXP_replace(
+																	REGEXP_replace(REGEXP_replace(REGEXP_replace(
+																				FORMAT(s2d(`v0`),2)
+																			,',',',?')
+
+																			,'\\.','.?')
+																			,'\\.\\?0*$','(\\0)?')
+																			,'\\.\\?[1-9]\\K0+','\\0?')
+																			)
+											,`v0`);
+
+					IF v0 IS NULL THEN SET `v` = json_remove(`v`,'$[1]'); ITERATE `l`;END IF; 
+					SET v2 = REGEXP_substr(cast(j as char),IFNULL(CAST(v0 AS CHAR),null)) ,`v0`= CONCAT_WS('','\\w+(?=":\\s*"?',`v0`,')');
+
+					 SET rs = REGEXP_substr(CAST(j AS CHAR) ,CAST(`v0` AS CHAR));
+
+					END IF; 
+								IF IFNULL(rs,'')= '' AND IFNULL(json_value(`v`,'$[1]'),'')!='' AND cast(json_value(`v`,'$[1]')AS CHAR)REGEXP '^￥?\\-?[\\d,]+(?:\\.\\d*)?$' THEN
+
+						SET `v0` = s2d(json_value(`v`,'$[1]')) - 0.01;
+
+					SET `v0` = IF(CAST(`v0` AS CHAR) REGEXP CONVERT('￥?\\-?[\\d,]+(\\.\\d*)?$' USING gbk) AND CAST(`v0` AS CHAR) NOT REGEXP '^\\(\\?'
+															,CONCAT_WS('','￥?'
+																	,REGEXP_replace(
+																	REGEXP_replace(REGEXP_replace(REGEXP_replace(
+																				FORMAT(s2d(`v0`),2)
+																			,',',',?')
+		-- 																	,'\\.0+(?=\\D|$)','')
+																			,'\\.','.?')
+																			,'\\.\\?0*$','(\\0)?')
+																			,'\\.\\?[1-9]\\K0+','\\0?')
+																			)
+											,`v0`);
+
+					IF v0 IS NULL THEN SET `v` = json_remove(`v`,'$[1]'); ITERATE `l`;END IF; 
+					SET v2 = REGEXP_substr(cast(j as char),IFNULL(CAST(v0 AS CHAR),null)) ,`v0`= CONCAT_WS('','\\w+(?=":\\s*"?',`v0`,')');
+
+					 SET rs = REGEXP_substr(CAST(j AS CHAR) ,CAST(`v0` AS CHAR));
+
+					END IF; 
+				END if ;	
+				SET `v` = json_remove(`v`,'$[1]'),i= i+1 ;
+	
+		END loop;
+
+	SET  rs = json_array(json_value(`v`,'$[0]'),rs);
+END CASE;
+
+	 IF IFNULL(v2,'')='' OR v2 REGEXP '\\s*null' OR v2 ='0'  OR json_length(rs) =1 OR rs REGEXP '^\\["\\w+"(?:,\\s*(?:null|""))*?]$' OR rs REGEXP '\\[null(,\\s*null)*]' THEN  
+	 SET rs = null;
+	 else  
+
+	  SET `format`  = CASE 
+					WHEN IFNULL(REGEXP_substr(`mode`,'\\d\\K\\d'),'')!='' THEN REGEXP_substr(`mode`,'\\d\\K\\d')
+					WHEN IFNULL(`v2` ,'')='' THEN NULL
+					WHEN `v2`REGEXP '￥|,' THEN 5
+					WHEN `v2`REGEXP '￥' THEN 4
+					WHEN `v2`REGEXP '^\\-?\\d+$' THEN 3
+			    WHEN`v2`REGEXP '\\,' THEN 2
+					WHEN `v2` REGEXP '\\.' THEN 1
+				ELSE 0 
+			 END;
+
+ SET v1 :=    case  
+				WHEN IFNULL(REGEXP_substr(`mode`,'^\\d'),0)=1  AND IFNULL(v2 ,'')!='' AND JSON_LENGTH(v1)>1  THEN  json_value(v1,'$[0]') 
+				WHEN IFNULL(REGEXP_substr(`mode`,'^\\d'),0)=2  AND IFNULL(v2 ,'')!='' AND JSON_LENGTH(v1)>2 THEN   json_value(v1,'$[1]') 
+				WHEN IFNULL(REGEXP_substr(`mode`,'^\\d'),0)=3  AND IFNULL(v2 ,'')!='' AND JSON_LENGTH(v1)>3 THEN json_value(v1,'$[2]') 
+				WHEN IFNULL(v2 ,'')!='' AND  json_length(v1)>0  AND i > json_length(v1) THEN json_value(v1,CONCAT('$[',MOD(i-1,json_length(v1)),']'))
+				WHEN IFNULL(REGEXP_substr(`mode`,'^\\d'),0)=9  AND IFNULL(v2 ,'')!='' THEN v2 
+ 				WHEN  i<=json_length(v1) THEN json_value(v1,CONCAT('$[',i-1,']'))
+				ELSE json_value(v1,'$[0]')END;
+
+SET @v7:= null, 
+		v1 =  CASE 
+					WHEN IFNULL(v1,'')='' THEN NULL
+					WHEN `FORMAT` IS NOT NULL  THEN 
+					 case 
+		 			    WHEN FORMAT = 1 THEN s2d(v1)
+		 					WHEN FORMAT = 2 THEN FORMAT(s2d(v1),2)
+	 						WHEN FORMAT = 3 THEN replace(s2d(IF(v1 NOT REGEXP '\\.' AND length(v1) != length(v2) AND length(CONCAT_WS('',v1 ,'00'))=  length(v2 ),CONCAT_WS('',v1 ,'00'),v1)),'.','')
+	 						WHEN FORMAT = 7 AND if1(@v7 := concat('￥',v1)) THEN 
+									case  WHEN length(@v7) > length(v2)  THEN REGEXP_replace(@v7, CONCAT('\\d{',length(@v7)-LENGTH(v2),'}$'),'') 
+												WHEN  length(@v7) < length(v2) THEN CONCAT(@v7,REPEAT("0",LENGTH(v2)- length(@v7)))
+									ELSE @v7 END 
+	 						WHEN FORMAT = 5 THEN CONCAT('￥',FORMAT(s2d(v1),2))
+						ELSE v1 END
+					else v1 END;
+
+	 set 	   rs = JSON_set(rs,'$[2]',cast(`v1` as char),'$[3]',`format`,'$[4]',cast(`v2` as char)) ;	
+	 END if;
+
+ RETURN if(JSON_extract(rs,'$[2]') REGEXP '""' ,null,rs) ;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `j转`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `j转`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`::1` FUNCTION `j转`(`p` LONGTEXT,`k` MEDIUMTEXT) RETURNS longtext CHARSET utf8mb3
+    NO SQL
+    DETERMINISTIC
+BEGIN
+
+
+	  IF 	 IFNULL(p,'') = '' THEN  RETURN  NULL; END IF;
+	
+		IF IFNULL(`k`,'') =''THEN return NULL ;END IF; 
+					CASE 
+							WHEN  `k`  REGEXP  '2键$' THEN  RETURN  REGEXP_replace(REGEXP_replace(p,CONCAT(r('-键'),r('-v')),'\\1'),'^,|,$','');
+							WHEN  `k`  REGEXP  '2值$' THEN   
+										SET p = REGEXP_replace(p,'"([^"]+)":','')  ; RETURN REGEXP_replace(p,'^,|,$','');
+							WHEN `k` REGEXP '(?im)(?:j0(?:son)?[2变]sel(?:ect)|Sql语句)(?=[,"]|$)'THEN
+	
+									IF NOT JSON_VALID(k) THEN  SET `k` = CONCAT('["',REPLACE(`k`,',','","'),'"]'); END IF;
+							BEGIN	DECLARE rs LONGTEXT DEFAULT '[]';DECLARE `c`  VARCHAR(5) DEFAULT JSON_VALUE(`k`, '$[1]') ; 
+								
+
+													set p = REGEXP_replace(p,'^,|,$','');
+													IF !json_valid(p) THEN SET p = CONCAT('[',REGEXP_replace(p,'("[^"]+":).+?(?:(?=,\\1)|$)','{\\0}'),']');END IF ;#变json 
+						
+													IF JSON_DEPTH(p)=2 THEN SET p = CONCAT('[',p,']');END IF;
+
+													SET rs = JSON_QUERY(p,'$[0]');
+													SET rs = JSON_ARRAY_INSERT(CONCAT('[',rs,']'),'$[1]',concat('SELECT @i:=1 AS ROWno,',REGEXP_replace(REGEXP_REPLACE(rs,'(?i)"((?:(?=\\\\).{2}|[^\\\\"]*+)*?)":\\s*("(?:(?=\\\\).{2}|[^\\\\"]*+)*?"|NULL|[\\d\\.\\-]+)','\\2 AS \\1'),'^[\\{\\[]*+|[\\}\\]]*+$','')))  ;
+
+													SET rs = JSON_set(rs,'$[0]',REGEXP_replace(JSON_COMPACT(json_keys(JSON_QUERY(p, '$[0]'))),'[\\[\\]"]','')); #0值
+													SET p= JSON_REMOVE(p,'$[0]');
+
+IF IFNULL(p,'') != 0 then 
+													SET p =  CONCAT_WS(CONCAT_WS('',' UNION ALL	',`c`) #拼装 SELECT 
+,JSON_value(rs,'$[1]')
+,CONCAT("SELECT @i:=@i+1,"
+		,IF(JSON_LENGTH(p) > 0
+				,REGEXP_replace(
+						REGEXP_REPLACE(p,'\\},\\s*\\{(?=")',CONCAT_WS('',' UNION ALL	',`c`,'SELECT @i:=@i+1,'))
+						,'^[\\[\\{]+|"([^"]+)":|[\\}\\]]+$','' )
+				,NULL)
+));	
+END IF;
+
+												CASE#update  REPLACE 等  
+												WHEN (@p := JSON_value(`k`,'$[2]') ) REGEXP "(?i)^(update|(?:REPLACE\\s*INTO))\\s+[\\w_\\.\`]++"  THEN # REPLACE  
+													SET  @p := CONCAT(@p,"(",JSON_VALUE(rs,'$[0]'),")");# 1
+														 
+
+
+l1:BEGIN DECLARE `i` INT(5) DEFAULT 0; DECLARE `q` MEDIUMTEXT DEFAULT  json_value(k,'$[5]'); declare `key` VARCHAR(200) ; DECLARE `value` MEDIUMTEXT; #2,3
+declare `okey` VARCHAR(200) ;DECLARE 长度 INT(5) DEFAULT NULL; 
+
+
+IF IFNULL(`q`,'') != '' THEN  #2 存入rs2,3
+SET `q` := CONCAT_WS('','[',JSON_KEYS(`q`),',',JSON_EXTRACT(`q`,'$.*'),',["是3"]]');
+
+l2: LOOP
+
+	IF i > JSON_LENGTH(json_query(`q`,'$[0]'))-1   THEN	LEAVE l2; 	END IF; 
+
+		SET `KEY` =  json_value(`q`,CONCAT('$[0][',i,']')),`value` = JSON_EXTRACT(`q`,CONCAT('$[1][',i,']'));
+
+
+		CASE WHEN JSON_UNQUOTE(`VALUE`) REGEXP '^自动\\d+$' THEN SET `q` = JSON_ARRAY_APPEND(`q`, '$[2]', `key`);
+
+		ELSE SET `q` = JSON_ARRAY_APPEND(q,"$[2]",CONCAT(`value` ,' AS ', `key`));
+
+		END CASE;
+ 
+  SET i = i+ 1; 
+END LOOP l2;
+
+end IF; #2结束
+
+SET `VALUE` = CONCAT('[["',replace(JSON_value(rs, '$[0]'),',','","'),'"]]');
+IF  JSON_VALID(`VALUE`) AND JSON_LENGTH(`VALUE`) THEN SET rs = JSON_MERGE(rs, `value`); else SET rs  =  JSON_MERGE(rs, '[["无字段2"]]');end IF;#存入字段2 原字段 okye
+SET `value` = concat('[',json_query(q,'$[0]'),']') ; 
+IF  JSON_VALID(`VALUE`) AND JSON_LENGTH(`VALUE`) THEN SET rs = JSON_MERGE(rs, `value`); else SET rs  =  JSON_MERGE(rs, '[["无字段3"]]');end IF;#存入字段3 表头  
+SET `value` = concat('[',JSON_QUERY(JSON_REMOVE(`q`,'$[2][0]'), '$[2]'),']') ; 
+IF  JSON_VALID(`VALUE`) AND JSON_LENGTH(`VALUE`) THEN SET rs = JSON_MERGE(rs, `value`); else SET rs  =  JSON_MERGE(rs, '[["无字段4"]]');end IF;#存入字段4 中间
+SET RS = JSON_set(rs,'$[5]',JSON_VALUE(RS,'$[1]'));
+SET RS = JSON_SET(rs, '$[1]',0);
+IF  ! (JSON_LENGTH(JSON_QUERY(RS, '$[3]'))=1 AND JSON_value(RS, '$[3][0]')  REGEXP '无字段\\d')  THEN 
+SET  rs = JSON_SET(rs, '$[1]',JSON_LENGTH(JSON_QUERY(RS, '$[3]'))); END IF;
+
+
+
+
+SET `q` = JSON_COMPACT(json_value(k,'$[6]'));
+
+
+
+IF IFNULL(`q`,'') = ''  OR JSON_VALUE(k,'$[6]') = 'null' THEN  SET  q =  CONCAT('{',REGEXP_replace(REGEXP_replace(json_query(rs,'$[2]'),'("[^"]+")','\\1:null'),'^\\[|\\]$',''),'}'); end IF;
+
+#3
+SET `q` := CONCAT_WS('','[',JSON_KEYS(`q`),',',JSON_EXTRACT(`q`,'$.*'),']');
+
+SET 长度 =  (SELECT MAX(a) FROM (SELECT JSON_LENGTH(json_query(`q`,'$[1]')) as a union SELECT JSON_LENGTH(json_query(rs,'$[2]')))AS a);
+
+SET i = 0;
+l3: LOOP
+
+		IF i >= 长度   THEN	LEAVE l3; 	END IF; 
+		SET `oKEY` =  json_value(`rs`,CONCAT('$[2][',i,']')),
+				`KEY` =  json_value(`q`,CONCAT('$[0][',i,']')),`value` = JSON_UNQUOTE(JSON_value(`q`,CONCAT('$[1][',i,']')));
+
+		CASE #处理key  {"oKEY": "a5", "`KEY`": "a5", "`value`": "null"}
+				WHEN IFNULL(`KEY`,'') = ''   THEN SET rs = JSON_ARRAY_APPEND(rs, '$[3]',`okey`);SET rs = JSON_ARRAY_APPEND(rs, '$[4]',`okey`);
+			
+				WHEN IFNULL(`KEY`,'') != ''	 THEN SET rs = JSON_ARRAY_APPEND(rs, '$[3]',`key`); 
+
+
+						CASE #处理value 
+								WHEN  IFNULL(`value`,'') = '' OR `value` ='NULL' OR `value` =  `key` THEN    SET rs = JSON_ARRAY_APPEND(rs, '$[4]'
+																					,IF(`key` <=> `okey`,`okey`, CONCAT_WS(' AS ',IFNULL(`okey`,'NULL') ,`key`)));
+
+								ELSE   SET rs = JSON_ARRAY_APPEND(rs, '$[4]', CONCAT_WS(' AS ',`value`,`key`));
+
+						END CASE;
+
+		  ELSE return '错误#3' ;
+		END case;	
+
+	  SET i = i+ 1; 
+END LOOP l3;
+
+END;
+
+SET p = 
+CONCAT_WS(c
+,CONCAT_WS(c
+,CONCAT('SELECT ' ,'b.*',' FROM(')
+,CONCAT('SELECT ' ,j2a(JSON_QUERY(rs, '$[4]'),'引号')),' FROM('
+,CONCAT_WS(c,CONCAT_WS(CONCAT(' UNION ',c),JSON_value(rs, '$[5]'),JSON_EXTRACT(p, '$[*]')))
+,' ) AS b ) AS b ')
+);
+
+										CASE  WHEN  `k`  REGEXP "(?i)update" THEN # 拼装语句
+
+SET p = cONCAT_WS(c
+ 	,CONCAT(JSON_VALUE(k, '$[2]'),' AS a INNER JOIN (')#表头
+	,CONCAT_WS('c',p)#链接
+,CONCAT(')AS B ON ', j2a(JSON_KEYS(JSON_VALUE(k,'$[5]'))  ,'转等式,a,b'))
+ ,CONCAT('SET ',j2a(JSON_EXTRACT(rs,'$[3]')  ,'转等式,a,b'))#核心2
+,CONCAT('WHERE ',j2a(JSON_VALUE(k,'$[5]'),'转变量,b'))
+
+ );
+
+
+										ELSE #replace 
+
+SET  p = CONCAT_WS(c
+	,CONCAT(JSON_VALUE(k, '$[2]'),'(',REGEXP_replace(JSON_QUERY(rs, '$[3]'),'^\\[|\\]$|(?<!\\\\)"',''),')')#表头
+	,p
+);
+
+ 
+										END CASE; # 拼装语句
+										
+SET rs = JSON_SET(rs, '$[5]',p);
+SET  p = rs;
+												WHEN  @p  REGEXP "(?i)^\\s*update" THEN # UPDATE
+															SET  @p := IF( @p NOT REGEXP '\\s+As\\s+\\w',CONCAT(@p," AS a"),@p) 
+,@p := CONCAT(
+CONCAT_WS(c
+		,@p
+	,CONCAT('INNER JOIN(',p,') as b ')
+	,CONCAT('ON ',JSON_VALUE(k,'$[3]'),'=',JSON_QUOTE(JSON_VALUE(k,'$[4]'))) 
+	,CONCAT('SET ',REGEXP_replace(JSON_VALUE(rs,'$[0]'),'([^,\\s]+)(,|$)','a.\\1=b.\\1\\2'))) 
+	,';'
+);
+														SET  p = @p,@p=NULL;
+
+		 
+													ELSE SET p  =  p;
+												END CASE;
+
+SET rs = JSON_SET(rs,'$[1]',p);
+
+													RETURN  rs ;
+						  END; 
+						ELSE RETURN CONCAT_WS(':', '没有此功能');
+
+					END CASE;
+
+
+
+		
+	RETURN p ;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
 --  Procedure definition for `kv`
 -- ----------------------------
 DROP FUNCTION IF EXISTS `kv`;
@@ -6857,7 +9571,7 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `kv`(`j` blob,`k` varchar(100),`v` bl
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 	SET `j` = CASE 
 				WHEN `j` IS NULL THEN '{'
 				WHEN `j` =''  THEN '{'
@@ -6883,7 +9597,7 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `kv0`(`k` varchar(100),`v` blob,`i` v
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 	CASE
 			WHEN `i`IS NULL OR `i`=0 THEN	SET v = CONCAT(quotn(k),':',quotn(v));
 			WHEN `i` = 1 THEN 
@@ -6901,16 +9615,21 @@ END
 DELIMITER ;
 
 -- ----------------------------
---  Procedure definition for `KW`
+--  Procedure definition for `lm`
 -- ----------------------------
-DROP FUNCTION IF EXISTS `KW`;
+DROP FUNCTION IF EXISTS `lm`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `KW`(`k` varchar(60) , `s` varchar(30) ,`s1` varchar(30) , `s2` varchar(30)) RETURNS varchar(30) CHARSET utf8mb3
+CREATE DEFINER=`root`@`localhost` FUNCTION `lm`(`p` longblob) RETURNS longblob
     NO SQL
+    DETERMINISTIC
 BEGIN
-	
-
-	RETURN SUBSTR(CONCAT(s,MD5(concat(s1,k,s2))),1,30);
+	#Routine body goes here...
+IF ISNULL(P) THEN RETURN NULL;END IF;
+SET @pp = CAST(p AS CHAR);
+RETURN CASE  WHEN  @pp != p THEN P 
+		ELSE CONVERT(@pp USING gbk)
+END ;
+	RETURN @pp;
 END
 ;;
 DELIMITER ;
@@ -6922,8 +9641,15 @@ DROP PROCEDURE IF EXISTS `longin`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `longin`(IN `func_id` TINYINT (2) , IN `userName`  Text , IN `userPassWd` Text, IN `LongIp`  varchar(50))
 BEGIN
-	
+	#Routine body goes here...
+/* func_id
+	0 -  取信息,"0",null,null,null
+	1 -  username,pasword md5;
+  2 -  phonename,PASSWORD;
+	3 -  email，password；
+*/
 
+-- INSERT INTO plogs (Function_Name,parameter) VALUES ('longin',CONCAT_WS(',',QUOTE(`func_id`), QUOTE(`userName`),QUOTE(`userPassWd`),QUOTE(`LongIp`)));
 
   CALL `mysq1_schema`.`funcSysLongin`(func_id,userName,userPassWd,LongIp,DATABASE());
 
@@ -6940,8 +9666,103 @@ CREATE DEFINER=`root`@`%` FUNCTION `m`(`id` varchar(100)) RETURNS varchar(100) C
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 	RETURN REGEXP_substr(`id`,'^.*?(?=\\s)');
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `m2c`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `m2c`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`::1` FUNCTION `m2c`(MONEY VARCHAR(200)) RETURNS varchar(200) CHARSET utf8mb3
+    DETERMINISTIC
+BEGIN
+
+DECLARE  RESULT      VARCHAR(100); -- 返回字符串
+DECLARE  NUM_ROUND   VARCHAR(100); -- 转换数字为小数点后2位的字符(正数)
+DECLARE  NUM_LEFT    VARCHAR(100); -- 小数点左边的数字
+DECLARE  NUM_RIGHT   VARCHAR(2); -- 小数点右边的数字
+DECLARE  STR1        VARCHAR(10); -- 数字大写
+DECLARE  STR2        VARCHAR(16); -- 数字位数(从低至高)
+DECLARE  NUM_PRE     INT; -- 前一位上的数字
+DECLARE  NUM_CURRENT INT; -- 当前位上的数字
+DECLARE  NUM_COUNT   INT; -- 当前数字位数
+DECLARE  NUM1        INT;
+DECLARE  负数        varchar(10) DEFAULT '';
+SET  money = REGEXP_replace(money,'^\\s*￥|,','');
+
+IF IFNULL(money,'') ='' THEN RETURN NULL; END IF; -- 转换数字为null时返回null
+IF money<0 THEN SET 负数 = '（负数）' ,money = AbS( money);END IF;
+SET	MONEY=CONVERT(MONEY,DECIMAL(14,2));
+SET NUM_ROUND=CONCAT(MONEY, '');
+SET STR1='零壹贰叁肆伍陆柒捌玖'; 
+SET STR2='元拾佰仟万拾佰仟亿拾佰仟万拾佰仟';
+SET NUM_PRE=1;
+SET NUM_COUNT=0;
+SET NUM_LEFT=FLOOR(MONEY);
+SET NUM_RIGHT=REPLACE(NUM_ROUND,CONCAT(NUM_LEFT,'.'),'');
+
+IF MONEY IS NULL THEN SET RESULT=NULL; END IF; -- 转换数字为null时返回null
+
+IF LENGTH(NUM_LEFT)>=8 THEN SET NUM1=CAST(SUBSTR(NUM_LEFT, -8, 4) AS SIGNED);
+ELSEIF LENGTH(NUM_LEFT)>4 THEN	SET NUM1=CAST(SUBSTR(NUM_LEFT, -LENGTH(NUM_LEFT), LENGTH(NUM_LEFT)-4) AS SIGNED);
+ELSE SET NUM1=CAST(SUBSTR(NUM_LEFT, 1, 4) AS SIGNED);
+END IF;
+
+IF LENGTH(NUM_LEFT) > 16 THEN SET RESULT='**********';
+END IF; -- 数字整数部分超过16位时
+
+ -- 采用从低至高的算法，先处理小数点右边的数字
+IF LENGTH(NUM_RIGHT) = 2 THEN
+   IF CAST(SUBSTR(NUM_RIGHT, 1, 1) AS SIGNED) = 0 THEN
+      SET RESULT = CONCAT('零' ,
+                SUBSTR(STR1, CAST(SUBSTR(NUM_RIGHT, 2, 1) AS SIGNED) + 1, 1) , '分');
+   ELSE
+      SET RESULT = CONCAT(SUBSTR(STR1, CAST(SUBSTR(NUM_RIGHT, 1, 1) AS SIGNED) + 1, 1) , '角' ,
+                SUBSTR(STR1, CAST(SUBSTR(NUM_RIGHT, 2, 1) AS SIGNED) + 1, 1) , '分');
+   END IF;
+ELSE 
+   IF LENGTH(NUM_RIGHT) = 1 THEN
+	SET RESULT = CONCAT(SUBSTR(STR1, CAST(SUBSTR(NUM_RIGHT, 1, 1) AS SIGNED) + 1, 1) , '角整');
+   ELSE
+        SET RESULT = '整';
+   END IF;
+END IF;
+
+-- 再处理小数点左边的数字
+myloop:LOOP
+SET NUM_COUNT=NUM_COUNT+1; -- 当前数字位数
+SET NUM_CURRENT=CAST(SUBSTR(NUM_LEFT, LENGTH(NUM_LEFT)-NUM_COUNT+1, 1) AS SIGNED);
+IF  NUM_CURRENT > 0 THEN SET RESULT=CONCAT(SUBSTR(STR1, NUM_CURRENT + 1, 1) ,
+                SUBSTR(STR2, NUM_COUNT, 1) , RESULT);
+ELSE
+    IF NUM_COUNT = 5 THEN
+       IF MOD(NUM_COUNT - 1, 4) = 0 AND NUM1 <> 0 THEN SET RESULT = CONCAT(SUBSTR(STR2, NUM_COUNT, 1) , RESULT); SET NUM_PRE = 0;
+       END IF;
+    ELSE
+       IF MOD(NUM_COUNT - 1, 4) = 0 THEN SET RESULT  = CONCAT(SUBSTR(STR2, NUM_COUNT, 1) , RESULT); SET  NUM_PRE = 0; -- 元、万,亿前不准加零
+       END IF;
+    END IF;
+    IF NUM_PRE > 0 OR LENGTH(NUM_LEFT) = 1 THEN
+        -- 上一位数字不为0或只有个位时
+        SET RESULT = CONCAT(SUBSTR(STR1, NUM_CURRENT + 1, 1) , RESULT);
+    END IF;
+END IF;
+SET NUM_PRE = NUM_CURRENT;
+IF NUM_COUNT>=LENGTH(NUM_LEFT) THEN LEAVE myloop;
+END IF;
+END LOOP myloop; 
+IF MONEY < 0 THEN
+    -- 转换数字是负数时
+    SET RESULT =CONCAT( '负' , RESULT);
+END IF;
+ SET RESULT=REPLACE(RESULT,'零零分','整');
+ SET RESULT=REPLACE(RESULT,'零分','整');
+ SET RESULT=REPLACE(RESULT,'元整','元整');
+RETURN CONCAT_ws('',负数,RESULT);
 END
 ;;
 DELIMITER ;
@@ -6958,7 +9779,7 @@ START TRANSACTION;
 								CONCAT_WS(',',QUOTE(`blobfunID`),QUOTE(`dBlob`)),
 								dblob);
 COMMIT;
- 
+/**/ 
 CALL `mysq1_schema`.`manu_blob`(blobfunID,keyname,keyvalue,dBlob,fieldsname); 
 END
 ;;
@@ -6971,8 +9792,13 @@ DROP PROCEDURE IF EXISTS `manu_content`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `manu_content`(IN `Fun_id` varchar(20), IN `key_value` longtext, IN `dBlob`  LONGBLOB)
 blol:BEGIN
-	
+	#Routine body goes here...
+/*
+	CALL Audit_2('manu_ware_1',
+						CONCAT_WS(',',QUOTE(Fun_id), QUOTE(`key_value`)),DBLOB);
 
+LEAVE blol;
+  */
 	CALL `mysq1_schema`.`manu_content`(DATABASE(),`Fun_id`, `key_value` ,`dBlob`);
 END
 ;;
@@ -6983,12 +9809,28 @@ DELIMITER ;
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `manu_ware`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `manu_ware`(IN `Fun_id` varchar(20), IN `key_value` longtext, IN `dBlob`  LONGBLOB)
-blol:BEGIN
-	
+CREATE DEFINER=`root`@`localhost` PROCEDURE `manu_ware`(IN `funcid` varchar(20), IN `p` longblob, IN `dBlob`  LONGBLOB)
+manu_ware:BEGIN
+	#Routine body goes here...
+  DECLARE CONTINUE HANDLER FOR  /*SQLSTATE 'HY000',*/  SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22'	
+	bl:BEGIN 
+		GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;SET  @`sqlstate` = JSON_OBJECT('sqlstate',@`sqlstate`,'errno',@errno,'text',@text);
+		SET @funcid = CONCAT_WS(' ','Error：', 'anu_ware',`funcid` );
+		CALL `Audit_3`(COLUMN_create('m',CONCAT_WS(' ',@funcid),'err',@`sqlstate`,'SQL',@stmtbody,'pp',CONCAT_WS(',',QUOTE(`funcid`),QUOTE(`p`)),'dblob',dblob
+	));END; 
 
 
-	CALL `mysq1_schema`.`manu_ware`(DATABASE(),`Fun_id`, `key_value` ,`dBlob`);
+start TRANSACTION;
+SET @funcid = CONCAT_WS(' ','manu_ware ',`funcid` );
+CALL Audit_3(COLUMN_create('m',CONCAT_WS(' : ',@funcid),'pp',CONCAT_WS(',',QUOTE(`funcid`),QUOTE(`p`)),'dblob',dblob));COMMIT;/*
+LEAVE manu_ware;
+*//*
+	IF json_valid(p) AND IFNULL(json_value(`p`,dblob),'') = '' AND dblob IS NOT NULL THEN
+		 SET `p` = json_compact(json_insert(`p`,'$.dblob',to_base64(dblob))),
+					dblob = NULL;
+	END IF;
+*/
+	CALL `mysq1_schema`.`manu_ware`(DATABASE(),`funcid`, `p` ,`dBlob`);
 END
 ;;
 DELIMITER ;
@@ -7002,72 +9844,9 @@ CREATE DEFINER=`root`@`%` FUNCTION `mid`(`id` varchar(100)) RETURNS varchar(100)
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 
 	RETURN '';
-END
-;;
-DELIMITER ;
-
--- ----------------------------
---  Procedure definition for `mission_total`
--- ----------------------------
-DROP PROCEDURE IF EXISTS `mission_total`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `mission_total`(IN `v` text)
-mistl:BEGIN
-	
-
-		SET @mist_body1 = CONCAT_WS('',	"SELECT a.classNo,b.courseNo,b.courseName,a.className"),
-				@mist_body0 = CONCAT_WS('',	"INTO @classNo,@courseNo,@courseName,@className"),
-				@mist_body2 = CONCAT_WS('',	"FROM exp_experimentclass AS a\n",
-																		"INNER JOIN exp_courses AS b ON a.courseNo = b.courseNo\n",
-																		"WHERE b.statu = '9'"),
-				@mist_body4 = IF( v IS NULL ,NULL ,CONCAT_WS('\n',"AND CASE ",QUOTE(v), 
-																									" WHEN a.classNo THEN 1",
-																									" WHEN b.courseNo THEN 1",
-																									" WHEN b.courseName THEN 1",
-																									" WHEN a.className THEN 1",
-																									" ELSE 0 END")), 
-				@mist_body  = CONCAT_WS('\n',@mist_body1,@mist_body0,@mist_body2,@mist_body3,@mist_body4,"LIMIT 0,1");
-
- 
-
-	PREPARE stmt_mist FROM @mist_body;
-	EXECUTE stmt_mist ;
-
-	IF NOT FOUND_ROWS() THEN 
-			LEAVE mistl;
-	END IF;
-
-	SET @mist_body1 = CONCAT_WS('\n',"SELECT GROUP_CONCAT(a.classNo) AS classNo,b.courseNo,b.courseName,a.className"),
-			@mist_body = CONCAT_WS('\n',	@mist_body1,@mist_body2,@mist_body3,@mist_body4),
-			@mist_body1 = CONCAT_WS('\n',	"CREATE TEMPORARY TABLE exp","AS",
-																	"SELECT a.classNo,a.courseNo,a.courseName,a.className,COUNT(*) AS total",
-																	"FROM (",@mist_body,"GROUP BY b.courseNo) AS a"),
-			@mist_body2 = CONCAT_WS('\n',	"INNER JOIN exp_courses_node AS b1 ON b1.node_courseNo = a.courseNo",
-																		"INNER JOIN exp_courses_node_content AS b2 ON b2.contentNo = b1.contentNo",
-																		"WHERE b2.contentType ='kj'",
-																		"GROUP BY a.classNo"),
-			@mist_body = CONCAT_WS('\n',@mist_body1,@mist_body2);
-
-
-  DROP TEMPORARY TABLE IF EXISTS exp;
-
-	PREPARE stmt_mist FROM @mist_body;
-	EXECUTE stmt_mist ;
-
-	SET @mist_body = CONCAT_WS('\n',"UPDATE exp AS a",
-"INNER JOIN exp_experimentclass AS b ON a.courseNo = b.courseNo AND INSTR(a.classNo , b.classNo)> 0 ",
-"INNER JOIN exp_courses AS c ON a.courseNo = c.courseNo",
-"SET b.mission_total = a.total,c.statu = NULL");
-
-	PREPARE stmt_mist FROM @mist_body;
-	EXECUTE stmt_mist ;
-
-  DROP TEMPORARY TABLE IF EXISTS exp;	
-	DEALLOCATE PREPARE stmt_mist;
-
 END
 ;;
 DELIMITER ;
@@ -7083,7 +9862,7 @@ CREATE DEFINER=`root`@`%` FUNCTION `money`(`money` varchar(60)) RETURNS varchar(
 BEGIN
 	#Routine body goes here...
 	SET `money` = 
-				CASE WHEN `money` IS NULL ||money = '' || `money` = '0'  THEN NULL
+				CASE WHEN `money` IS NULL OR `money` =0 THEN NULL
 					ELSE FORMAT(`money`,2) END;
 						
 	RETURN  `money`;
@@ -7099,17 +9878,17 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `muti_chart_min_node`( in v_course_no varchar(100),in v_class_no varchar(100),in v_stu_no varchar(100))
 BEGIN
 
-
+-- 1、获取实验及该用户的账户信息
 	SET @dyn_sql = CONCAT('select exp.classNo,exp.className,exp.classType,exp_p.studentNo,exp_p.expNo from exp_experimentclass exp ',
 	'INNER JOIN exp_experimentclassstudent exp_p on exp.classNo=exp_p.classNo ' ,
 	'and exp_p.classNo=\'',v_class_no,'\' and exp_p.studentNo=\'',v_stu_no,'\'');
   PREPARE stmt_sql FROM @dyn_sql;   
   EXECUTE stmt_sql;
 
-
+-- 2、课程编号获取所有一级节点及一节节点的最小叶子结点
 	SET @dyn_sql = CONCAT('SELECT ecd.node_No,ecd.node_text,zmnode.w_contentNo,zmnode.w_node_text from exp_courses_node ecd ',
 	'LEFT JOIN ( ',
-	
+	-- 章下的最小内容节点
 	'select SUBSTRING_INDEX(w.node_No,\'.\',1) as r_node_No,w.contentNo as w_contentNo,w.node_text as w_node_text from exp_courses_node w where w.node_courseNo=\'',v_course_no,'\' and w.node_No in ',
 	'(SELECT min(node_No) m_node_No from ',
 	'(SELECT SUBSTRING_INDEX(e.node_No,\'.\',1) as r_node_No,e.node_No from exp_courses_node e where e.node_courseNo=\'',v_course_no,'\' and e.contentNo in',
@@ -7120,7 +9899,7 @@ BEGIN
 	'SELECT DISTINCT SUBSTRING_INDEX(e.node_No,\'.\',1) from exp_courses_node e where e.node_courseNo=\'',v_course_no,'\' and e.contentNo in ',
 	'(SELECT DISTINCT contentNo from exp_cour_node_cont where classNo=\'',v_class_no,'\'))', 
 	'ORDER BY ecd.node_No');
-  
+  -- SELECT @dyn_sql;
   PREPARE stmt_sql FROM @dyn_sql;   
   EXECUTE stmt_sql;
 
@@ -7135,13 +9914,19 @@ DROP PROCEDURE IF EXISTS `muti_courses2exp`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `muti_courses2exp`(in v_course_nos_condition longtext,in v_classNo varchar(100),in v_courseNo varchar(100),in v_type integer)
 c2e:BEGIN
+-- 处理思路：形成最新的任务数据
+-- 1、删除该实验当前的所有任务数据
+-- 2、添加新课程任务数据
+-- 	DECLARE CONTINUE HANDLER FOR  SQLSTATE '23000' BEGIN END;
+/*
+	CALL Audit_2('muti_courses2exp',
+						CONCAT_WS(',',QUOTE(v_course_nos_condition),QUOTE(v_classNo),QUOTE(v_courseNo),QUOTE(v_type)),@a);
+ COMMIT;
 
+LEAVE c4e; 
+-- 1、课程节点*/
 
-
-
-
-
-
+-- 2、添加新课程任务数据
 
 	SET @a = NULL,
 			@a = DATABASE();
@@ -7161,29 +9946,30 @@ c2e:BEGIN
 		END CASE;
 			
 
-
+-- SELECT 	@dyn_sql;LEAVE c2e;
     PREPARE stmt_sql FROM @dyn_sql;   
     EXECUTE stmt_sql;
 
 		LEAVE c2e;
 	END IF;
-
+/*
+*/
 
 
 
  if v_type=0 then
-    
+    -- 1、删除不在所选课程中的所有节点
     SET @dyn_sql = CONCAT('delete from exp_cour_node_cont where classNo=\'',v_classNo,
      '\' and not exists (select * from exp_courses_node_content where exp_courses_node_content.contentNo=exp_cour_node_cont.contentNo and exp_courses_node_content.typesort=exp_cour_node_cont.typesort ',
      ' and exp_courses_node_content.missionid=exp_cour_node_cont.missionid and exp_courses_node_content.contentType=exp_cour_node_cont.contentType and exp_courses_node_content.contentNo in (select distinct contentNo from ',
      ' exp_courses_node where node_courseNo in (',v_course_nos_condition,')))');
-
+--  SELECT @dyn_sql;
     PREPARE stmt_sql FROM @dyn_sql;   
     EXECUTE stmt_sql;
 
-    
-    
-    
+    -- 2、迁入所选节点下，而未在当然实验中的节点数据
+    -- 2.1 总量，所选节点下的数据
+    -- 2.2 去除量，已有部分（通过该实验下已有课程节点粒度来判断）
     SET @dyn_sql = CONCAT('insert into exp_cour_node_cont (classNo,contentNo,typesort,missionid,contentType,sort,paramId,contentReferenced,isShow,log_study_proc,fileURL,createdInXxTask,isShotCut,shotCutFrom_ContentId,isProcess,statu)',
      ' select distinct \'',v_classNo,'\' as classNo,contentNo,typesort,missionid,contentType,sort,paramId,contentReferenced,isShow,log_study_proc,fileURL,createdInXxTask,isShotCut,shotCutFrom_ContentId,isProcess,statu from exp_courses_node_content content', 
      ' where content.contentNo in (select distinct contentNo from exp_courses_node node where node.node_courseNo in (',v_course_nos_condition,')) and not exists ( select * from exp_courses_node_content ctx where content.contentNo=ctx.contentNo and ',
@@ -7193,9 +9979,9 @@ c2e:BEGIN
     PREPARE stmt_sql FROM @dyn_sql;   
     EXECUTE stmt_sql;
  end if;
-
+-- 3、批量签入数据
  if v_type=1 then
- 
+ -- 1、删除该课程实验下相关节点
     SET @dyn_sql = CONCAT('delete from exp_cour_node_cont where classNo=\'',v_classNo,
      '\' and exists (select * from exp_courses_node_content where exp_courses_node_content.contentNo=exp_cour_node_cont.contentNo and exp_courses_node_content.typesort=exp_cour_node_cont.typesort ',
      ' and exp_courses_node_content.missionid=exp_cour_node_cont.missionid and exp_courses_node_content.contentType=exp_cour_node_cont.contentType and exp_courses_node_content.contentNo in (select distinct contentNo from ',
@@ -7222,7 +10008,14 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `muti_courses4exp`(in v_classNo varchar(100),in v_type integer)
 c4e:BEGIN	
 
+/*
+'EXP20140218140332043','0'
+*//*
+ 	CALL Audit_2('muti_courses4exp',
+						CONCAT_WS(',',QUOTE(v_classNo), QUOTE(`v_type`)),@a);
+COMMIT;
 
+LEAVE c4e; */
 
 	SET @a = NULL,
 			@a = DATABASE();
@@ -7280,17 +10073,22 @@ DROP PROCEDURE IF EXISTS `muti_courses_tree`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `muti_courses_tree`(in v_course_no varchar(100),in v_class_no varchar(100),in v_search varchar(100))
 BEGIN
+-- 处理思路：获取课程数所需要件
+-- 1、课程节点
+-- 2、任务内容
+-- 3、课件内容
+ /*
+	CALL Audit_2('muti_courses_tree',
+						CONCAT_WS(',',QUOTE(v_course_no), QUOTE(`v_class_no`),QUOTE(`v_search`)),@a);
+COMMIT;
 
+LEAVE c4e; */
 
-
-
- 
-
-
+-- 1、课程节点
  select CONCAT(node.node_No,'\t',node.node_text) as data,node.contentNo,node.node_Id,node.node_No,node.node_text,node.node_parentNo from exp_courses_node node 
     where node.node_courseNo=v_course_no order by -node.node_parentNo desc,-node.node_No desc;
   
-
+-- 2、任务内容
  select DISTINCT CONCAT_WS('|',ctt.contentNo,ctt.typesort,ctt.missionid,ctt.contentType) as id,ctt.contentNo,ctt.typesort,ctt.missionid,ctt.contentType,am.missionLabel,am.mission_ask
    ,case when ecnc.missionid is NULL then '0' else '1' end as ischecked
  from 
@@ -7299,7 +10097,7 @@ BEGIN
    )ctt
  LEFT JOIN acc_mission am on am.missionId=ctt.missionid
  LEFT JOIN exp_cour_node_cont ecnc on ecnc.classNo=v_class_no and ecnc.contentNo=ctt.contentNo and ctt.contentType=ecnc.contentType and ctt.missionid=ecnc.missionid and ctt.typesort=ecnc.typesort;   
-
+-- 3、课件内容  
 
 END
 ;;
@@ -7313,17 +10111,17 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `muti_courses_tree4allvalid`()
 BEGIN
 
+-- 有效课程内容方便使用
+-- select contentNo from exp_cour_node_cont nodec where nodec.classNo IN
+-- (select classNo from exp_experimentclass exp where EndTime>= now() and EXISTS 
+-- (select * from exp_experimentclassstudent expc where exp.classNo=expc.classNo)
+-- );
 
-
-
-
-
-
-
+-- 实验ok
  select exp.classNo,exp.className from exp_experimentclass exp where EndTime>= now() and EXISTS 
  (select * from exp_experimentclassstudent expc where exp.classNo=expc.classNo);
 
-
+-- 实验、课程ok
  SELECT DISTINCT fexp.classNo,fnode.node_courseNo,exp_c.courseName from 
   (select * from exp_courses_node node where node.contentNo is not null and node.contentNo in 
   (select DISTINCT contentNo from exp_cour_node_cont nodec where nodec.classNo IN
@@ -7337,10 +10135,10 @@ BEGIN
   )) fexp on fnode.contentNo=fexp.contentNo
  LEFT JOIN exp_courses exp_c on exp_c.courseNo=fnode.node_courseNo order by fexp.classNo,exp_c.createtime;
 
-
+-- 所有节点（非叶子）
  select node_id,node_No,node_parentNo,node.node_courseNo,contentNo,node_type,node_text,node_tip from exp_courses_node node where  node.contentNo is null;
 
-
+-- 实验、所有有效叶子
  select distinct ecncn.classNo,cnode.node_id,cnode.node_No,cnode.node_parentNo,cnode.node_courseNo,cnode.contentNo,cnode.node_type,cnode.node_text,cnode.node_tip  
   from (select * from exp_cour_node_cont nodec where nodec.classNo IN
   (select classNo from exp_experimentclass exp where EndTime>= now() and EXISTS 
@@ -7361,13 +10159,17 @@ DROP PROCEDURE IF EXISTS `muti_courses_tree4expend`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `muti_courses_tree4expend`(in v_course_no varchar(100))
 BEGIN
-
-
-
-
+-- 处理思路：获取课程数所需要件
+-- 1、课程节点
+-- 2、该节点所有内容（含是否选中信息）
+/*	CALL Audit_2('muti_courses_tree4expend',
+						CONCAT_WS(',',QUOTE(v_course_no)),@a);
+ COMMIT;
+ LEAVE c4e; 
+-- 1、课程节点*/
 		SET @stmt1 = CONCAT_WS('',"SELECT CONCAT(a.node_No,'	',a.node_text) AS `data`,a.contentNo,a.node_Id,a.node_No,a.node_text,a.node_parentNo\n",
 															"FROM exp_courses_node AS a\n","WHERE a.node_courseNo = ",QUOTE(v_course_no),"\n","ORDER BY nabc(a.node_parentNo), nabc(a.node_No)");
-
+-- SELECT @stmt1;
 	PREPARE stmt1 FROM @stmt1;
 	EXECUTE stmt1 ;
 
@@ -7382,18 +10184,23 @@ DROP PROCEDURE IF EXISTS `muti_courses_tree4mlist`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `muti_courses_tree4mlist`(in `courseNo` varchar(100),in `classNo` varchar(100),in `node_no` varchar(60),in `type` integer,in v_search varchar(100),in `start` integer,in `len` integer)
 t4l:BEGIN
-   
+   -- 遍历数据结束标志
   declare done int; 
   DECLARE exp_courses_node_no CURSOR FOR SELECT distinct node_no FROM exp_courses_node where node_NO=`node_no`;
   declare continue handler FOR SQLSTATE '02000' SET done = 1;
+-- 处理思路：获取课程数所需要件
+-- 2、该节点所有内容（含是否选中信息）
 
+/*
+CALL Audit_2('muti_courses_tree4mlist',
+CONCAT_WS(',',QUOTE(`courseNo`), QUOTE(``classNo``),QUOTE(``node_no``),QUOTE(``type``),QUOTE(`v_search`),QUOTE(``start``),QUOTE(``len``)),@a);
+COMMIT; 
 
-
-
+LEAVE c4e; */
 
 
 SET @dyn_sql = NULL,@a = NULL,@a = DATABASE();
-
+/**/
 IF @a NOT REGEXP 'taxde$' THEN
 
 		SET @a ='kjan_a-e,kjan_a-f,kjan_abcd,kjan_dtb,kjqt_kjfl00_kjfl';
@@ -7404,7 +10211,7 @@ IF @a NOT REGEXP 'taxde$' THEN
 						@b1 =  IFNULL(preg_rlike('/(?<=\\s|^)任\\s*务(?=\\s|$)/',v_search),0),
 						@b2 =  IFNULL(preg_rlike('/(?<=\\s|^)习\\s*题(?=\\s|$)/',v_search),0),
 						@b3 =  IFNULL(preg_rlike('/(?<=\\s|^)任\\s*务(?=\\s|$)/',v_search),0),
-
+-- 章~2，节 ~ 3 * 4
 						@b4 =  preg_capture('/(?<=\\s|^)\\d{1,2}(\\.\\d{0,3}){0,4}(?=\\s|$)/',v_search);
 
 				IF @b1 OR @b2 OR @b3 THEN
@@ -7441,7 +10248,7 @@ IF @a NOT REGEXP 'taxde$' THEN
 
 				END LOOP sl;
 
-
+-- SELECT CAST(@dyn_sql AS CHAR),v_search,c(@b1),@b2;
 		 END IF;
 
 
@@ -7480,7 +10287,7 @@ LIMIT ",`start`,",", `len`
 ),"")
 );
 
-
+-- SELECT CAST(@dyn_sql AS CHAR);LEAVE t4l;
 PREPARE stmt_sql FROM @dyn_sql;
 EXECUTE stmt_sql ;
 
@@ -7490,20 +10297,20 @@ END IF;
 
 
 
-  
+  -- 打开游标
   OPEN exp_courses_node_no;
   
-  
+  -- 开始循环
   read_loop: LOOP
-    
+    -- 提取游标里的数据，这里只有一个，多个的话也一样；
     FETCH exp_courses_node_no INTO `node_no`;
-    
+    -- 声明结束的时候
     if done THEN
       LEAVE read_loop;
     END if;
    END LOOP;
   
-   
+   -- 关闭游标
    CLOSE exp_courses_node_no;
  
    if `type`=0 then
@@ -7536,9 +10343,9 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `muti_exp_info4tech`( in v_class_no varchar(100))
 BEGIN
 
-
-
-
+-- 1、实验名称
+-- 2、课程名称组及相关介绍
+-- 3、实验任务总数、单个课程任务数
   
  SET @dyn_sql = CONCAT('select exp.classNo,exp.className,exp.classType,exp.assistant_teaNo,exp.StartTime,exp.EndTime from exp_experimentclass exp where exp.classNo=\'',v_class_no,'\'');
  PREPARE stmt_sql FROM @dyn_sql;   
@@ -7557,22 +10364,6 @@ BEGIN
  PREPARE stmt_sql FROM @dyn_sql;   
  EXECUTE stmt_sql;
 
-END
-;;
-DELIMITER ;
-
--- ----------------------------
---  Procedure definition for `myjson`
--- ----------------------------
-DROP FUNCTION IF EXISTS `myjson`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`%` FUNCTION `myjson`(`j` blob) RETURNS text CHARSET utf8mb3
-    NO SQL
-    DETERMINISTIC
-BEGIN
-	
-
-	RETURN '';
 END
 ;;
 DELIMITER ;
@@ -7673,7 +10464,7 @@ COMMIT;LEAVE m_j;
 															"SELECT  @rowId := @rowId +1,preg_capture(",QUOTE(REG('index')),",b.missionLabel),",@`2C`,
 															"\nFROM acc_b AS a\n",
 															'INNER JOIN acc_mission AS b ON a.missionId = b.missionId\n',
-															"WHERE a.expID = ",json_extract(`0`,'$.expID'),
+															"WHERE a.expID = ",j0(`0`,'expID'),
 															' AND\n\tCONCAT_WS("",',@`2C`,')!=""'
 															),
 							@stmt_json = CONCAT_WS('',"SELECT  quotd(a.rowNo) AS rowno,quotj(CONCAT_WS(',',",CONCAT_WS(',',
@@ -7700,7 +10491,7 @@ COMMIT;LEAVE m_j;
 
 -- b
 				SET		`1C` = '1,3,4,5,6',
-							@stmt_json = CONCAT_WS('',"SELECT b.rowNo,b.b1,","/*@t, 3  b.b3,*/money(CASE @t WHEN 0 THEN b.b3 WHEN 1  THEN @b3  WHEN 2 THEN @z3 END) AS b3,","/*4 c.b3*/money(CASE @t WHEN 0 THEN c.b3 WHEN 1  THEN @b4  WHEN 2 THEN @z4 END)  AS b4,","/*b.b5 c.b4*/money(CASE @t WHEN 0 THEN c.b4 WHEN 1  THEN @b5  WHEN 2 THEN @z5 END)  AS b5,","/*6*/money(CASE @t WHEN 0 THEN isnu(b.b3) + isnu(c.b3) - isnu(c.b4) WHEN 1 THEN @b3 + @b4 -@b5 WHEN 2 THEN @z3 + @z4 -@z5 END) AS b6,\n","/*clear*/CASE @t WHEN 0 THEN if1(@b3 := @b3 + isnu(b.b3)) AND if1(@b4 := @b4 + isnu(c.b3)) AND if1(@b5 := @b5 + isnu(c.b4)) WHEN 1  THEN if1(@z3 := @z3 + @b3) AND if1(@b3:=0) AND if1(@z4 := @z4 + @b4) AND if1(@b4:=0) AND if1(@z5 := @z5 + @b5) AND if1(@b5:=0) WHEN 2 THEN IF(b.b1 LIKE '负债合计%',1,if1(@z3:=0) AND if1(@z4:=0) AND if1(@z5:=0)) END \n",																			"FROM acc_standard_n AS b LEFT JOIN acc_b AS c ON c.expID = ",json_extract(`0`,'$.expID'), " AND b.b1 = c.b2\n",																			"WHERE b.missionId = ",json_extract(`0`,'$.missionId')," AND if1(@t := CASE WHEN b.b1 LIKE '%合计%' AND NOT b.b1 LIKE '负债合计%'  THEN 1 WHEN b.b1 LIKE '%总计%' OR b.b1 LIKE '负债合计%' THEN 2 ELSE 0 END)" ),
+							@stmt_json = CONCAT_WS('',"SELECT b.rowNo,b.b1,","/*@t, 3  b.b3,*/money(CASE @t WHEN 0 THEN b.b3 WHEN 1  THEN @b3  WHEN 2 THEN @z3 END) AS b3,","/*4 c.b3*/money(CASE @t WHEN 0 THEN c.b3 WHEN 1  THEN @b4  WHEN 2 THEN @z4 END)  AS b4,","/*b.b5 c.b4*/money(CASE @t WHEN 0 THEN c.b4 WHEN 1  THEN @b5  WHEN 2 THEN @z5 END)  AS b5,","/*6*/money(CASE @t WHEN 0 THEN IFNULL(b.b3,0) + IFNULL(c.b3,0) - IFNULL(c.b4,0) WHEN 1 THEN @b3 + @b4 -@b5 WHEN 2 THEN @z3 + @z4 -@z5 END) AS b6,\n","/*clear*/CASE @t WHEN 0 THEN if1(@b3 := @b3 + IFNULL(b.b3,0)) AND if1(@b4 := @b4 + IFNULL(c.b3,0)) AND if1(@b5 := @b5 + IFNULL(c.b4,0)) WHEN 1  THEN if1(@z3 := @z3 + @b3) AND if1(@b3:=0) AND if1(@z4 := @z4 + @b4) AND if1(@b4:=0) AND if1(@z5 := @z5 + @b5) AND if1(@b5:=0) WHEN 2 THEN IF(b.b1 LIKE '负债合计%',1,if1(@z3:=0) AND if1(@z4:=0) AND if1(@z5:=0)) END \n",																			"FROM acc_standard_n AS b LEFT JOIN acc_b AS c ON c.expID = ",j0(`0`,'expID'), " AND b.b1 = c.b2\n",																			"WHERE b.missionId = ",j0(`0`,'missionId')," AND if1(@t := CASE WHEN b.b1 LIKE '%合计%' AND NOT b.b1 LIKE '负债合计%'  THEN 1 WHEN b.b1 LIKE '%总计%' OR b.b1 LIKE '负债合计%' THEN 2 ELSE 0 END)" ),
 							@stmt_json = CONCAT_WS('',"SELECT  quotd(a.rowNo) AS rowno,quotj(CONCAT_WS(',',",CONCAT_WS(',',preg_replace(REG('2c'),"CONCAT(quotn('$1'),':{\"v\":',quotn(b$1),',\"c\":\"1\"}')$2",`1C`)),')) AS b\n',														"FROM(\n",@stmt_json,"\n) AS a "),
 							@stmt_json = CONCAT_WS('',"SELECT c(CONCAT_WS('',CONCAT('{\"line\":',quotd(COUNT(*))),',',GROUP_CONCAT(CONCAT_WS('',a.rowno,':',a.b,'\n')),'}')) AS b\nFROM(\n",													@stmt_json,"\n) AS a ")/**/ ;
 
@@ -7722,12 +10513,13 @@ COMMIT;LEAVE m_j;
 -- b
 				SET		`1C` = REPLACE('`1`,`3`,`4`,`5`,`6`','`',''),
 							`2C` = REPLACE('`1`,`2`,`3`,`4`','`',''),
-							@stmt_json = CONCAT_WS('',"SELECT c.expID,c.missionId,c.missionId1,c.rowNo,c.b1,c.b2,Sum(c.b3) AS b3,c(GROUP_CONCAT(IF(IFNULL(c.b3,'')!='',REGEXP_substr(a.missionLabel,",QUOTE(R('index')),"),NULL))) AS t3,SUM(c.b4) AS b4 ,c(GROUP_CONCAT(IF(IFNULL(c.b4,'')!='',REGEXP_substr(a.missionLabel,",QUOTE(R('index')),"),NULL))) AS t4 FROM acc_b AS c INNER JOIN acc_mission AS a ON c.missionId = a.missionId  WHERE c.expID = ",json_extract(`0`,'$.expID'), " GROUP BY TRIM(c.b2)"),
-							@stmt_json = CONCAT_WS('',"SELECT b.rowNo,b.b1,NULL AS t1,NULL AS t2, NULL AS t3,NULL AS t6,","/* @t,@b3,b.b3,*/money(@`1`:= if(if1(@b3 := @b3 + @t*isnu(b.b3)) AND @t = '0.0',@b3,b.b3)) AS b3,","/*c.b3 AS b3,@b4,b.b4,*/money(@`2`:= IF(if1(@b4 := @b4 + isnu(c.b3)) AND @t = '0.0',@b4,c.b3)) AS b4,c.t4,","/*c.b3 AS cb3,@b4,*/money(@`3`:= if(if1(@b5 := @b5 + isnu(c.b4)) AND @t = '0.0',@b5,c.b4)) AS b5,c.t4 AS t5,","/*b6,*/money(CASE WHEN @t =1 OR @t ='0.0' THEN isnu(@`1`)-isnu(@`2`)+ isnu(@`3`) ELSE isnu(@`1`)+isnu(@`2`)-isnu(@`3`) END) AS b6\n","FROM acc_standard_n AS b LEFT JOIN(",@stmt_json,")AS c ON INSTR(b.b1,c.b2)\n",	"WHERE b.missionId = ",json_extract(`0`,'$.missionId')," AND if1(@t := CASE WHEN b.b1 REGEXP '^(减)' THEN '-1' WHEN b.b1 REGEXP '^(加)' THEN '1' WHEN b.b1 REGEXP '^其中' THEN '0'WHEN b.b1 REGEXP '^(一|五)' THEN '1' WHEN b.b1 REGEXP CONCAT('^(',R1('〇-九'),')') THEN '0.0' ELSE @t END)" ),
+							@stmt_json = CONCAT_WS('',"SELECT c.expID,c.missionId,c.missionId1,c.rowNo,c.b1,c.b2,Sum(c.b3) AS b3,c(GROUP_CONCAT(IF(IFNULL(c.b3,'')!='',preg_capture(",QUOTE(R('index')),",a.missionLabel),NULL))) AS t3,SUM(c.b4) AS b4 ,c(GROUP_CONCAT(IF(IFNULL(c.b4,'')!='',preg_capture(",QUOTE(R('index')),",a.missionLabel),NULL))) AS t4 FROM acc_b AS c INNER JOIN acc_mission AS a ON c.missionId = a.missionId  WHERE c.expID = ",j0(`0`,'expID'), " GROUP BY TRIM(c.b2)"),
+							@stmt_json = CONCAT_WS('',"SELECT b.rowNo,b.b1,NULL AS t1,NULL AS t2, NULL AS t3,NULL AS t6,","/* @t,@b3,b.b3,*/money(@`1`:= if(if1(@b3 := @b3 + @t*IFNULL(b.b3,0)) AND @t = '0.0',@b3,b.b3)) AS b3,","/*c.b3 AS b3,@b4,b.b4,*/money(@`2`:= IF(if1(@b4 := @b4 + IFNULL(c.b3,0)) AND @t = '0.0',@b4,c.b3)) AS b4,c.t4,","/*c.b3 AS cb3,@b4,*/money(@`3`:= if(if1(@b5 := @b5 + IFNULL(c.b4,0)) AND @t = '0.0',@b5,c.b4)) AS b5,c.t4 AS t5,","/*b6,*/money(CASE WHEN @t =1 OR @t ='0.0' THEN IFNULL(@`1`,0)-IFNULL(@`2`,0)+ IFNULL(@`3`,0) ELSE IFNULL(@`1`,0)+IFNULL(@`2`,0)-IFNULL(@`3`,0) END) AS b6\n","FROM acc_standard_n AS b LEFT JOIN(",@stmt_json,")AS c ON INSTR(b.b1,c.b2)\n",	"WHERE b.missionId = ",j0(`0`,'missionId')," AND if1(@t := CASE WHEN b.b1 REGEXP '^(减)' THEN '-1' WHEN b.b1 REGEXP '^(加)' THEN '1' WHEN b.b1 REGEXP '^其中' THEN '0'WHEN b.b1 REGEXP '^(一|五)' THEN '1' WHEN b.b1 REGEXP CONCAT('^(',R1('〇-九'),')') THEN '0.0' ELSE @t END)" ),
 							@stmt_json = CONCAT_WS('',"SELECT  quotd(a.rowNo) AS rowno,quotj(CONCAT_WS(',',",CONCAT_WS(',',preg_replace(REG('2c'),"CONCAT(quotn('$1'),':{\"v\":',quotn(b$1),',\"c\":\"1\"',IF((@tt:=CONCAT(',\"t\":',quotd(t$1)))IS NULL,'',@tt),'}')$2",`1C`)),')) AS b\n',"FROM(\n",@stmt_json,"\n) AS a "),
 							@stmt_json = CONCAT_WS('',"SELECT c(CONCAT_WS('',CONCAT('{\"line\":',quotd(COUNT(*))),',',GROUP_CONCAT(CONCAT_WS('',a.rowno,':',a.b,'\n')),'}')) AS b\nFROM(\n",@stmt_json,"\n) AS a ");
 
--- SELECT  c(@stmt_json ); LEAVE m_j;
+
+-- SELECT  c(@stmt_json ); -- LEAVE m_j;
 
 					SET @t = '',@b3 = -0.00,@b4 = -0.00,@b5 = -0.00,@`1`=0,@`2`=0,@`3`=0;
 
@@ -7752,7 +10544,7 @@ preg_replace(REG('2c'),"CONCAT(quotn('$1'),':{\"v\":',quotn(a$1),',\"c\":\"1\"}'
 
 															" FROM acc_mission AS a 
 INNER JOIN acc_standard_1 AS b ON b.missionId = a.missionId
-WHERE a.missionId = ",json_extract(`0`,'$.missionId'));
+WHERE a.missionId = ",j0(`0`,'missionId'));
 
  -- SELECT  c(@stmt_json ); LEAVE m_j;
 		PREPARE stmt_json FROM @stmt_json;
@@ -7761,10 +10553,10 @@ WHERE a.missionId = ",json_extract(`0`,'$.missionId'));
 -- b
 				SET		`1C` = REPLACE('`1`,`3`,`4`,`5`,`6`','`',''),
 							`2C` = REPLACE('`1`,`2`,`3`,`4`','`',''),
-							@stmt_json = CONCAT_WS('',"SELECT c.expID,c.missionId,c.missionId1,c.rowNo,c.b1,c.b2,Sum(c.b3) AS b3,c(GROUP_CONCAT(IF(IFNULL(c.b3,'')!='',preg_capture(",QUOTE(R('index')),",a.missionLabel),NULL))) AS t3,SUM(c.b4) AS b4 ,c(GROUP_CONCAT(IF(IFNULL(c.b4,'')!='',preg_capture(",QUOTE(R('index')),",a.missionLabel),NULL))) AS t4 FROM acc_b AS c INNER JOIN acc_mission AS a ON c.missionId = a.missionId  WHERE c.expID = ",json_extract(`0`,'$.expID'), " GROUP BY TRIM(c.b2)"),
+							@stmt_json = CONCAT_WS('',"SELECT c.expID,c.missionId,c.missionId1,c.rowNo,c.b1,c.b2,Sum(c.b3) AS b3,c(GROUP_CONCAT(IF(IFNULL(c.b3,'')!='',preg_capture(",QUOTE(R('index')),",a.missionLabel),NULL))) AS t3,SUM(c.b4) AS b4 ,c(GROUP_CONCAT(IF(IFNULL(c.b4,'')!='',preg_capture(",QUOTE(R('index')),",a.missionLabel),NULL))) AS t4 FROM acc_b AS c INNER JOIN acc_mission AS a ON c.missionId = a.missionId  WHERE c.expID = ",j0(`0`,'expID'), " GROUP BY TRIM(c.b2)"),
 
-							@stmt_json = CONCAT_WS('',"SELECT b.rowNo,b.b1,NULL AS t1,NULL AS t2, NULL AS t3,NULL AS t6,","/* @t,@b3,b.b3,*/money(@`1`:= if(if1(@b3 := @b3 + @t*isnu(b.b3)) AND @t = '0.0',@b3,b.b3)) AS b3,","/*c.b3 AS b3,@b4,b.b4,*/money(@`2`:= IF(if1(@b4 := @b4 + isnu(c.b3)) AND @t = '0.0',@b4,c.b3)) AS b4,c.t4,","/*c.b3 AS cb3,@b4,*/money(@`3`:= if(if1(@b5 := @b5 + isnu(c.b4)) AND @t = '0.0',@b5,c.b4)) AS b5,c.t4 AS t5,","/*b6,*/money(CASE WHEN @t =1 OR @t ='0.0' THEN isnu(@`1`)-isnu(@`2`)+ isnu(@`3`) ELSE isnu(@`1`)+isnu(@`2`)-isnu(@`3`) END) AS b6\n",
-"FROM acc_standard_n AS b LEFT JOIN(",@stmt_json,")AS c ON INSTR(b.b1,c.b2)\n",	"WHERE b.missionId = ",json_extract(`0`,'$.missionId')," AND if1(@t := CASE WHEN b.b1 REGEXP '^(减)' THEN '-1' WHEN b.b1 REGEXP '^(加)' THEN '1' WHEN b.b1 REGEXP '^其中' THEN '0'WHEN b.b1 REGEXP '^(一|五)' THEN '1' WHEN b.b1 REGEXP CONCAT('^(',R1('〇-九'),')') THEN '0.0' ELSE @t END)"
+							@stmt_json = CONCAT_WS('',"SELECT b.rowNo,b.b1,NULL AS t1,NULL AS t2, NULL AS t3,NULL AS t6,","/* @t,@b3,b.b3,*/money(@`1`:= if(if1(@b3 := @b3 + @t*IFNULL(b.b3,0)) AND @t = '0.0',@b3,b.b3)) AS b3,","/*c.b3 AS b3,@b4,b.b4,*/money(@`2`:= IF(if1(@b4 := @b4 + IFNULL(c.b3,0)) AND @t = '0.0',@b4,c.b3)) AS b4,c.t4,","/*c.b3 AS cb3,@b4,*/money(@`3`:= if(if1(@b5 := @b5 + IFNULL(c.b4,0)) AND @t = '0.0',@b5,c.b4)) AS b5,c.t4 AS t5,","/*b6,*/money(CASE WHEN @t =1 OR @t ='0.0' THEN IFNULL(@`1`,0)-IFNULL(@`2`,0)+ IFNULL(@`3`,0) ELSE IFNULL(@`1`,0)+IFNULL(@`2`,0)-IFNULL(@`3`,0) END) AS b6\n",
+"FROM acc_standard_n AS b LEFT JOIN(",@stmt_json,")AS c ON INSTR(b.b1,c.b2)\n",	"WHERE b.missionId = ",j0(`0`,'missionId')," AND if1(@t := CASE WHEN b.b1 REGEXP '^(减)' THEN '-1' WHEN b.b1 REGEXP '^(加)' THEN '1' WHEN b.b1 REGEXP '^其中' THEN '0'WHEN b.b1 REGEXP '^(一|五)' THEN '1' WHEN b.b1 REGEXP CONCAT('^(',R1('〇-九'),')') THEN '0.0' ELSE @t END)"
 															),
 							@stmt_json = CONCAT_WS('',"SELECT  quotd(a.rowNo) AS rowno,quotj(CONCAT_WS(',',",CONCAT_WS(',',preg_replace(REG('2c'),"CONCAT(quotn('$1'),':{\"v\":',quotn(b$1),',\"c\":\"1\"',IF((@tt:=CONCAT(',\"t\":',quotd(t$1)))IS NULL,'',@tt),'}')$2",`1C`)),')) AS b\n',"FROM(\n",@stmt_json,"\n) AS a "),
 
@@ -7806,28 +10598,25 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` FUNCTION `nabc`(`nodechar` varchar(20)) RETURNS decimal(26,20)
     NO SQL
     DETERMINISTIC
-BEGIN
-	declare  bit int default 3;
-	declare i int default 0 ;
-	declare nc varchar(20) default nodechar;
-
-	declare num decimal(36,20) default 0 ;
-	if nodechar  is  null  then 
-		return 0 ;
-	end if ;
-	lab: loop
-
-		set 	num =num + substring_index(nc ,'.' , 1) * power( 10, -1*i*bit) ;
-
-		if   instr( nc , '.' ) =  0 then
-			leave lab;
-		end if;
-
-		set	nc =  substring( nc ,instr(nc ,'.' )+1),
-			i = i+1;
-	end loop   ;
-	RETURN num;
-END
+BEGIN 
+declare  bit int default 3;
+declare i int default 0 ;
+declare nc varchar(20) default nodechar; 
+declare num decimal(36,20) default 0 ;
+if IFNULL(nodechar,'')=''  then 
+	return NULL ;
+end if ; 
+lab: loop 
+	set 
+num =num + substring_index(nc ,'.' , 1) * power( 10, -1*i*bit) ;
+	if   instr( nc , '.' ) =  0 then
+		leave lab;
+	end if;
+	set
+nc =  substring( nc ,instr(nc ,'.' )+1),
+		i = i+1; 
+end loop   ;
+RETURN num; END
 ;;
 DELIMITER ;
 
@@ -7839,44 +10628,13 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`%` FUNCTION `nb`(`p` varchar(200)) RETURNS varchar(200) CHARSET utf8mb3
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 	DECLARE `r` VARCHAR(200) DEFAULT r('nb-1');
 	DECLARE `id` VARCHAR(200) DEFAULT REGEXP_replace(`p`,`r`,'\\10\\2');
 	DECLARE `subp` VARCHAR(200) DEFAULT REGEXP_replace(`p`,`r`,'\\10\\2\\3');
 	DECLARE `fname` VARCHAR(200) DEFAULT REGEXP_replace(`p`,`r`,'\\4') ;
 
 	RETURN IF(`fname` NOT REGEXP '\\.',CONCAT_WS('.',IF(`fname`<>REGEXP_replace(`p`,`r`,'\\1') ,CONCAT(`subp`,`fname`),`id`),'jsp'),CONCAT(`subp`,`fname`));
-END
-;;
-DELIMITER ;
-
--- ----------------------------
---  Procedure definition for `needinput`
--- ----------------------------
-DROP FUNCTION IF EXISTS `needinput`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `needinput`(`table1` varchar(20),`table2` varchar(20),`fieldtype` varchar(20),`startno`smallint(2),`num` smallint(2)) RETURNS varchar(9500) CHARSET utf8mb3
-    NO SQL
-    DETERMINISTIC
-BEGIN
-	set @subST = '' , 
-			@field1 = CONCAT(trim(table2),'.',trim(fieldtype)), 
-			@field2 = CONCAT(trim(table1),'.','init_',trim(fieldtype)); 
-
-		SET @x  =  startno,
-				@subst = '';
-
-		while  num > 0 do
-				set @y1 =  concat( @field1, @x), 
-						@y2 = concat( @field2, @x),
-						@subST = concat(@subST , IF(@x=1,'','+'),
-"IF(IFNULL(",@y2,",'')='1', 0,IF(IFNULL(",@y1,",'')='',0,1)",')',if(MOD(@x,10)=0,char(10),'')),
-				 @x = @x+1,
-				 num = num - 1;		
-		end WHILE;
-
-
-	RETURN @subST ;  
 END
 ;;
 DELIMITER ;
@@ -7890,7 +10648,7 @@ CREATE DEFINER=`root`@`%` FUNCTION `NewMId`(`mId` varchar(60),`0or1` varchar(1))
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 
 	CASE
 			WHEN IFNULL(`mId`,'') ='' THEN
@@ -7919,8 +10677,8 @@ CREATE DEFINER=`root`@`%` FUNCTION `node`(`i` int(5),`N` varchar(200)) RETURNS v
     NO SQL
     DETERMINISTIC
 BEGIN
-	
-
+	#Routine body goes here...
+-- 	DECLARE r VARCHAR(200) DEFAULT '(?<=\\.|^)\\d+$';
 	RETURN 	CONCAT(REGEXP_replace(`N`,'(?<=\\.|^)\\d+$','\\1'),REGEXP_substr(`N`,'(?<=\\.|^)\\d+$')+i);
 END
 ;;
@@ -7937,6 +10695,7 @@ CREATE DEFINER=`root`@`::1` FUNCTION `num`(`s` varchar(5880)) RETURNS varchar(10
 BEGIN
 	#Routine body goes here...
 	DECLARE `r1` VARCHAR(2000) DEFAULT '0(?:○|零)	1(?:一|壹)	2(?:二|贰)	3(?:三|叁|参)	 4(?:四|肆)	5(?:五|伍)	6(?:六|陆)	7(?:七|柒)	8(?:八|捌)	9(?:九|玖)';
+	DECLARE `r2` VARCHAR(2000) DEFAULT '[[0,"○","零"],[1,"一","壹"],[2,"二","贰"],[3,"三","叁"],[4,"四","肆"],[5,"五","伍"],[6,"六","陆"],[7,"七","柒"],[8,"八","捌"],[9,"九","玖"]]';
 	DECLARE `r0` VARCHAR(2000) DEFAULT '10(?:十|拾)	20(?:百|佰)	30(?:千|仟)	40万	80亿	160兆	320京	640垓';
 	DECLARE `r`  VARCHAR(2000) DEFAULT REGEXP_replace(REGEXP_replace(CONCAT('^(.*?)(?:((?:',`r1`,'))((?:',`r0`,')*))'),'(?:\\s*)(\\d+)','|'),'(?<=:)\\|','');
 	DECLARE `p`  VARCHAR(10) DEFAULT NULL;
@@ -7944,40 +10703,629 @@ BEGIN
 	DECLARE `c0`  VARCHAR(10) DEFAULT 0;
 	DECLARE `re`  VARCHAR(10) DEFAULT NULL;
 
-SET @i=0;
-	SET s = REGEXP_replace(s,'(?:元|圆)(?:整|正)?','');
- 	l:LOOP 
-SET @i=@i+1;
-		SET `p`=REGEXP_SUBSTR(`s`,`r`);
-/**/
-		IF IFNULL(`p`,'') = '' THEN LEAVE l;END IF;
+	CASE  
+	-- WHEN INSTR(JSON_EXTRACT(s,'$[*][2]'),REGEXP_substr(@a,'\\w')) THEN
+	WHEN  s REGEXP '^\\s*\\d+\\s*' THEN
+	
+			l0:LOOP
+			if  s NOT REGEXP '\\d' THEN LEAVE l0; END IF;
+			SET c0 := REGEXP_substr(s,'\\d'),
+				  r0 = CONCAT('$[',c0 ,'][2]');
 
-    SET  `s` = REGEXP_replace(`s`,`r`,'');
+				SET p0:= json_value(r2,r0)
+			      ,s = regexp_replace(s,c0 ,p0)
+				;
+
+		END LOOP l0;
+		SET re = s;
+	ELSE
+		
+
+
+			SET @i=0;
+				SET s = REGEXP_replace(s,'(?:元|圆)(?:整|正)?','');
+				l:LOOP 
+			SET @i=@i+1;
+					SET `p`=REGEXP_SUBSTR(`s`,`r`);
+			/**/
+					IF IFNULL(`p`,'') = '' THEN LEAVE l;END IF;
+
+					SET  `s` = REGEXP_replace(`s`,`r`,'');
+						
+							BEGIN DECLARE `ree`  VARCHAR(1000) DEFAULT REGEXP_replace(`p`,`r`,'\\3');DECLARE `part`  VARCHAR(10) DEFAULT NULL;
+							SET p0=0;l2: LOOP 
+							SET `part` = REGEXP_substr(`ree`,'^.');	IF IFNULL(`part`,'')=''THEN LEAVE l2;END IF;
+									SET `ree` = REGEXP_replace(`ree`,'^.',''),`p0` = `p0`+REGEXP_substr(`r0`,CONCAT_WS('','\\d?(?=[^\\s]*',`part`,'[^\\s]*)'));
+							END LOOP;END;
+			/*IF @i = 4 then RETURN
+			 c0;
+			END if;*/
+							CASE	WHEN `c0` = 0   THEN	SET `c0` = p0;
+										WHEN	`c0`!= 0 AND p0>0 THEN
+											SET `re` = CONCAT_WS('',`re`,REPEAT(0,ABS(c0-p0-1))),
+													`c0` = `p0`;
+									ELSE SET `re` = CONCAT_WS('',`re`,0),`c0` = `c0` -1;
+							END CASE;
+
+							SET		`re` = CONCAT_WS('',`re`,REGEXP_replace(`p`,`r`,'\\1')
+			,REGEXP_substr(`r1`,CONCAT_WS('','\\d?(?=[^\\s]*',REGEXP_replace(`p`,`r`,'\\2'),'[^\\s]*)'))
+			);
+
 			
-				BEGIN DECLARE `ree`  VARCHAR(1000) DEFAULT REGEXP_replace(`p`,`r`,'\\3');DECLARE `part`  VARCHAR(10) DEFAULT NULL;SET p0=0;l2: LOOP 
-				SET `part` = REGEXP_substr(`ree`,'^.');	IF IFNULL(`part`,'')=''THEN LEAVE l2;END IF;
-						SET `ree` = REGEXP_replace(`ree`,'^.',''),`p0` = `p0`+REGEXP_substr(`r0`,CONCAT_WS('','\\d?(?=[^\\s]*',`part`,'[^\\s]*)'));
-				END LOOP;END;
-/*IF @i = 4 then RETURN
- c0;
-END if;*/
-				CASE	WHEN `c0` = 0   THEN	SET `c0` = p0;
-							WHEN	`c0`!= 0 AND p0>0 THEN
-								SET `re` = CONCAT_WS('',`re`,REPEAT(0,ABS(c0-p0-1))),
-										`c0` = `p0`;
-						ELSE SET `re` = CONCAT_WS('',`re`,0),`c0` = `c0` -1;
-				END CASE;
+				END LOOP ;
+				SET re = CONCAT(`re`,REPEAT(0,c0), `s`);
+	END CASE;
+	RETURN  re/**/
+;
+END
+;;
+DELIMITER ;
 
-				SET		`re` = CONCAT_WS('',`re`,REGEXP_replace(`p`,`r`,'\\1')
-,REGEXP_substr(`r1`,CONCAT_WS('','\\d?(?=[^\\s]*',REGEXP_replace(`p`,`r`,'\\2'),'[^\\s]*)'))
-);
+-- ----------------------------
+--  Procedure definition for `o`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `o`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `o`(o TEXT) RETURNS text CHARSET utf8mb3
+    DETERMINISTIC
+BEGIN
+	DECLARE 默认 ,`mod`VARCHAR(100) DEFAULT NULL  ;
+	DECLARE r  TINYTEXT  DEFAULT '(?:^|([\\s,]+\\-?\\w+)*)\\s*$'  ;
+	
+	DECLARE rs,action,多个动作  TEXT DEFAULT NULL ;
+	DECLARE i  INT(11) DEFAULT REGEXP_instr(o,r) ;
+	DECLARE k TINYTEXT DEFAULT REGEXP_replace(SUBSTR(o,i),'^[\\s,]+|[\\s,]+$','');
+	DECLARE 		次数 int(5) DEFAULT 0;
 
+  -- `mod` = REGEXP_substr(k,'[\\s,]+\\K\\w+\\s*$'),
+  IF i= 0 && (@默认 IS NOT NULL || 默认 )IS NOT NULL tHEN
+	 SET k =CONCAT_WS('',默认,@默认),
+	 i = LENGTH(o)+1;
+	END IF;
+	SET o = substr(o,1,i-1);
+
+
+
+	SET 多个动作 = CONCAT('["',REGEXP_replace(k,'[\\s,]+','","'),'"]'),k = REGEXP_substr(k,'\\w+') ;
+
+	多个动作:WHILE JSON_LENGTH(多个动作)>次数  DO
+	
 
 	
- 	END LOOP ;
+	CASE 
+	
+	WHEN   IFNULL(k,'') =''   THEN SET 次数=999 ;
+	
+	WHEN 多个动作 REGEXP '"i"' THEN 
 
-	RETURN CONCAT(`re`,REPEAT(0,c0), `s`)/**/
-;
+				SET rs = o0(k,0,0);
+
+				IF rs is NULL THEN 
+					SET rs = o1(k); 
+				END IF ;
+
+
+				SET  rs =  s(JSON_ARRAY(CONCAT_ws('','S专用',k),'','o专用'
+				,rs),'i');
+
+				SET k = IF(IFNULL(rs,'')= '',null, k );
+
+				SET 多个动作 = REGEXP_replace(多个动作,',?"i"','') ;
+				ITERATE 多个动作;
+
+	WHEN   i != 0  AND rs IS NULL  THEN
+
+		SET rs = s(CONCAT_ws('','S专用',k),0);
+			IF rs = "no_ROWS"  THEN
+					SET 多个动作 = '"i"';
+
+			END IF ;
+		ITERATE 多个动作;
+		
+	WHEN  i != 0 THEN
+
+		SET 默认 = REGEXP_substr(k,@自用:='^-'),
+				k = REGEXP_replace(k,'(^-|[\\s,]+\\w+?$)','');
+
+		SET		k = case 
+								WHEN k REGEXP @自用:='^\\s*\\$?\\[' THEN  REGEXP_replace(k,@自用,'$[')
+								WHEN k REGEXP @自用:='^\\s*(?:\\$\\.)?(\\w)' THEN  REGEXP_replace(k,@自用,'$.\\1')
+						ELSE k END ;
+
+		CASE  WHEN  rs NOT REGEXP '\\s+\\Q(?(DEFINE)\\E'  THEN set o = rs;				
+		ELSE
+		SET  k = '^\\s*((?:.+\\|)?).*\\s*?(?=[\r\n])';
+		SET rs = iF(默认 = '-' , REGEXP_replace(rs,k,' '),rs);
+
+		SET  o = CASE WHEN   o REGEXP '^(?![\\n\\r])\\s*$' THEN rs 
+									WHEN  默认 = '-' || rs REGEXP k THEN  REGEXP_replace(rs,k,CONCAT('\\1',REGEXP_replace(o,'\\\\','\\\\\\\\')))
+						ELSE	CONCAT('',o,rs) END;
+
+		SET k :=  CONCAT('(?xi)(?&dx)
+(?(DEFINE)
+(?<k>[xmsiJU])
+(?<d>^\\(\\?(?&k)+\\))
+(?<dx>(?=[^)]+x)(?&d))
+)
+');
+
+
+  SET o = CONCAT(IF(o REGEXP k ,'' , '(?x)'),o); 
+
+	END case;
+
+	ELSE SET `o` = `o` ;
+
+	end CASE ;
+	SET 次数 = 次数 +1 ;
+	END while 多个动作;
+
+		RETURN `o` ;
+	
+
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `o0`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `o0`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `o0`(`k` tinytext,action TINYTEXT,p LONGBLOB) RETURNS longblob
+    DETERMINISTIC
+BEGIN  
+
+DECLARE  r TINYTEXT DEFAULT NULL ;
+
+
+	SET R =  CONCAT('\\.(',r3(k),')\\b'),
+			k =CONCAT('^',r3(k),'$');
+
+
+	CASE 
+	WHEN IFNULL(k,'')='' THEN 
+		SET k = k;
+	WHEN  action =null || action =0  THEN 
+
+
+	SET  p  =(  
+SELECT
+	a.Reg
+FROM
+	mysq1_schema.regc AS a
+WHERE
+	a.reg IS NOT NULL AND
+	a.id REGEXP k 
+);
+
+	WHEN  action REGEXP '^(?:1|i)$'   THEN 
+
+
+		UPDATE	mysq1_schema.regc AS a SET  a.Reg =  p  WHERE a.id REGEXP k ;
+		SET p = ROW_COUNT();
+	WHEN  action REGEXP '^(?:66|json)$'   THEN 
+
+		UPDATE	mysq1_schema.regc AS a SET  a.json =  p  WHERE a.id REGEXP k ;
+		DELETE 	a.* FROM  mysq1_schema.json AS a 	WHERE a.id REGEXP r;
+		SET p = ROW_COUNT();
+
+	ELSE
+
+					SET   p  =(  
+SELECT
+	a.json
+FROM
+	mysq1_schema.regc AS a
+WHERE
+	a.json IS NOT NULL AND
+	a.id REGEXP k 
+);
+	END CASE;
+
+
+	RETURN p;
+
+BEGIN
+		DECLARE k LONGtext DEFAULT JSON_OBJECT(
+'gql',CONCAT_WS('\n','(?x)\\b(\\w+)(?=(?&colon))'
+,CONCAT('(?(DEFINE)
+			(?<colon>
+						\\s*:\\s*
+			)	
+			(?<postfix>
+						[!]|\\[\\]
+			)
+'),')')
+
+,'date',  CONCAT( '(?x)
+(?(DEFINE)
+		(?<year0>
+				(?:20)([01]\\d)
+		)
+		(?<year1>
+				(?<!\\d)(?:20)([01]\\d)(?=(?&fg1)(?&month))
+		)
+		(?<year2>
+				(?<!\\d)(?:20)([01]\\d)(?=(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\\d|3[0-1]))
+		)
+		(?<year3>
+		贰零(?:零|壹|贰)(?&cnum)
+		)
+		(?<year4>
+			(?<!\\d)[1]\\d(?=(?&month1)(?&day1)\\b)
+		)
+		(?<year5>
+			(?<=")(?&year0)(?=")
+		)
+		(?<month>
+			(?:0?[1-9]|1[0-2])(?=月|\\D)(?!日|年)
+		)
+		(?<month1>
+			(?:0[1-9]|1[0-2])
+		)
+		(?<day>
+			(?:0?[1-9]|[1-3][0-9])(?=日|\\D)(?!月|年)
+		)
+		(?<day1>
+			(?:0[1-9]|[12]\\d|3[0-1])
+		)
+		(?<fg0>
+			"\\s*,\\s*"
+		)
+		(?<fg1>
+			(?:年|\\D|(?&fg0))
+		)
+		(?<fg2>
+			(?:月|\\D)
+		)
+		(?<fg3>
+			(?:日|\\D)
+		)
+		(?<cnum>
+		(?:零|壹|贰|叁|肆|伍|陆|柒|捌|玖)
+		)
+
+)' )
+,'seal',CONCAT('(?ix)(?&私章)
+(?(DEFINE)
+	(?<分割1>(?#分割1)
+		"\\s*:\\s*"
+	)
+	(?<b>(?i)
+	<br/?>
+	)	
+	(?<bs>(?i)
+	<br/?>\\w+
+	)
+	(?<shape>
+	_shape":\\s*"
+	)
+	(?<私章>(?#私章)
+		_name(?&分割1)\\w*[私签法]|_shape(?&分割1)4
+	)
+	(?<特殊>
+	出纳.+法人
+	)
+	(?<排除>
+		(*SKIP)(*F)
+	)
+	(?<str>
+		\\w+\\b
+	)
+	(?<role>
+		(?=`?rolename`)\\w+
+	)
+	(?<name>
+		(?=`?name`)\\w+
+	)
+	(?<分割2>
+	\\s*[:：]\\s*
+	)
+)')
+,'REGEXP',CONCAT('(?x)(?:(?&zs))(*SKIP)(*FAIL)|
+
+(?(DEFINE)
+		(?<zs>
+			(?&zs1)|(?&zs3)
+		)
+		(?<zs1>
+			(?m)//.*?(?=\\s*$)
+		)
+		(?<zs2>
+			(?s)<!--.*?-->
+		)
+		(?<zs3>
+			(?s)/\\*.*?\\*/
+		)
+		(?<k>
+		  \\b(?:\\w+\\.)*\\w+\\b
+		)
+		(?<v>
+			(?ms)(?>"(?:[^\\\\"]|\\\\.)*?"|\'(?:[^\\\\\']|\\\\.)*?\')
+		)
+		(?<zfc>
+      (?&v)(?&zfc0)++(?=\\s*(?:;|(?m)$))
+		)
+		(?<fg>
+			\\s*\\+\\s*
+		)
+		(?<zfc0>
+     (?:(?&fg)(?:(?&v)|(?&k)+))
+		)
+		
+	(?<括>
+		[()\\[\\]{}|]
+	)
+	(?<r0>
+		\\s*(?>(?:(?!(?&括)|\\\\).|\\\\.)+|(?&r1)|(?&r2)|\\\\.)\\s*
+	)	
+	(?<r>
+		((?:(?&k)|(?&r0))+)(?:\\s*\\|\\s*(?-1))*+
+	)
+	(?<r1>
+		(?:(?&k)\\s*\\((?:(?&r))+\\))+
+	)
+	(?<r2>
+		(?:\\{(?:(?&r))+})+
+	)
+	
+)')
+,'抓取',CONCAT('
+	(?(DEFINE)
+	(?<o>[^"\'])
+	(?<b>(?i)(?&o)+?values)
+	(?<e>(?ms)((?>','"(?:[^\\\\"]|\\\\.)*?"',"|'(?:[^\\\\']|\\\\.)*?'",'|null|-?\\d+(?:\\.\\d+)?))(?=\\s*(?:,\\s*(?-1)|\\))))
+	(?<es>(?ms)(?&e)(?:\\s*,\\s*(?&e))*)
+	)')
+,'xml', CONCAT( '
+		(?(DEFINE)
+		(?<o>[^"\'])
+		(?<col>(\\b\\w+\\b)(?:,(?-1))*)
+		(?<name>(?&o)+?\\K\\b\\w+(?=\\())
+		(?<k>(?im)^(?&o)+?values\\()
+		(?<v>(?ms)((?>', '"(?:[^\\\\"]|\\\\.)*?"', "|'(?:[^\\\\']|\\\\.)*?'", '|null|-?\\d+(?:\\.\\d+)?))(?=\\s*(?:,\\s*(?-1)|\\))))
+		(?<vs>(?ms)(?&v)(?:\\s*,\\s*(?&v))*)
+
+	)' )
+,'j',CONCAT( '(?x)
+(?(DEFINE)(?ixsm)
+			(?<k>"[\\w\\.\\$]+"|(?:\\$\\.)?\\b[\\w]+\\b|`.+`)(?=\\s*:)
+			(?<k0>(?<!["])\\b(?![\\d])\\w+)
+			(?<v>(?:"(?s)(?:[^\\\\"]|\\\\.)*"|\\-?\\d+(?:\\.\\d+)?|null|ture|false|(?&kvs)|(?&a)|(?&k)))
+			(?<a0>\\[\\s*(?&v)(?:(?:\\s*,\\s*)(?&v))*?\\s*])
+			(?<a>\\[\\s*(?&v)(?:(?:\\s*,\\s*)(?&v))*?\\s*])
+			(?<kv>(?&k)\\s*:\\s*(?&v))
+			(?<kvs>\\{\\s*(?&kv)(?:\\s*,\\s*(?&kv))*?\\s*})
+			(?<j>(?:(?&kvs)|(?&a)))
+		)' )
+,'百家姓',CONCAT_WS('\n','(?x)^(?&过滤)(*SKIP)(*F)|',
+'(?(DEFINE)',
+			CONCAT('(?<过滤>','法(?=人|定)|出(?=纳|票)|中(?=国)|成本',')'),
+			CONCAT('(?<过滤1>','^(?&过滤)(*SKIP)(*F)|^(?&姓)',')'),
+			CONCAT('(?<姓>','[赵钱孙李周吴郑王冯陈褚卫蒋沈韩杨朱秦尤付许何吕施敬张孔曹严华金魏陶姜戚谢邹喻柏水窦章云苏潘葛奚范彭郎鲁韦昌马苗凤花方俞任袁柳酆鲍史唐费廉岑薛雷贺倪汤滕殷罗毕郝邬安常乐于时傅皮岳帅卞卿齐康伍余元卜顾孟平黄和穆萧尹姚邵湛汪祁毛禹狄米贝明臧计伏成戴谈宋茅庞熊纪舒屈项祝董梁杜阮蓝闵席季麻强贾路娄危江童颜郭梅盛林刁钟徐邱骆高夏蔡田樊胡凌霍虞万支柯昝管卢莫经房裘缪干解应宗丁宣贲邓郁单杭洪包诸左石崔吉钮龚程嵇邢滑裴陆荣翁荀羊於惠甄曲家封芮羿储靳汲邴糜松井段富巫乌焦巴弓牧隗山谷车侯宓蓬全郗班仰秋仲伊宫宁仇栾暴甘钭厉戎祖武符刘景詹束龙叶幸司韶郜黎蓟薄印宿白怀蒲邰从鄂索咸籍赖卓蔺屠蒙池乔阴鬱胥能苍双闻莘党翟谭贡劳逄姬申扶堵冉宰郦雍郤璩桑桂濮牛寿通边扈燕冀郏浦尚农温别庄晏柴瞿阎充慕连茹习宦艾鱼容向古易慎戈廖庾终暨居衡步都耿满弘匡国文寇广禄阙东欧殳沃利蔚越夔隆师巩厍聂晁勾敖融冷訾辛阚那简饶空曾毋沙乜养鞠须丰巢关蒯相查后荆红游竺权逯盖益桓公寸却逮唱有丛寸皇彤端实集翠辟良芒其中之称来繁朴毓荤绪硕买巧撒秘绍壬斋奕朋羽占穰闾贵贯崇告褒锐闳歧示委频呼威律保抄化校抗綦宏庚敏拱丑畅随卯友乙甲尾玄裔植矫昔度遇前咎敛泷衅圣夫镇邸掌员戏智凭进厚业资仍衷刑仵夷蛮孛帖洛洋郸邗剑隋茆苌桐机铎玉针庹磨瓮刀牵恽世同止睢种肖泣卷谬赧顿次念斯丹聊姓寻出户才书愚性霜寒字板独诗扬揭析紫柔奇佛弥素僧仙宇酒塔闪星天波速腾镜澄謇渠风濯茂兰藤检折驹貊肥雀禽节鲜栗帛布藏钞门庆及建巨希载漫力勤改亓修闽守勇练士五将军奉恭母丘礼孝伦问辉让依介市苑剧零招达六战候励萨覃初城局原妫泉清卑麦百言爱笪哈赏佴牟琴亢帅归鄢法楚督库稽光瑞泥摩铁]|(?:万俟|司马|上官|欧阳|夏侯|诸葛|闻人|东方|赫连|皇甫|尉迟|公羊|澹台|公冶|宗政|濮阳|淳于|单于|太叔|申屠|公孙|仲孙|轩辕|令狐|钟离|宇文|长孙|慕容|鲜于|闾丘|司徒|司空|丌官|司寇|仉督|子车|颛孙|端木|巫马|公西|漆雕|乐正|壤驷|公良|拓跋|夹谷|宰父|谷梁|晋楚|闫法|汝鄢|涂钦|段干|百里|东郭|南门|呼延|归海|羊舌|微生|缑亢|况郈|有琴|梁丘|左丘|东门|西门|商牟|佘佴|伯赏|南宫|墨哈|谯笪|年爱|阳佟|第五|言福|百家|姓终|万俟|司马|上官|欧阳|夏侯|诸葛|闻人|东方|赫连|皇甫|尉迟|公羊|澹台|公冶|宗政|濮阳|淳于|单于|太叔|申屠|公孙|仲孙|轩辕|令狐|钟离|宇文|长孙|慕容|鲜于|闾丘|司徒|司空|丌官|司寇|仉督|子车|颛孙|端木|巫马|公西|漆雕|乐正|壤驷|公良|拓跋|夹谷|宰父|谷梁|晋楚|闫法|汝鄢|涂钦|段干|百里|东郭|南门|呼延|归海|羊舌|微生|岳帅|缑亢|况郈|有琴|梁丘|左丘|东门|西门|商牟|佘佴|伯赏|南宫|墨哈|谯笪|年爱|阳佟|第五|言福|步都|东欧|聂晁|空曾|相查|凃肖|亓官|锺离|荔菲|辗迟)',')'),
+')')
+,'enter',CONCAT_WS('\n',
+'(?&e)
+(?(DEFINE)',
+			CONCAT('(?<o>','(?:公司)',')'),
+			 CONCAT('(?<e>','\\w+(?&o)',')'),
+')')
+,'s',CONCAT('(?x)
+(?(DEFINE)
+	(?<k>
+			^\\s*\\K([^\\s,]+)
+	)
+	(?<p>
+		(?:(?&k)\\s*,\\s*)?\\K[$\\w\\[\\]\\.*]+\\s*$
+	)
+)')
+,'html',CAST(s('html',0)AS CHAR)
+,'jsp',CAST(s('html',0)AS CHAR)
+
+,'过滤',CONCAT('
+(?(DEFINE)
+	(?
+	)
+)
+')
+,'es6',CONCAT_ws('\n','(?x)'
+,CONCAT('(?(DEFINE)
+		(?<zs>
+			(?&zs1)|(?&zs2)|(?&zs3)
+		)
+		(?<zs1>
+			(?m)//.*?(?=\\s*$)
+		)
+		(?<zs2>
+			(?s)<!--.*?-->
+		)
+		(?<zs3>
+			(?s)/\\*.*?\\*/
+		)
+		(?<k0>
+		  [\\w\\.]+
+		)
+		(?<k>
+		  [\\@$]*(?&k0)+[?]?\\s*
+		)
+		(?<v>
+		(?mis)(?>`[^`]*`|"(?:[^\\\\"]|\\\\.)*?"|\'(?:[^\\\\\']|\\\\.)*?\'|/(?:[^\\\\/]|\\\\.)+?/|null|true|false|\\-?\\d+(?:\\.\\d+)?)
+		)
+		(?<zfc>
+      (?&zfc0)(?:(?&fg)(?&zfc0))+
+		)
+		(?<fg>
+		  \\s*\\+\\s*
+		)
+		(?<zfc0>
+     (?&v)|(?&k)
+		)')
+,CONCAT('(?<rcc>
+(?m)^(?![\\n\\r])\\s*export\\s+class\\s+SearchNew.*?(?=\\{)(?&r2)
+)
+(?<state>
+(?m)^(?![\\n\\r])\\s*export\\s+class\\s+SearchNew.*?(?=\\{)(?&r2)
+)
+
+
+')
+,CONCAT('(?<kuoHao>
+		[()\\[\\]{}|"\']
+	)
+	(?<link>
+			\\s*[+\\-,=>;\\s:\\.<>!]+\\s*
+	)
+	(?<e>
+			(\\s*(?&v)|(?&k)|(?&r1)|(?&r2)|(?&r3)|[&]|\\s*)(?:(?&link)(?-1))*(?&link)?\\s*
+	)	
+	(?<fn>
+			(?=\\$\\.post)(?&k)(?&link)?\\s*\\((?&zfc)\\(\\s*(\\w+)\\s*\\)\\s*(?&r2)\\s*\\)
+	)
+	(?<r1>
+		(\\s*\\(\\s*(?:\\.?(?&e)?)+\\s*\\))(?:(?&link)?(?-1))*
+	)
+	(?<r2>
+		(\\s*\\{\\s*(?:\\.?(?&e)?)+\\s*\\})
+	)
+	(?<r3>
+		(?:\\[\\s*(?:(?&e)?)+\\s*\\])+
+	)'/**/)
+,CONCAT('(?<post>
+\\$\\.post\\s*\\((\\s*(?&zfc)\\s*),\\s*(?&k).+(\\w+).+(?=\\{)
+		)')
+,CONCAT('(?<tag>
+<(\\w+)[^>]*?/\\s*>
+		)
+		(?<inner0>
+		(?mis)(?>[^"\'<>{}\\s/]+|(?&r2)|`[^`]*`|(?:"(?:[^\\\\"]|\\\\.)*?")|(?:\'(?:[^\\\\\']|\\\\.)*?\'))
+		)
+		(?<inner>
+			((?&inner0))(?:\\s*(?-1))*+\\s*
+		)
+
+		(?<outer>
+				(?>(?&r2)|(?&tag1)|(?&tag2)|[^<>]+)
+		)
+		(?<tag1>
+			<\\w+\\s*(?&inner)?/>
+		)
+		(?<tag2>
+			<(\\w+)\\s*(?&inner)?>(?&outer)*?</\\g-1>
+		)
+')
+,CONCAT('
+(?<fields>
+(?m)^\\s+\\K(?&k0)
+)
+')
+,')')
+
+,'path',CONCAT('(?x)^(?&分割)?[w](?:((?&分割))(?&path0))+
+(?(DEFINE)
+	(?<w>
+			^(?&分割)?[w]\\K(?:(?&分割)(?&path0))+
+	)
+
+
+	(?<头>
+		(?i)(?:(?:[a-z]|https?)\\:)?+
+	)
+	(?<分割1>
+	/+
+	)	
+	(?<分割2>
+		[\\\\]+
+	)	
+	(?<分割>
+		(?:(?&分割1)|(?&分割2))
+	)
+	(?<path0>
+		[^\\\\/]+
+	)	
+	(?<path1>
+		(?&头)(?:(?&分割1)(?&path0))+
+	)
+	(?<path2>
+		(?&头)(?:(?&分割2)(?&path0))+
+	)	
+	(?<path>
+		(?&头)(?:(?&分割)(?&path0))+
+	)
+	(?<url>
+	 	https?(?:(?&分割2)(?&path0))+
+	)
+)')); 
+RETURN p;
+
+		
+		
+
+  END;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `o1`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `o1`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `o1`(`p` text  ) RETURNS longblob
+    DETERMINISTIC
+BEGIN
+	DECLARE 多个动作,动作  TEXT DEFAULT NULL ;	DECLARE 次数 int(5) DEFAULT 0;
+
+
+	多个动作:WHILE  次数 = 0   DO
+
+	  SET  p = (
+						SELECT
+			`replace`
+		FROM
+			mysq1_schema.regc AS a
+		WHERE
+			a.id= p );
+
+
+		SET	次数 = 次数 + 1;
+
+	END while 多个动作;
+
+	RETURN p;
+
+
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `o2`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `o2`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `o2`(`p` text) RETURNS text CHARSET utf8mb3
+    DETERMINISTIC
+BEGIN
+	DECLARE 多个动作,动作  TEXT DEFAULT NULL ;	DECLARE 次数 int(5) DEFAULT 0;
+
+	SET 多个动作 = JSON_SEARCH(JSON_EXTRACT(p ,'$[*][0]'),"all","跳");
+	
+	-- IF json_value(多个动作, '$[]'
+	
+	SET  次数 = json_length(多个动作);
+
+	
+	多个动作:WHILE  次数 > 0   DO
+		
+	 SET  动作 = json_value(多个动作,CONCAT('$[',次数-1,']'));
+	 
+	 SET  p = JSON_REMOVE(p, 动作),
+				次数 = 次数 - 1;
+	
+	END while 多个动作;
+	RETURN p;
+	
 END
 ;;
 DELIMITER ;
@@ -7989,56 +11337,87 @@ DROP PROCEDURE IF EXISTS `p`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `p`(IN `p` MEDIUMBLOB)
 p:BEGIN
-	DECLARE `p2` BLOB DEFAULT j(`p`,'p2'); DECLARE `funcid` VARCHAR(60) DEFAULT j(`p2`,'funcid');DECLARE `b` BLOB DEFAULT NULL;
+	DECLARE `p2` BLOB DEFAULT json_extract(p,'$**.p2'); DECLARE `funcid` VARCHAR(60) DEFAULT j0(`p2`,'funcid');DECLARE `b` BLOB DEFAULT NULL;
+	DECLARE `p1` BLOB DEFAULT NULL;
+	DECLARE `ISp2` VARCHAR(1) DEFAULT 0;
 
-  DECLARE CONTINUE HANDLER FOR  SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22' , SQLSTATE	'HY000'
-	bl:BEGIN GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;SET  @`sqlstate` = JSON_OBJECT('sqlstate',@`sqlstate`,'errno',@errno,'text',@text);
-				SET @`errsql` = @sql_body,@funcid =  NULL;
-				SET @funcid = CONCAT_WS(' ','Error: ',(SELECT CONCAT_WS(', ',a.note,CONCAT_WS('',UPPER(SUBSTR(a.`name`,1,1)),LOWER(substr(a.`name`,2))),a.id) FROM mysq1_schema.qs AS a WHERE a.`name` = `funcid`)
-									, ' p' ),
+  DECLARE CONTINUE HANDLER FOR  SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22' , SQLSTATE	'HY000'-- ,SQLSTATE	'22007'
+	bl:BEGIN 
+	GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;SET  @`sqlstate` = JSON_OBJECT('sqlstate',@`sqlstate`,'errno',@errno,'text',@text);
+				SET @`errsql` = @p1_body,@funcid =  NULL;
+				SET @funcid = CONCAT_WS(' ','Error: ',IF(isp2,
+				
+				(SELECT CONCAT_WS(', ',a.note,CONCAT_WS('',UPPER(SUBSTR(a.`name`,1,1)),LOWER(substr(a.`name`,2))),a.id) FROM mysq1_schema.qs AS a WHERE a.`name` = `funcid`)
+				,(SELECT CONCAT_WS(', ',a.`SUBJECT`,CONCAT_WS('',UPPER(SUBSTR(a.`name`,1,1)),LOWER(substr(a.`name`,2))),a.id) FROM mysq1_schema.qs2 AS a WHERE a.`name` = `funcid`))
+									,IF(isp2, ' p2' , ' p' )),
 				@pp = QUOTE(`p`);
-				CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp,'SQL',@`errsql`,'err',@`sqlstate`,'l',1));END;
+				CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp,'SQL',@`errsql`,'err',@`sqlstate`,'l',1));END;/**/
 
+
+SET isp2 = p2 REGEXP ':\\s*"p2"';
+IF IFNULL(`p2`,'')= '' or !json_valid(p2)  THEN CALL Error('p :no p2 or courseNo');	ELSE SET @p1_body = '';END IF;
+IF isp2 THEN CALL p2(p);LEAVE p; END IF;
 
 START TRANSACTION;
 SET @funcid = CONCAT_WS(' ',(SELECT CONCAT_WS(', ',a.note,CONCAT_WS('',UPPER(SUBSTR(a.`name`,1,1)),LOWER(substr(a.`name`,2))),a.id) FROM mysq1_schema.qs AS a WHERE a.`name` = `funcid`)
 							, ' p' ),
 		@pp = QUOTE(`p`);
-CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp));COMMIT;	
+INSERT INTO plogs (Function_Name,parameter) VALUES (@funcid,@pp);
+ -- CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp AS CHAR));
+COMMIT;/*	
+*/
 
+	IF IFNULL(`p2`,'')= '' or !json_valid(p2)  THEN CALL Error('p :no p2 or courseNo');	ELSE SET @p1_body = '';END IF;
 
-	IF IFNULL(`p2`,'')= '' THEN CALL Error('p :no p2 or courseNo');	ELSE SET @p1_body = '';END IF;
-
-	IF j(p2,'keyword') <> '' THEN 
-
-		BEGIN 
-			DECLARE k TEXT DEFAULT j(p2,'keyword');DECLARE k1 TEXT DEFAULT NULL;
-
-			SET k1 :=  REGEXP_replace(k,r('hza'),'\\\\\\\\Q\\1\\\\\\\\\E'),
+	IF j0(p2,'keyword') <> '' THEN BEGIN 
+			DECLARE k TEXT DEFAULT j0(p2,'keyword');DECLARE k1 TEXT DEFAULT NULL;
+			SET k1 :=  REGEXP_replace(k,'(?:([^\\x4e00-\\x9fa5]+))','|\\\\\\\\Q\\1\\\\\\\\\E'),
+					k1 := REGEXP_replace(k1,'^\\s*\\|\\s*|\\s*\\|\\s*$',''),
 					p2 = REGEXP_replace(p2,'(?i)(?<="keyword":)("(?:\\\\.|[^"])+")',json_quote(k1));
-		END;
+
+	END;END IF;
+
+
+	IF (@p0 := json_keys(p)) REGEXP '"p1"' THEN  
+			SET @P0	=	json_query(p,'$.p1');
+
+	   	SET @P0	:=	CONCAT_WS(''	,'SELECT  "k1":',REGEXP_replace(REGEXP_replace(@P0
+																,CONCAT_WS('|',REGEXP_replace(r('`kvP`'),'\\Q.*?(?:[{]?)\\E',''),'(?:[{,])((?4))(?::\\{)')
+																,'\\1\\3\\4\\6\\7'),'(?<=")\\}(?=")','UNION ALL \nSELECT "k1":')),
+					@p0 := REGEXP_replace(@p0,'(?is)"(?=(?:"(?:\\\\.|[^"])+"|\d+):)','",'),
+					@P0	:=	CONCAT_WS('',REGEXP_replace(REGEXP_SUBSTR(@P0,r('`aline`')) ,r('`kv`'),'\\4 AS \\2 ') -- head
+															,REGEXP_replace(REGEXP_replace(@P0,r('`aline`'),''),r('`kv-k`'),'\\1') -- other
+												),
+					@P0 = REGEXP_replace(REGEXP_REPLACE(@P0,'\\}+$',''),'(?im)(?<=^|,)""(?=(?:\\s+AS\\s+[^\\n\\r]*?)?(?:,|$))','NULL')/**/ ;
+			SET `p` = JSON_COMPACT(json_set(`p`,'$.p1',@P0));
 	END IF;
 
+
+
+
+
 	IF p2 REGEXP '(?i)"bid":"(?:\\\\.|[^"])+"' THEN
-		SET `b` = r8(j(p2,"bid"));
+		SET `b` = r8(j0(p2,"bid"));
+
 
 		sc:BEGIN
 			DECLARE `pl` VARCHAR(200) DEFAULT REGEXP_replace(REGEXP_replace(COLUMN_list(b),'(?:^|,)`[^`]*(?<!\\d)`(?=,|$)',''),'^,|,$','');
 			DECLARE `oP`  VARCHAR(60) DEFAULT NULL; DECLARE `s` BLOB DEFAULT column_get(b,'s'AS CHAR);DECLARE parameter BLOB DEFAULT column_get(b,'parameter'AS CHAR);
 
 			IF IFNULL(parameter,'')<>'' AND IFNULL(s,'')<>'' THEN 
-					SET @s = s;
-					SET parameter = r5(parameter,p2);
+
+					SET @s = `s`;
+					SET parameter = r5(parameter,p);
 					EXECUTE immediate parameter;
-					SET s = @s;
+					SET `s` = @s;
 			END IF;
 
 			SET	@p1_body = COLUMN_get(`b`,'sql'AS CHAR);
 
-			IF IFNULL(@p1_body,'') <> '' THEN SET	@p1_body = r5(@p1_body,p2);ELSE LEAVE sc; END IF; 
+			IF IFNULL(@p1_body,'') <> '' THEN SET	@p1_body = r5(@p1_body,p);ELSE LEAVE sc; END IF; 
 
 			IF CAST(@p1_body AS CHAR) IS NULL THEN SET @p1_body = CONVERT(@p1_body USING gbk);END IF;
-
+-- SELECT @p1_body AS s,REGEXP_substr(@p1_body ,r('`Sart-End`')) AS core ;-- LEAVE p;
 			PREPARE scp_stmt from  @p1_body;COMMIT;EXECUTE scp_stmt ;		DEALLOCATE PREPARE scp_stmt ;
 
 			l1:LOOP
@@ -8052,32 +11431,37 @@ CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp));COMMIT;
 
 				IF IFNULL(@p1_body,'') = '' THEN ITERATE l1; END IF;
 
-        IF s <>'' THEN 	SET @p1_body = REGEXP_replace(@p1_body,'(?i)(?<=FROM)\\s*(?:\\(\\s*)?`SQL`(?:\\s*\\))?\\s*(?=as\\s+[\\w]\\b)',CONCAT_WS('\n','\\1(','-- Start',REGEXP_replace(QUOTE(s),'^[\'"]|[\'"]$',''),'-- End',')'));				END IF;
+        IF `s` <>'' THEN 	SET @p1_body = REGEXP_replace(@p1_body,'(?i)(?<=FROM)\\s*(?:\\(\\s*)?`SQL`(?:\\s*\\))?\\s*(?=as\\s+[\\w]\\b)',CONCAT_WS('\n','\\1(','-- Start',REGEXP_replace(QUOTE(s),'^[\'"]|[\'"]$',''),'-- End',')'));				END IF;
 
-				SET @p1_body = CAST(r5(@p1_body,p2) AS CHAR);
+				SET @p1_body = CAST(r5(@p1_body,p) AS CHAR);
 
 				IF CAST(@p1_body AS CHAR) IS NULL THEN SET @p1_body = CONVERT(@p1_body USING gbk);END IF;
 
-
+-- SELECT @p1_body AS s,REGEXP_substr(@p1_body ,r('`Sart-End`')) AS core ; LEAVE p;	-- 
 
 		 	PREPARE scp_stmt from  @p1_body;COMMIT;EXECUTE scp_stmt ;		DEALLOCATE PREPARE scp_stmt ;COMMIT;
-
 			END LOOP;
-
 		END;
 		SET `b` = NULL ;
 	END IF;
 
-
 	SET `b` = r8(`funcid`);
 	SET @p1_body = COLUMN_get(`b`,'sql'AS CHAR);
+
+
+
+
 	IF @p1_body IS NULL THEN SET @p1_body  = CONVERT("No sql!" USING gbk);SIGNAL SQLSTATE 'HY000' SET MYSQL_ERRNO =12345 , MESSAGE_TEXT =  @p1_body ; END IF;
 		BEGIN DECLARE `plist` VARCHAR(200) DEFAULT REGEXP_replace(REGEXP_replace(COLUMN_list(b),'(?:^|,)`[^`]*(?<!\\d)`(?=,|$)',''),'^,|,$','');
 					DECLARE `oneP`  VARCHAR(60) DEFAULT NULL;DECLARE `s` BLOB DEFAULT column_get(b,'s'AS CHAR);DECLARE parameter BLOB DEFAULT column_get(b,'parameter'AS CHAR);
 
+
+
 			IF IFNULL(parameter,'')<>'' THEN 
 
-					SET @s = s,parameter = r5(parameter,p2);
+
+					SET @s = s,parameter = r5(parameter,p);
+
 
 					EXECUTE immediate parameter;
 
@@ -8086,12 +11470,12 @@ CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp));COMMIT;
 					END IF;
 			END IF;
 
-
       IF s <>'' THEN 	SET @p1_body = REGEXP_replace(@p1_body,'(?i)(?<=FROM)\\s*(?:\\(\\s*)?`SQL`(?:\\s*\\))?\\s*(?=as\\s+[\\w]+\\b)',CONCAT_WS('\n','\\1(','-- Start',REGEXP_replace(QUOTE(s),'^[\'"]|[\'"]$',''),'-- End',')'));				END IF;
+-- SELECT r5(@p1_body,p),CONVERT(r5(@p1_body,p) USING utf8 ) ,CAST(r5(@p1_body,p) AS CHAR );-- LEAVE p;
+			SET @p1_body = CAST(r5(@p1_body,p)AS CHAR);
 
-			SET @p1_body = CAST(r5(@p1_body,p2)AS CHAR);
 
-			IF j(p2,'limit') <> '' THEN SET @p1_body  = REGEXP_REPLACE(@p1_body,'(?i)"\\s*(\\d+\\s*,\\s*\\d+)"','limit \\1');END IF;
+			IF j0(p2,'limit') <> '' THEN SET @p1_body  = REGEXP_REPLACE(@p1_body,'(?i)"\\s*(\\d+\\s*,\\s*\\d+)"','limit \\1');END IF;
 
 			l:LOOP
 
@@ -8108,14 +11492,498 @@ CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp));COMMIT;
 
 		END ;
 
-	 	SET 	@p1_body =CONCAT_WS('\t','SELECT\tCAST(COLUMN_json(COLUMN_create(',QUOTE(IF(IFNULL(COLUMN_get(b,'dom'AS CHAR),'')='','dblob',COLUMN_get(b,'dom'AS CHAR)))
-,CONCAT_WS('',',a.dblob))AS CHAR)AS dblob\tFROM(\n',@p1_body,'\n)AS A '));			
+/*最后处理*/
+		CASE
+			WHEN CAST(@p1_body AS CHAR) REGEXP  CONCAT_WS('','\\b',funcid,'2JSON\\b(?=\\s*from\\()') THEN
+			SET @p1_body= CONCAT_WS('\n'
+									,CONCAT('select json_object(',QUOTE(funcid),',json_arrayagg(JSON_EXTRACT(',CONCAT(funcid,'2JSON'),',"$"))) as dblob\nfrom(')
+									,@p1_body
+									,') as 聚合');
+	
+			WHEN funcid  NOT REGEXP 'help|json$'  && REGEXP_substr(@p1_body,'(?is-m)^\\s*SELECT.+?(?m)^\\s*FROM') REGEXP '[\\w\\)]`?\\s+`?dblob`?\\b(?=\\s*)'  THEN
+			SET 	@p1_body =CONCAT_WS('\t','SELECT\tCAST(COLUMN_json(COLUMN_create(',QUOTE(IF(IFNULL(COLUMN_get(b,'dom'AS CHAR),'')='','dblob',COLUMN_get(b,'dom'AS CHAR)))
+,CONCAT_WS('',',a.dblob))AS CHAR)AS dblob\tFROM(\n',@p1_body,'\n)AS A '));
 
-		IF CAST(@p1_body AS CHAR) IS NULL THEN SET @p1_body = CONVERT(@p1_body USING gbk);END IF;
+			IF CAST(@p1_body AS CHAR) IS NULL THEN SET @p1_body = CONVERT(@p1_body USING gbk);END IF;
+			ELSE SET @p1_body= @p1_body;
+		END CASE ;
+
+		
+-- SELECT cast(p AS CHAR),@p1_body AS s,REGEXP_substr(@p1_body ,r('`Sart-End`')) AS core,'3' ;-- LEAVE p;
+
+	PREPARE p_stmt from  @p1_body;COMMIT;EXECUTE p_stmt ;		DEALLOCATE PREPARE p_stmt ;-- 
+
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `p0`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `p0`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p0`(IN `params` LONGBLOB)
+p:BEGIN
+		DECLARE path,`key` ,`value` TINYTEXT DEFAULT NULL;
+		DECLARE ROOT   TINYTEXT DEFAULT 'D:/Program Files (x86)/Qianxue/';
+		DECLARE TROOT  TINYTEXT DEFAULT 'D:/Program Files (x86)/Qianxue/';
+		DECLARE  r  TINYTEXT DEFAULT  '\\s*:?=\\s*\\K(["\'])(?:(?=\\\\).{2}|(?!\\g1).)*?\\g1';
+		DECLARE `p`  LONGBLOB DEFAULT NULL;
+/*
+		START TRANSACTION;
+		INSERT INTO plogs (Function_Name,parameter) VALUES ('p0 ',params);
+		COMMIT;
+/**/
+
+		CASE 
+			WHEN json_valid(params) && JSON_DEPTH(params)>1 && JSON_EXISTS(params, '$.root')  THEN
+				SET root =  JSON_VALUE(params, '$.root');
+			WHEN   params REGEXP o('^(?&path)$ path') THEN
+				SET root = `params`;
+		
+		END CASE;
+
+		IF  IFNULL(root,'')='' THEN
+				SET  p = `params` ,`params` = NULL;
+		ELSE
+			SET `p` = CAST(LOAD_FILE(CONVERT(CAST(root AS  CHAR) using gbk)) AS CHAR);
+		END IF ;
 
 
 
-	PREPARE p_stmt from  @p1_body;COMMIT;EXECUTE p_stmt ;		DEALLOCATE PREPARE p_stmt ;
+		IF  json_valid(params) && JSON_DEPTH(params) > 1 && JSON_EXISTS(params ,'$.path')&& json_value(params,'$.path')  REGEXP '^\\s*\\w+' THEN 
+
+			SET 	 params = json_set(
+				params,
+				'$.path',
+				CONCAT(
+						 CASE WHEN  j0(params ,'troot')!='' THEN j0(params ,'troot') 
+									WHEN  p REGEXP CONCAT('@root',r)THEN REGEXP_replace(REGEXP_substr(p ,CONCAT('@root',r)),'^["\']|["\']$','')
+								ELSE TROOT
+						 end
+						 ,json_value(params,'$.path')));
+
+		END IF;
+
+
+		SET root  = _f(p, JSON_ARRAY( '(?sx)^\\s*/\\*\\s*\\K
+		(\\w+(?:[,\\s]+\\w+)*)
+		(?=[,\\s]*\\*/)'
+		,'[,\\s]+','","'
+		,'^.+?$','["\\0"]'))
+		;
+
+		WHILE  IFNULL(root,'')!=''&& json_valid(root)&& JSON_DEPTH(root)>1 && json_length(root)>0   DO
+			SET `key` = json_value(root,'$[0]'),root =JSON_REMOVE(root,'$[0]');
+			SET value= json_EXTRACT(params,CONCAT('$.',`key`,'')),`key`= CONCAT('\\@`?',`key`,'`?');
+			
+
+			SET  p = REGEXP_replace(p,CONCAT(`key`,r),VALUE);
+
+		END WHILE;
+
+
+		SET  p  = 语句变数组(p);
+
+		IF not json_valid(p) || JSON_LENGTH(p)<1 THEN 
+		SELECT '不是数组 或长度为0' error;
+		LEAVE p;
+		END IF; 
+
+		SET  @执行安静 = '--slint';
+
+		CALL `执行`(p);
+
+
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `p0`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `p0`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `p0`(`p` longblob,k VARCHAR(10)) RETURNS longtext CHARSET utf8mb3
+    NO SQL
+BEGIN
+	#Routine body goes here...
+
+	RETURN CASE 
+						WHEN k IS NULL || k = ''  THEN  p
+						WHEN k =0 && p = 0  THEN 'here IS ok '
+						WHEN k  REGEXP '(?i)\\\bq\\s*$'  || k='1' THEN QUOTE(p)
+						WHEN k  REGEXP '(?i)\\\bdq\\s*$' || k = '2' THEN json_QUOTE(p)
+	ELSE p END;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `p0_copy1`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `p0_copy1`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p0_copy1`(IN `params` LONGBLOB)
+p:BEGIN
+		DECLARE path,`key` ,`value` TINYTEXT DEFAULT NULL;
+		DECLARE ROOT   TINYTEXT DEFAULT 'D:/Program Files (x86)/Qianxue/';
+		DECLARE TROOT  TINYTEXT DEFAULT 'D:/Program Files (x86)/Qianxue/';
+		DECLARE  r  TINYTEXT DEFAULT  '\\s*:?=\\s*\\K(["\'])(?:(?=\\\\).{2}|(?!\\g1).)*?\\g1';
+		DECLARE `p`  LONGBLOB DEFAULT NULL;
+/*
+		START TRANSACTION;
+		INSERT INTO plogs (Function_Name,parameter) VALUES ('p0 ',params);
+		COMMIT;
+*/
+
+		CASE 
+			WHEN json_valid(params) && JSON_DEPTH(params)>1 && JSON_EXISTS(params, '$.root')  THEN
+				SET root =  JSON_VALUE(params, '$.root');
+			WHEN   params REGEXP o('^(?&path)$ path') THEN
+				SET root = `params`;
+		
+		END CASE;
+
+		IF  IFNULL(root,'')='' THEN
+				SET  p = `params` ,`params` = NULL;
+		ELSE
+			SET `p` = CAST(LOAD_FILE(CONVERT(CAST(root AS  CHAR) using gbk)) AS CHAR);
+		END IF ;
+
+
+
+		IF  json_valid(params) && JSON_DEPTH(params) > 1 && JSON_EXISTS(params ,'$.path')&& json_value(params,'$.path')  REGEXP '^\\s*\\w+' THEN 
+
+			SET 	 params = json_set(
+				params,
+				'$.path',
+				CONCAT(
+						 CASE WHEN  j0(params ,'troot')!='' THEN j0(params ,'troot') 
+									WHEN  p REGEXP CONCAT('@root',r)THEN REGEXP_replace(REGEXP_substr(p ,CONCAT('@root',r)),'^["\']|["\']$','')
+								ELSE TROOT
+						 end
+						 ,json_value(params,'$.path')));
+
+		END IF;
+
+
+		SET root  = _f(p, JSON_ARRAY( '(?sx)^\\s*/\\*\\s*\\K
+		(\\w+(?:[,\\s]+\\w+)*)
+		(?=[,\\s]*\\*/)'
+		,'[,\\s]+','","'
+		,'^.+?$','["\\0"]'))
+		;
+
+		WHILE  IFNULL(root,'')!=''&& json_valid(root)&& JSON_DEPTH(root)>1 && json_length(root)>0   DO
+			SET `key` = json_value(root,'$[0]'),root =JSON_REMOVE(root,'$[0]');
+			SET value= json_EXTRACT(params,CONCAT('$.',`key`,'')),`key`= CONCAT('\\@`?',`key`,'`?');
+			
+
+			SET  p = REGEXP_replace(p,CONCAT(`key`,r),VALUE);
+
+		END WHILE;
+
+
+		SET  p  = 语句变数组(p);
+
+		IF not json_valid(p) || JSON_LENGTH(p)<1 THEN 
+		SELECT '不是数组 或长度为0' error;
+		LEAVE p;
+		END IF; 
+
+		SET  @执行安静 = '--slint';
+
+		CALL `执行`(p);
+
+
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `p2`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `p2`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `p2`(IN `p` longblob)
+    MODIFIES SQL DATA
+p2:BEGIN
+	#Routine body goes here...
+
+	DECLARE `p2` BLOB DEFAULT j0(`p`,'p2'); DECLARE `funcid` VARCHAR(60) DEFAULT j0(`p2`,'funcid');DECLARE `b` MEDIUMBLOB DEFAULT NULL;
+	DECLARE `k` VARCHAR(200) DEFAULT j0(p2,'k');
+  DECLARE CONTINUE HANDLER FOR  SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22' , SQLSTATE	'HY000',SQLSTATE	'22007'
+	/*BEGIN GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;SET  @`sqlstate` = JSON_OBJECT('sqlstate',@`sqlstate`,'errno',@errno,'text',@text);
+				SET @`errsql` = @p1_body,@funcid =  NULL;
+				SET @funcid = CONCAT_WS(' ','Error: ',(SELECT CONCAT_WS(', ',a.note,CONCAT_WS('',UPPER(SUBSTR(a.`name`,1,1)),LOWER(substr(a.`name`,2))),a.id) FROM mysq1_schema.qs2 AS a WHERE a.`name` = `funcid`)
+									, ' p2' ),
+				@pp = QUOTE(`p`);
+				CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp,'SQL',@`errsql`,'err',@`sqlstate`,'l',1));END;*/
+
+START TRANSACTION;
+SET @funcid = CONCAT_WS(' ',(SELECT CONCAT_WS(', ',a.note,CONCAT_WS('',UPPER(SUBSTR(a.`name`,1,1)),LOWER(substr(a.`name`,2))),a.id) FROM mysq1_schema.qs2 AS a WHERE a.`name` = `funcid`)
+							, ' p2' ),
+		@pp = QUOTE(`p`);
+
+INSERT INTO plogs (Function_Name,parameter) VALUES (@funcid,@pp);
+COMMIT;	/*
+*/
+
+/*校验*/
+
+	IF IFNULL(`p2`,'')= '' OR IFNULL(`funcid`,'') = '' THEN SIGNAL SQLSTATE 'HY000' SET MESSAGE_TEXT = 'no p2 or funcid is null';LEAVE p2;	ELSE SET @sql_body = NULL;END IF;
+
+	SET `b` = r9(`funcid`), @P0	=	j0(p,"p1"),@p1_body = COLUMN_get(b,'sql'AS CHAR),@sql_body = NULL;
+
+
+	CASE 	WHEN @p1_body REGEXP '(?im)^\\s*+delete' THEN	SET @p1_body = r5(@p1_body,p);
+		ELSE
+-- 处理参数
+			IF k REGEXP '\\w+' THEN BEGIN DECLARE `r` VARCHAR(200) DEFAULT 
+				CONCAT('(?is)("\\d+":\\{"',replace(k,',','":"(?:\\\\.|[^"])*"\\K((?:,"(?:\\\\.|[^"])*":"(?:\\\\.|[^"])*")+?)(?=,"'),')');
+				SET @k := REGEXP_substr(@P0,`R`),
+						@k := REGEXP_REPLACE(@k,r('`kv-v`'),'\\1\\2:""'),
+						@k = CONCAT('\\1',@k),
+						r = CONCAT('(?is)("\\d+":\\{"',replace(k,',','":"(?:\\\\.|[^"])*"(?=,"'),')')/**/ ;
+				SET	@P0 = REGEXP_replace(@P0,r,@k), @k = NULL;
+			END; END IF;
+-- 处理p1;
+			SET @P0	:=	CONCAT_WS(' ',"SELECT",REGEXP_replace(REGEXP_replace(@P0,r('`kvP`'),'\\1\\3\\4\\6'),'(?<=")\\}(?=")','UNION ALL \nSELECT ')),
+					@P0	:=	CONCAT_WS('',REGEXP_replace(REGEXP_SUBSTR(@P0,r('`aline`')) ,r('`kv`'),'\\4 AS \\2 ') -- head
+														,REGEXP_replace(REGEXP_replace(@P0,r('`aline`'),''),r('`kv-k`'),'\\1') -- other
+													),
+					@P0 = REGEXP_replace(REGEXP_REPLACE(@P0,'\\}+$',''),'(?im)(?<=^|,)""(?=(?:\\s+AS\\s+[^\\n\\r]*?)?(?:,|$))','NULL');
+
+
+			BEGIN DECLARE `pl` VARCHAR(200) DEFAULT COLUMN_list(b);DECLARE `oPs`  VARCHAR(60) DEFAULT NULL;
+
+					SET @i = 0;
+
+					p20:LOOP 
+
+							SET `oPs` = REPLACE(REGEXP_SUBSTR(`pl`, '^`[^`]+`'),'`',''),@s = NULL;
+							IF IFNULL(`oPs`,'') ='' THEN LEAVE p20;ELSE SET `pl` = REGEXP_replace(`pl`, '^`[^`]+`,?','');END IF;
+
+							SET	@p1_body = COLUMN_get(b,`oPs`AS CHAR);
+							IF IFNULL(@p1_body,'') ='' THEN   ITERATE  p20;END IF;
+
+							CASE	WHEN @p1_body REGEXP '(?is)^\\s*select(.*?)from(.*?)(?=where\\s+|$)' AND `funcid` REGEXP '(?i)UPDAT' THEN
+											SET @p1_body = REGEXP_replace(@p1_body,'(?is)^\\s*SELECT(.*?)from(.*?)(?=where\\s+|$)','update \\2\nSET \\1');
+											SET	@p1_body = REGEXP_replace(@p1_body,'(?ims)^((?:`?\\w+`?\\.)?[\\w`]+)\\s*,\\s*?([\\n\\r]+^\\s*`?\\w)','\\1 = \\2');
+											SET @p1 := @p0;
+
+										WHEN @p1_body REGEXP '(?i)^\\s*insert'  THEN
+											SET @kfield  = REGEXP_REPLACE(REGEXP_substr(p,'(?s)(?<="p1":{"\\d":\\{)(?:"(?:\\\\.|[^"])*":"(?:\\\\.|[^"])*",?)*(?=\\})')
+																													,'(?s)"((?:\\\\.|[^"])*)":"(?:\\\\.|[^"])*"','\\1');
+
+											SET @k	=	REGEXP_replace(REGEXP_substr(@p1_body,'(?ims)^\\s*insert\\s+into\\s*\\w+\\(\\s*\\K.*?(?=,f`|\\))')
+																								,'(?<!`)(\\b\\w+)\\b(?!`)','`\\1` AS `\\1`');
+											SET	@k	=	REGEXP_replace(CONCAT('\\1', r5(@k,p2) ,','),'(?i)null','""');
+
+											SET	@p1 =	REGEXP_REPLACE(@p0,'(?ims)^(\\s*SELECT\\s+)',@k) ;
+
+											SET @p1_body = REGEXP_REPLACE(@p1_body,'f`kfield`',@`kfield`);
+
+								ELSE SET @p1 = @p0 ;
+							END CASE;
+
+
+					IF @p1 IS NULL|| @p1 ='SELECT' THEN SET @p1 =NULL; END IF; -- SELECT @p1_body ,CAST(CONCAT_WS(',',p2,'"p1":"`p1`"')AS CHAR) ;
+					SET @p1_body = r5(@p1_body,CONCAT_WS(',',p2,p2)); -- SELECT CAST(@p1_body AS CHAR);
+					IF @p1_body REGEXP '(?ims)^\\s*\\-\\- +\\-\\-' THEN BEGIN 
+							DECLARE `op` BLOB DEFAULT NULL ;DECLARE i INT(10) DEFAULT 0;DECLARE `mr` BLOB DEFAULT '(?is)^(.+?(?=(?:,[\\n\\r]+\\-\\-\\s+\\-)|$))([,\\-\\r\\n ]*)';
+
+							
+									SET @p1_body1 = REGEXP_replace(REGEXP_substr(@p1_body,'(?ism)^.+(?=^\\s*set)'),'"`p1`"',@p1),
+											@p1_body2 = REGEXP_substr(@p1_body,'(?is)(?<=[\\n\\r])\\s*set\\K.*?(?=[\\n\\r]+\\s*where|$)'),
+											@p1_body3 = REGEXP_substr(@p1_body,'(?isXx)(?<=[\\n\\r])where.*?$');
+									p2l:LOOP
+
+										SET `op` = REGEXP_REPLACE(REGEXP_substr(@p1_body2,`mr`),`mr`,'\\1');
+
+										IF `op` ='' THEN LEAVE p2l;END IF;
+										SET 	@p1_body2		=  REGEXP_REPLACE(@p1_body2,`mr`,'');
+										SET @`op` = CAST(CONCAT_WS('\n',@p1_body1,'SET',`op`,@p1_body3)AS CHAR);
+-- SELECT @`op`,REGEXP_replace(REGEXP_replace(@`op`,r('u2s'),'select \\2\nfrom \\1'),r('u2s2'),',');-- 
+
+											EXECUTE immediate  @`op`;SET @i= @i+ROW_COUNT();
+									END LOOP;
+							END;
+						ELSE 
+
+							SET @p1_body =  IF(IFNULL(@p1,'') ='', @p1_body, REGEXP_replace(@p1_body,'`p1`',@p1));
+							IF CAST(@p1_body AS CHAR) IS NULL THEN SET @p1_body = CONVERT(@p1_body USING gbk);END IF;
+-- SELECT '2',@i,CAST(@p1_body AS CHAR),@p1 ,CAST(REGEXP_replace(REGEXP_replace(@p1_body,r('u2s'),'select \\2\nfrom \\1'),r('u2s2'),',') AS CHAR)AS `SQL`;-- LEAVE p2;
+
+
+						EXECUTE immediate @p1_body;
+						SET @i =  @i + ROW_COUNT();
+					 END IF;
+				END LOOP;
+
+EXECUTE immediate CONCAT("SELECT  ",@i,IF(IFNULL(json_query(`p2`,'$.p2'),'') = 'p2',
+' AS ROW_COUNT',
+' AS dblob')
+);
+				LEAVE p2;
+		END;
+
+	END CASE;
+	
+-- SELECT j0(`p`,'p2'),p2, j0(`p2`,'funcid');leave p2;
+	IF CAST(@p1_body AS CHAR) IS NULL THEN SET @p1_body = CONVERT(@p1_body USING gbk);END IF;
+-- SELECT CAST(@p1_body AS CHAR),@p1 ,CAST(REGEXP_replace(REGEXP_replace(@p1_body,r('u2s'),'select \\2\nfrom \\1'),r('u2s2'),',') AS CHAR)AS `SQL`;LEAVE p2;-- 
+
+	EXECUTE immediate @p1_body;
+
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `p2_copy`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `p2_copy`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `p2_copy`(IN `p` LONGblob)
+    MODIFIES SQL DATA
+p2:BEGIN
+	#Routine body goes here...
+
+	DECLARE `p2` BLOB DEFAULT j0(`p`,'p2'); DECLARE `funcid` VARCHAR(60) DEFAULT j0(`p2`,'funcid');DECLARE `b` MEDIUMBLOB DEFAULT NULL;
+	DECLARE `k` VARCHAR(200) DEFAULT j0(p2,'k');
+  DECLARE CONTINUE HANDLER FOR  SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22' , SQLSTATE	'HY000',SQLSTATE	'22007'
+	BEGIN GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;SET  @`sqlstate` = JSON_OBJECT('sqlstate',@`sqlstate`,'errno',@errno,'text',@text);
+				SET @`errsql` = @p1_body,@funcid =  NULL;
+				SET @funcid = CONCAT_WS(' ','Error: ',(SELECT CONCAT_WS(', ',CONCAT_ws('',a.note,a.`SUBJECT`),CONCAT_WS('',UPPER(SUBSTR(a.`name`,1,1)),LOWER(substr(a.`name`,2))),a.id) FROM mysq1_schema.qs2 AS a WHERE a.`name` = `funcid`)
+									, ' p2' ),
+				@pp = QUOTE(`p`);
+				CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp,'SQL',@`errsql`,'err',@`sqlstate`,'l',1));END;
+	/*
+START TRANSACTION;
+SET @funcid = CONCAT_WS(' ',(SELECT CONCAT_WS(', ',CONCAT_ws('',a.note,a.`SUBJECT`),CONCAT_WS('',UPPER(SUBSTR(a.`name`,1,1)),LOWER(substr(a.`name`,2))),a.id) FROM mysq1_schema.qs2 AS a WHERE a.`name` = `funcid`)
+							, ' p2' ),
+		@pp = QUOTE(`p`);
+
+INSERT INTO plogs (Function_Name,parameter) VALUES (@funcid,@pp);
+COMMIT;
+*/
+
+/*校验*/
+
+	IF IFNULL(`p2`,'')= '' OR IFNULL(`funcid`,'') = '' THEN SIGNAL SQLSTATE 'HY000' SET MESSAGE_TEXT = 'no p2 or funcid is null';LEAVE p2;	ELSE SET @sql_body = NULL;END IF;
+
+	SET `b` = r9(`funcid`), @P0	=	j0(p,"p1"),@p1_body = COLUMN_get(b,'sql'AS CHAR),@sql_body = NULL;
+
+
+	CASE 	WHEN @p1_body REGEXP '(?im)^\\s*+delete' THEN	SET @p1_body = r5(@p1_body,p);
+		ELSE
+-- 处理参数
+			IF k REGEXP '\\w+' THEN BEGIN DECLARE `r` VARCHAR(200) DEFAULT 
+				CONCAT('(?is)("\\d+":\\{"',replace(k,',','":"(?:\\\\.|[^"])*"\\K((?:,"(?:\\\\.|[^"])*":"(?:\\\\.|[^"])*")+?)(?=,"'),')');
+				SET @k := REGEXP_substr(@P0,`R`),
+						@k := REGEXP_REPLACE(@k,r('`kv-v`'),'\\1\\2:""'),
+						@k = CONCAT('\\1',@k),
+						r = CONCAT('(?is)("\\d+":\\{"',replace(k,',','":"(?:\\\\.|[^"])*"(?=,"'),')')/**/ ;
+				SET	@P0 = REGEXP_replace(@P0,r,@k), @k = NULL;
+			END; END IF;
+-- 处理p1;
+			SET @P0	:=	CONCAT_WS(' ',"SELECT",REGEXP_replace(REGEXP_replace(@P0,r('`kvP`'),'\\1\\3\\4\\6'),'(?<=")\\}(?=")','UNION ALL \nSELECT ')),
+					@P0	:=	CONCAT_WS('',REGEXP_replace(REGEXP_SUBSTR(@P0,r('`aline`')) ,r('`kv`'),'\\4 AS \\2 ') -- head
+														,REGEXP_replace(REGEXP_replace(@P0,r('`aline`'),''),r('`kv-k`'),'\\1') -- other
+													),
+					@P0 = REGEXP_replace(REGEXP_REPLACE(@P0,'\\}+$',''),'(?im)(?<=^|,)""(?=(?:\\s+AS\\s+[^\\n\\r]*?)?(?:,|$))','NULL');
+
+
+			BEGIN DECLARE `pl` VARCHAR(200) DEFAULT COLUMN_list(b);DECLARE `oPs`  VARCHAR(60) DEFAULT NULL;
+
+					SET @i = 0;
+
+					p20:LOOP 
+
+							SET `oPs` = REPLACE(REGEXP_SUBSTR(`pl`, '^`[^`]+`'),'`',''),@s = NULL;
+						IF IFNULL(`oPs`,'') ='' THEN LEAVE p20;ELSE SET `pl` = REGEXP_replace(`pl`, '^`[^`]+`,?','');END IF;
+
+							SET	@p1_body = COLUMN_get(b,`oPs`AS CHAR);
+							IF IFNULL(@p1_body,'') ='' THEN   ITERATE  p20;END IF;
+
+							CASE	WHEN @p1_body REGEXP '(?is)^\\s*select(.*?)from(.*?)(?=where\\s+|$)' AND `funcid` REGEXP '(?i)UPDAT' THEN
+											SET @p1_body = REGEXP_replace(@p1_body,'(?is)^\\s*SELECT(.*?)from(.*?)(?=where\\s+|$)','update \\2\nSET \\1');
+											SET	@p1_body = REGEXP_replace(@p1_body,'(?ims)^((?:`?\\w+`?\\.)?[\\w`]+)\\s*,\\s*?([\\n\\r]+^\\s*`?\\w)','\\1 = \\2');
+											SET @p1 := @p0;
+
+										WHEN @p1_body REGEXP '(?i)^\\s*insert'  THEN
+
+											SET @kfield  = REGEXP_REPLACE(REGEXP_substr(p,'(?s)(?<="p1":{"\\d":\\{)(?:"(?:\\\\.|[^"])*":"(?:\\\\.|[^"])*",?)*(?=\\})')
+																													,'(?s)"((?:\\\\.|[^"])*)":"(?:\\\\.|[^"])*"','\\1');
+
+											SET @k	=	REGEXP_replace(REGEXP_substr(@p1_body,'(?ims)^\\s*insert\\s+into\\s*\\w+\\(\\s*\\K.*?(?=,f`|\\))')
+																								,'(?<!`)(\\b\\w+)\\b(?!`)','`\\1` AS `\\1`');
+											SET	@k	=	REGEXP_replace(CONCAT('\\1', r5(@k,p2) ,','),'(?i)null','""');
+
+											SET	@p1 =	REGEXP_REPLACE(@p0,'(?ims)^(\\s*SELECT\\s+)',@k) ;
+
+											SET @p1_body = REGEXP_REPLACE(@p1_body,'f`kfield`',@`kfield`);
+
+								ELSE SET @p1 = @p0 ;
+							END CASE;
+
+
+					IF @p1 IS NULL|| @p1 ='SELECT' THEN SET @p1 =NULL; END IF; -- SELECT @p1_body ,CAST(CONCAT_WS(',',p2,'"p1":"`p1`"')AS CHAR) ;
+					SET @p1_body = r5(@p1_body,CONCAT_WS(',',p2,p2)); -- 
+					SELECT CAST(@p1_body AS CHAR);
+
+					
+					
+					IF @p1_body REGEXP '(?ims)^\\s*\\-\\- +\\-\\-' THEN BEGIN 
+					
+							DECLARE `op` BLOB DEFAULT NULL ;DECLARE i INT(10) DEFAULT 0;DECLARE `mr` BLOB DEFAULT '(?is)^(.+?(?=(?:,[\\n\\r]+\\-\\-\\s+\\-)|$))([,\\-\\r\\n ]*)';
+
+							
+									SET @p1_body1 = REGEXP_replace(REGEXP_substr(@p1_body,'(?ism)^.+(?=^\\s*set)'),'"`p1`"',@p1),
+											@p1_body2 = REGEXP_substr(@p1_body,'(?is)(?<=[\\n\\r])\\s*set\\K.*?(?=[\\n\\r]+\\s*where|$)'),
+											@p1_body3 = REGEXP_substr(@p1_body,'(?isXx)(?<=[\\n\\r])where.*?$');
+									p2l:LOOP
+
+										SET `op` = REGEXP_REPLACE(REGEXP_substr(@p1_body2,`mr`),`mr`,'\\1');
+
+										IF `op` ='' THEN LEAVE p2l;END IF;
+										SET 	@p1_body2		=  REGEXP_REPLACE(@p1_body2,`mr`,'');
+										SET @`op` = CAST(CONCAT_WS('\n',@p1_body1,'SET',`op`,@p1_body3)AS CHAR);
+										
+-- SELECT @`op`,REGEXP_replace(REGEXP_replace(@`op`,r('u2s'),'select \\2\nfrom \\1'),r('u2s2'),',');-- 
+
+											EXECUTE immediate  @`op`;SET @i= @i+ROW_COUNT();
+									END LOOP;
+							END;
+						ELSE 
+
+							SET @p1_body =  IF(IFNULL(@p1,'') ='', @p1_body, REGEXP_replace(@p1_body,'`p1`',@p1));
+							IF CAST(@p1_body AS CHAR) IS NULL THEN SET @p1_body = CONVERT(@p1_body USING gbk);END IF;
+-- 
+SELECT '2',@i,CAST(@p1_body AS CHAR),@p1 ,CAST(REGEXP_replace(REGEXP_replace(@p1_body,r('u2s'),'select \\2\nfrom \\1'),r('u2s2'),',') AS CHAR)AS `SQL`;-- LEAVE p2;
+
+
+						EXECUTE immediate @p1_body;
+						SET @i =  @i + ROW_COUNT();
+					 END IF;
+				END LOOP;
+
+EXECUTE immediate CONCAT("SELECT  ",@i,IF(IFNULL(json_query(`p2`,'$.p2'),'') = 'p2',
+' AS ROW_COUNT',
+' AS dblob')
+);
+				LEAVE p2;
+		END;
+
+	END CASE;
+	
+SELECT j0(`p`,'p2'),p2, j0(`p2`,'funcid');leave p2;
+	IF CAST(@p1_body AS CHAR) IS NULL THEN SET @p1_body = CONVERT(@p1_body USING gbk);END IF;
+-- SELECT CAST(@p1_body AS CHAR),@p1 ,CAST(REGEXP_replace(REGEXP_replace(@p1_body,r('u2s'),'select \\2\nfrom \\1'),r('u2s2'),',') AS CHAR)AS `SQL`;LEAVE p2;-- 
+
+	EXECUTE immediate @p1_body;
 
 END
 ;;
@@ -8128,8 +11996,7 @@ DROP PROCEDURE IF EXISTS `polling_mission`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `polling_mission`(in _expid varchar(60),in _id VARCHAR(60),in _pageNo VARCHAR(5))
 polling_mission: BEGIN
-	
-
+	#Routine body goes here...
 
 -- 用于背景表单(任务表单)
 -- 1、获取背景表单划线联次信息T数据
@@ -8138,10 +12005,9 @@ polling_mission: BEGIN
 -- 4、获取背景表单签章数据
 
 
-START TRANSACTION ;
 CALL Audit_1('polling_mission',CONCAT_WS(',',QUOTE(`_expid`),QUOTE(`_id`),QUOTE(`_pageNo`)),'ok');
-COMMIT;
-SELECT null;LEAVE polling_mission;
+/*
+*/
 
 	IF  _pageNo IS NULL THEN 	SET _pageNo =1;END IF;
 	IF _pageno =0 THEN SET _pageno =1;end IF;
@@ -8160,7 +12026,7 @@ SELECT null;LEAVE polling_mission;
 
 
 	
-
+-- 1 任务
 	SET @poll_mission_stat = CONCAT("SELECT 	a.missionId, a.billId,\n",
 					QUOTE(_pageno),"AS pageNo,a.is_line,a.line_x1,a.line_y1,a.line_x2,a.line_y2,a.line_color,a.line_type,\n" ,
 					Temp_Func("a.t??",1,8,NULL),",b.standard_jsp,b.max_page,\n",
@@ -8172,7 +12038,7 @@ SELECT null;LEAVE polling_mission;
 		EXECUTE stmt_poll;
 
 
-
+-- 2 a
 		SET @poll_mission_stat = CONCAT("SELECT ",QUOTE(_id)," AS missionId ,", Temp_Func("a??",1,100,NULL),"\n", 
 													"FROM acc_1 AS a \n",
 													"where a.expid=",QUOTE(_expid)," AND a.missionid =",QUOTE(_id));
@@ -8181,15 +12047,15 @@ SELECT null;LEAVE polling_mission;
 		EXECUTE stmt_poll;
 
 
-
-		SET @poll_mission_stat = CONCAT("SELECT a.ROWid,",QUOTE(_id)," AS missionId ,", Temp_Func("b??",1,50,NULL),"\n", 
+-- 3 b
+		SET @poll_mission_stat = CONCAT("SELECT a.rowNo,",QUOTE(_id)," AS missionId ,", Temp_Func("b??",1,50,NULL),"\n", 
 													"FROM ",expid2b(_expid)," AS a \n",
 													"where a.expid=",QUOTE(_expid)," AND a.missionid =",QUOTE(_id));
 
 		PREPARE stmt_poll FROM @poll_mission_stat;
 		EXECUTE stmt_poll;
 		
-
+-- 4 印章
 		SET @poll_mission_stat = CONCAT(" SELECT ",QUOTE(_id)," AS missionId, a.seal_Id, b.x, b.y, c.roleID, c.seal_name,c.seal_content,c.seal_shape,\n",
 										"c.seal_w AS w,c.seal_h AS h,c.seal_color,c.seal_font,\n",
 										"c.seal_content_arc,c.seal_content_arc_font,\n",
@@ -8203,10 +12069,186 @@ SELECT null;LEAVE polling_mission;
 
 		DEALLOCATE PREPARE stmt_poll;
 
+-- 测试
+
+-- 
+
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `prisma 2 grahpql`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `prisma 2 grahpql`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `prisma 2 grahpql`(`env` longblob) RETURNS longblob
+    DETERMINISTIC
+BEGIN
 
 
+SET @env_prisma2grahpql := JSON_MERGE(@ENV_prisma2grahpql := JSON_OBJECT(
+"是否删除文件",0
+,"是否写文件",1
+,"root",@root_prisma2grahpql:= 'D:/Program Files (x86)/Qianxue/QxServer7.0/qn/node/q'
+,'cd',CONCAT_WS(' ','cd /d',JSON_QUOTE(@root_prisma2grahpql))
+,'schemaPrismaPath',CONCAT_WS('/',@root_prisma2grahpql,'prisma/schema.prisma')
+),JSON_OBJECT(
+"mkdir", CONCAT('mkdir -p ',js('env') ,'/migrations/0_init'),
+"schemaPrisma",s(js('env.schemaPrismaPath'),'path'),
+CAST("删除" AS CHAR),CONCAT_WS(' ','DEL ',JSON_QUOTE(js('env.schemaPrismaPath')))
+));
+
+RETURN(
+SELECT 
+
+CAST(@env_prisma2grahpql := env AS CHAR) env
+
+FROM(
+SELECT 
+@file_prisma2grahpql :=js('env.schemaPrisma') file,
+
+@Type_prisma2grahpql := _f(@file_prisma2grahpql,JSON_ARRAY(
+o('model\\s+(post)\\s+(?&r2) es6')
+
+ ,'^\\s*model','type'
+ ,'(?m)^\\s*$\\s',''
+ ,o('(?m)((?&fields))\\s+((?&k0)(?&r3)?).*?$ es6'),'\\1:\\2'
+ ,'(?m)^\\s+\\@{2}.+?$',''
+
+)) Type 
+
+,@NEW_prisma2grahpql := _f(@Type_prisma2grahpql,JSON_ARRAY(
+@r_prisma2grahpql:=O('(?m)^\\w+(\\s+)(post\\s*(?&r2))$ es6')
+,@r_prisma2grahpql,'input\\1New\\2'
+,'(?m).ID!',''
+)) NEW
+
+,@Update_prisma2grahpql := _f(@Type_prisma2grahpql,JSON_ARRAY(
+@r_prisma2grahpql:=O('(?m)^\\w+(\\s+)(post\\s*(?&r2))$ es6')
+,@r_prisma2grahpql,'input\\1Update\\2'
+,'(?m).ID!',''
+)) `Update`
+
+,@Query_prisma2grahpql := _f(@Type_prisma2grahpql,JSON_ARRAY(
+O('(?m)^\\w+(\\s+)(post)\\s*(?&r2)$ es6')
+,'^type\\s+\\K(\\w+)([\\s*\\{]+[\\n\\r]+(?m)^(\\s+))([^\\s:]+:(\\s*))(\\S+)(?s).+?(?=[\\n\\r]?\\}(?-m)$)'
+,'Mutation\\2\\1s:\\5[\\1!]!\n\\3\\1(\\4\\6):\\5\\1'
+-- ,'(?m).ID!',''
+)) `Query`
+,@Mutation_prisma2grahpql := _f(@Type_prisma2grahpql,JSON_ARRAY(
+O('(?m)^\\w+\\s+(post)\\s*(?&r2)$ es6')
+, '^type\\s+\\K(\\w+)([\\s*\\{]+[\\n\\r]+(?m)^(\\s+))([^\\s:]+:(\\s*))(\\S+)(?s).+?(?=[\\n\\r]?\\}(?-m)$)'
+,CONCAT('Mutation\\2'
+,'\\5create\\1(input:\\5New\\1!):\\5\\1!'
+,'\n\\3update\\1(input:\\5update\\1!):\\5\\1'
+,'\n\\3update\\1(input:\\5update\\1!):\\5\\1'
+)
+)) `Mutation`
+
+,@Subscription_prisma2grahpql := _f(@Type_prisma2grahpql,JSON_ARRAY(
+O('(?m)^\\w+\\s+(post)\\s*(?&r2)$ es6')
+, '^type\\s+\\K(\\w+)([\\s*\\{]+[\\n\\r]+(?m)^(\\s+))([^\\s:]+:(\\s*))(\\S+)(?s).+?(?=[\\n\\r]?\\}(?-m)$)'
+,CONCAT('Subscription\\2'
+,'\\5post:\\5\\1'
+)
+)) `Subscription`
+,@file_prisma2grahpql := CONCAT_WS('\n\n',@NEW_prisma2grahpql,@NEW_prisma2grahpql,@Update_prisma2grahpql,@Query_prisma2grahpql,@Mutation_prisma2grahpql,@Subscription_prisma2grahpql)
+,JSON_MERGE_patch(@env_prisma2grahpql
+,JSON_OBJECT('schemagraphqlpath',CONCAT_WS('/',js('env.root'),'apps/q/src/posts/schema.graphql'))
+,JSON_OBJECT('schemagraphql',@file_prisma2grahpql)
+) env
+) as a
 
 
+);
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `prisma2grahpql`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `prisma2grahpql`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `prisma2grahpql`(`env` longblob) RETURNS longblob
+    DETERMINISTIC
+BEGIN
+
+
+SET @env_prisma2grahpql := JSON_MERGE(@ENV_prisma2grahpql := JSON_OBJECT(
+"是否删除文件",0
+,"是否写文件",1
+,"root",@root_prisma2grahpql:= 'D:/Program Files (x86)/Qianxue/QxServer7.0/qn/node/q'
+,'cd',CONCAT_WS(' ','cd /d',JSON_QUOTE(@root_prisma2grahpql))
+,'schemaPrismaPath',CONCAT_WS('/',@root_prisma2grahpql,'prisma/schema.prisma')
+),JSON_OBJECT(
+"mkdir", CONCAT('mkdir -p ',js('env') ,'/migrations/0_init'),
+"schemaPrisma",s(js('env.schemaPrismaPath'),'path'),
+CAST("删除" AS CHAR),CONCAT_WS(' ','DEL ',JSON_QUOTE(js('env.schemaPrismaPath')))
+));
+
+RETURN (
+SELECT 
+
+@env_prisma2grahpql := env env
+
+FROM(
+SELECT 
+@file_prisma2grahpql :=js('env.schemaPrisma') file,
+
+@Type_prisma2grahpql := _f(@file_prisma2grahpql,JSON_ARRAY(
+o('model\\s+(post)\\s+(?&r2) es6')
+
+ ,'^\\s*model','type'
+ ,'(?m)^\\s*$\\s',''
+ ,o('(?m)((?&fields))\\s+((?&k0)(?&r3)?).*?$ es6'),'\\1:\\2'
+ ,'(?m)^\\s+\\@{2}.+?$',''
+
+)) Type 
+
+,@NEW_prisma2grahpql := _f(@Type_prisma2grahpql,JSON_ARRAY(
+@r_prisma2grahpql:=O('(?m)^\\w+(\\s+)(post\\s*(?&r2))$ es6')
+,@r_prisma2grahpql,'input\\1New\\2'
+,'(?m).ID!',''
+)) NEW
+
+,@Update_prisma2grahpql := _f(@Type_prisma2grahpql,JSON_ARRAY(
+@r_prisma2grahpql:=O('(?m)^\\w+(\\s+)(post\\s*(?&r2))$ es6')
+,@r_prisma2grahpql,'input\\1Update\\2'
+,'(?m).ID!',''
+)) `Update`
+
+,@Query_prisma2grahpql := _f(@Type_prisma2grahpql,JSON_ARRAY(
+O('(?m)^\\w+(\\s+)(post)\\s*(?&r2)$ es6')
+,'^type\\s+\\K(\\w+)([\\s*\\{]+[\\n\\r]+(?m)^(\\s+))([^\\s:]+:(\\s*))(\\S+)(?s).+?(?=[\\n\\r]?\\}(?-m)$)'
+,'Mutation\\2\\1s:\\5[\\1!]!\n\\3\\1(\\4\\6):\\5\\1'
+-- ,'(?m).ID!',''
+)) `Query`
+,@Mutation_prisma2grahpql := _f(@Type_prisma2grahpql,JSON_ARRAY(
+O('(?m)^\\w+\\s+(post)\\s*(?&r2)$ es6')
+, '^type\\s+\\K(\\w+)([\\s*\\{]+[\\n\\r]+(?m)^(\\s+))([^\\s:]+:(\\s*))(\\S+)(?s).+?(?=[\\n\\r]?\\}(?-m)$)'
+,CONCAT('Mutation\\2'
+,'\\5create\\1(input:\\5New\\1!):\\5\\1!'
+,'\n\\3update\\1(input:\\5update\\1!):\\5\\1'
+,'\n\\3update\\1(input:\\5update\\1!):\\5\\1'
+)
+)) `Mutation`
+
+,@Subscription_prisma2grahpql := _f(@Type_prisma2grahpql,JSON_ARRAY(
+O('(?m)^\\w+\\s+(post)\\s*(?&r2)$ es6')
+, '^type\\s+\\K(\\w+)([\\s*\\{]+[\\n\\r]+(?m)^(\\s+))([^\\s:]+:(\\s*))(\\S+)(?s).+?(?=[\\n\\r]?\\}(?-m)$)'
+,CONCAT('Subscription\\2'
+,'\\5post:\\5\\1'
+)
+)) `Subscription`
+,@file_prisma2grahpql := CONCAT_WS('\n\n',@NEW_prisma2grahpql,@NEW_prisma2grahpql,@Update_prisma2grahpql,@Query_prisma2grahpql,@Mutation_prisma2grahpql,@Subscription_prisma2grahpql)
+,JSON_MERGE_patch(@env_prisma2grahpql
+,JSON_OBJECT('schemagraphqlpath',CONCAT_WS('/',js('env.root'),'apps/q/src/posts/schema.graphql'))
+,JSON_OBJECT('schemagraphql',@file_prisma2grahpql)
+) env
+) as a
+ );
 END
 ;;
 DELIMITER ;
@@ -8427,110 +12469,92 @@ END
 DELIMITER ;
 
 -- ----------------------------
---  Procedure definition for `psj`
--- ----------------------------
-DROP PROCEDURE IF EXISTS `psj`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `psj`(IN `db` LONGBLOB)
-psj:BEGIN
-	
-	DECLARE `0` VARCHAR(1000) DEFAULT NULL;	DECLARE `1` LONGBLOB DEFAULT NULL;DECLARE `2` BLOB DEFAULT NULL;
-
-  SET @stmt_json = NULL,
-	 		`0` = j(db,'0'),
-			`2` = j(db,'2'),
-			`db` = j(db,'1');
-
-	SET @stmt_json = CONCAT_WS('\t',j(`0`,"func"),j(`0`,"TABLE"));
-
-	CASE 
-			WHEN @stmt_json REGEXP '(update|INSERT)\\s+[\\S]+' THEN
-					SET  `1` = REG2('`fields2`'),
-							`db` =  CONCAT('SET ',c(filter1(`1`,db))),
-							@stmt_json = CONCAT_WS('\n',@stmt_json,`db`) ;
-
-			WHEN @stmt_json REGEXP '(select|delete)\\s+[\\S]+' THEN
-					SET	`1` = REG2('`fields1`'),
-							`db` = CONCAT('c(CONCAT("{",',filter1(`1`,`db`),',"}")) AS db'),
-
-
-							`1` = REG2('`where`'),
-
-							@stmt_json = CONCAT_WS('\n',j(`0`,"func"),`db`
-									,CONCAT('from ',j(`0`,"table"))
-									,REGEXP_replace(filter1(`1`,`0`),'^and','where'));
-
-
-		ELSE	SET @stmt_json = "something is wrang...";
-				
-	END CASE;
-	
-  
-
-
-	PREPARE stmt_json FROM @stmt_json;
-	EXECUTE stmt_json ;
-
-END
-;;
-DELIMITER ;
-
--- ----------------------------
 --  Procedure definition for `p_copy`
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `p_copy`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `p_copy`(IN `p` MEDIUMBLOB)
 p:BEGIN
-	DECLARE `p2` BLOB DEFAULT json_extract(`p`,'$.p2'); DECLARE `funcid` VARCHAR(60) DEFAULT j(`p2`,'funcId');DECLARE `b` BLOB DEFAULT NULL;
+	DECLARE `p2` BLOB DEFAULT JSON_EXTRACT(p,'$**.p2'); DECLARE `funcid` VARCHAR(60) DEFAULT j0(`p2`,'funcid');DECLARE `b` BLOB DEFAULT NULL;
+	DECLARE `p1` BLOB DEFAULT NULL;
+	DECLARE `ISp2` VARCHAR(1) DEFAULT 0;
 
-  DECLARE CONTINUE HANDLER FOR  SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22' , SQLSTATE	'HY000'
-	bl:BEGIN GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;SET  @`sqlstate` = JSON_OBJECT('sqlstate',@`sqlstate`,'errno',@errno,'text',@text);
-				SET @`errsql` = @sql_body,@funcid =  NULL;
-				SET @funcid = CONCAT_WS(' ','Error: ',(SELECT CONCAT_WS(', ',a.note,CONCAT_WS('',UPPER(SUBSTR(a.`name`,1,1)),LOWER(substr(a.`name`,2))),a.id) FROM mysq1_schema.qs AS a WHERE a.`name` = `funcid`)
-									, ' p' ),
+  DECLARE CONTINUE HANDLER FOR  SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22' , SQLSTATE	'HY000'-- ,SQLSTATE	'22007'
+	bl:BEGIN 
+	GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;SET  @`sqlstate` = JSON_OBJECT('sqlstate',@`sqlstate`,'errno',@errno,'text',@text);
+				SET @`errsql` = @p1_body,@funcid =  NULL;
+				SET @funcid = CONCAT_WS(' ','Error: ',IF(isp2,
+				
+				(SELECT CONCAT_WS(', ',a.note,CONCAT_WS('',UPPER(SUBSTR(a.`name`,1,1)),LOWER(substr(a.`name`,2))),a.id) FROM mysq1_schema.qs AS a WHERE a.`name` = `funcid`)
+				,(SELECT CONCAT_WS(', ',CONCAT_ws('',a.note,a.`SUBJECT`),CONCAT_WS('',UPPER(SUBSTR(a.`name`,1,1)),LOWER(substr(a.`name`,2))),a.id) FROM mysq1_schema.qs2 AS a WHERE a.`name` = `funcid`))
+									,IF(isp2, ' p2' , ' p' )),
 				@pp = QUOTE(`p`);
-				CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp,'SQL',@`errsql`,'err',@`sqlstate`,'l',1));END;
+				CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp,'SQL',@`errsql`,'err',@`sqlstate`,'l',1));END;/**/
 
-/*
+SET isp2 = p2 REGEXP ':\\s*"p2"';
+IF IFNULL(`p2`,'')= '' or !json_valid(p2)  THEN CALL Error('p :no p2 or courseNo');	ELSE SET @p1_body = '';END IF;
+IF isp2 THEN CALL p2(p);LEAVE p; END IF;
+
+/*	
 START TRANSACTION;
 SET @funcid = CONCAT_WS(' ',(SELECT CONCAT_WS(', ',a.note,CONCAT_WS('',UPPER(SUBSTR(a.`name`,1,1)),LOWER(substr(a.`name`,2))),a.id) FROM mysq1_schema.qs AS a WHERE a.`name` = `funcid`)
 							, ' p' ),
 		@pp = QUOTE(`p`);
-CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp));COMMIT;	
-/**/
-	IF IFNULL(`p2`,'')= '' THEN CALL Error('p :no p2 or courseNo');	ELSE SET @p1_body = '';END IF;
-SELECT 'fds';leave p;
-	IF j(p2,'keyword') <> '' THEN 
+INSERT INTO plogs (Function_Name,parameter) VALUES (@funcid,@pp);
+COMMIT;
+*/
 
-		BEGIN 
-			DECLARE k TEXT DEFAULT j(p2,'keyword');DECLARE k1 TEXT DEFAULT NULL;
 
-			SET k1 :=  REGEXP_replace(k,r('hza'),'\\\\\\\\Q\\1\\\\\\\\\E'),
+
+	IF j0(p2,'keyword') <> '' THEN BEGIN 
+			DECLARE k TEXT DEFAULT j0(p2,'keyword');DECLARE k1 TEXT DEFAULT NULL;
+			SET k1 :=  REGEXP_replace(k,'(?:([^\\x4e00-\\x9fa5]+))','|\\\\\\\\Q\\1\\\\\\\\\E'),
+					k1 := REGEXP_replace(k1,'^\\s*\\|\\s*|\\s*\\|\\s*$',''),
 					p2 = REGEXP_replace(p2,'(?i)(?<="keyword":)("(?:\\\\.|[^"])+")',json_quote(k1));
-		END;
+
+	END;END IF;
+
+
+	IF (@p0 := json_keys(p)) REGEXP '"p1"' THEN  
+			SET @P0	=	json_query(p,'$.p1');
+
+	   	SET @P0	:=	CONCAT_WS(''	,'SELECT  "k1":',REGEXP_replace(REGEXP_replace(@P0
+																,CONCAT_WS('|',REGEXP_replace(r('`kvP`'),'\\Q.*?(?:[{]?)\\E',''),'(?:[{,])((?4))(?::\\{)')
+																,'\\1\\3\\4\\6\\7'),'(?<=")\\}(?=")','UNION ALL \nSELECT "k1":')),
+					@p0 := REGEXP_replace(@p0,'(?is)"(?=(?:"(?:\\\\.|[^"])+"|\d+):)','",'),
+					@P0	:=	CONCAT_WS('',REGEXP_replace(REGEXP_SUBSTR(@P0,r('`aline`')) ,r('`kv`'),'\\4 AS \\2 ') -- head
+															,REGEXP_replace(REGEXP_replace(@P0,r('`aline`'),''),r('`kv-k`'),'\\1') -- other
+												),
+					@P0 = REGEXP_replace(REGEXP_REPLACE(@P0,'\\}+$',''),'(?im)(?<=^|,)""(?=(?:\\s+AS\\s+[^\\n\\r]*?)?(?:,|$))','NULL')/**/ ;
+			SET `p` = JSON_COMPACT(json_set(`p`,'$.p1',@P0));
 	END IF;
 
+
+
+
+
 	IF p2 REGEXP '(?i)"bid":"(?:\\\\.|[^"])+"' THEN
-		SET `b` = r8(j(p2,"bid"));
+		SET `b` = r8(j0(p2,"bid"));
+
 
 		sc:BEGIN
 			DECLARE `pl` VARCHAR(200) DEFAULT REGEXP_replace(REGEXP_replace(COLUMN_list(b),'(?:^|,)`[^`]*(?<!\\d)`(?=,|$)',''),'^,|,$','');
 			DECLARE `oP`  VARCHAR(60) DEFAULT NULL; DECLARE `s` BLOB DEFAULT column_get(b,'s'AS CHAR);DECLARE parameter BLOB DEFAULT column_get(b,'parameter'AS CHAR);
 
 			IF IFNULL(parameter,'')<>'' AND IFNULL(s,'')<>'' THEN 
-					SET @s = s;
-					SET parameter = r5(parameter,p2);
+
+					SET @s = `s`;
+					SET parameter = r5(parameter,p);
 					EXECUTE immediate parameter;
-					SET s = @s;
+					SET `s` = @s;
 			END IF;
 
 			SET	@p1_body = COLUMN_get(`b`,'sql'AS CHAR);
 
-			IF IFNULL(@p1_body,'') <> '' THEN SET	@p1_body = r5(@p1_body,p2);ELSE LEAVE sc; END IF; 
+			IF IFNULL(@p1_body,'') <> '' THEN SET	@p1_body = r5(@p1_body,p);ELSE LEAVE sc; END IF; 
 
 			IF CAST(@p1_body AS CHAR) IS NULL THEN SET @p1_body = CONVERT(@p1_body USING gbk);END IF;
-
+-- SELECT @p1_body AS s,REGEXP_substr(@p1_body ,r('`Sart-End`')) AS core ;-- LEAVE p;
 			PREPARE scp_stmt from  @p1_body;COMMIT;EXECUTE scp_stmt ;		DEALLOCATE PREPARE scp_stmt ;
 
 			l1:LOOP
@@ -8544,32 +12568,38 @@ SELECT 'fds';leave p;
 
 				IF IFNULL(@p1_body,'') = '' THEN ITERATE l1; END IF;
 
-        IF s <>'' THEN 	SET @p1_body = REGEXP_replace(@p1_body,'(?i)(?<=FROM)\\s*(?:\\(\\s*)?`SQL`(?:\\s*\\))?\\s*(?=as\\s+[\\w]\\b)',CONCAT_WS('\n','\\1(','-- Start',REGEXP_replace(QUOTE(s),'^[\'"]|[\'"]$',''),'-- End',')'));				END IF;
+        IF `s` <>'' THEN 	SET @p1_body = REGEXP_replace(@p1_body,'(?i)(?<=FROM)\\s*(?:\\(\\s*)?`SQL`(?:\\s*\\))?\\s*(?=as\\s+[\\w]\\b)',CONCAT_WS('\n','\\1(','-- Start',REGEXP_replace(QUOTE(s),'^[\'"]|[\'"]$',''),'-- End',')'));				END IF;
 
-				SET @p1_body = CAST(r5(@p1_body,p2) AS CHAR);
+				SET @p1_body = CAST(r5(@p1_body,p) AS CHAR);
 
 				IF CAST(@p1_body AS CHAR) IS NULL THEN SET @p1_body = CONVERT(@p1_body USING gbk);END IF;
 
-
+-- SELECT @p1_body AS s,REGEXP_substr(@p1_body ,r('`Sart-End`')) AS core ; LEAVE p;	-- 
 
 		 	PREPARE scp_stmt from  @p1_body;COMMIT;EXECUTE scp_stmt ;		DEALLOCATE PREPARE scp_stmt ;COMMIT;
-
 			END LOOP;
-
 		END;
 		SET `b` = NULL ;
 	END IF;
 
-
-	SET `b` = r8(`funcid`);
+	SET `b` = r8(`funcid`); 
+SELECT  COLUMN_json(b);
 	SET @p1_body = COLUMN_get(`b`,'sql'AS CHAR);
+
+
+
+
 	IF @p1_body IS NULL THEN SET @p1_body  = CONVERT("No sql!" USING gbk);SIGNAL SQLSTATE 'HY000' SET MYSQL_ERRNO =12345 , MESSAGE_TEXT =  @p1_body ; END IF;
 		BEGIN DECLARE `plist` VARCHAR(200) DEFAULT REGEXP_replace(REGEXP_replace(COLUMN_list(b),'(?:^|,)`[^`]*(?<!\\d)`(?=,|$)',''),'^,|,$','');
 					DECLARE `oneP`  VARCHAR(60) DEFAULT NULL;DECLARE `s` BLOB DEFAULT column_get(b,'s'AS CHAR);DECLARE parameter BLOB DEFAULT column_get(b,'parameter'AS CHAR);
 
+
+
 			IF IFNULL(parameter,'')<>'' THEN 
 
-					SET @s = s,parameter = r5(parameter,p2);
+
+					SET @s = s,parameter = r5(parameter,p);
+
 
 					EXECUTE immediate parameter;
 
@@ -8578,10 +12608,188 @@ SELECT 'fds';leave p;
 					END IF;
 			END IF;
 
+      IF s <>'' THEN 	SET @p1_body = REGEXP_replace(@p1_body,'(?i)(?<=FROM)\\s*(?:\\(\\s*)?`SQL`(?:\\s*\\))?\\s*(?=as\\s+[\\w]+\\b)',CONCAT_WS('\n','\\1(','-- Start',REGEXP_replace(QUOTE(s),'^[\'"]|[\'"]$',''),'-- End',')'));				END IF;
+-- SELECT r5(@p1_body,p),CONVERT(r5(@p1_body,p) USING utf8 ) ,CAST(r5(@p1_body,p) AS CHAR );-- LEAVE p;
+			SET @p1_body = CAST(r5(@p1_body,p)AS CHAR);
+
+
+			IF j0(p2,'limit') <> '' THEN SET @p1_body  = REGEXP_REPLACE(@p1_body,'(?i)"\\s*(\\d+\\s*,\\s*\\d+)"','limit \\1');END IF;
+
+			l:LOOP
+
+				SET `oneP` = REPLACE(REGEXP_SUBSTR(`plist`, '^`[^`]+`'),'`',''),@s = NULL;
+				IF IFNULL(`oneP`,'') = ''  THEN  LEAVE l; ELSE SET `plist` = REGEXP_replace(`plist`, '^`[^`]+`,?','');END IF;
+
+				SET @s := CONCAT_WS('',CONCAT("@",`oneP`," := ")
+										,CONCAT_WS('',"CONCAT_WS('','",REGEXP_replace(COLUMN_get(b,`oneP` AS CHAR),'(`.*?`)',"',CONVERT(@\\1USING gbk),'"),"'")
+										,CONCAT(")AS ",`oneP`)),
+						@p1_body := CONCAT_WS('\n',REGEXP_replace(@p1_body,CONCAT('(?im)^(?<![\\.\\w@]|(?:\\-{2}\\s))[\\s,]*\\K',`oneP`,'\\b'),CONCAT(@s,'\\1')));
+
+			END LOOP;
+			SET 	@p1_body = REGEXP_replace(@p1_body , '(?i)as\\s+[^\\s,)]+(?=\\s+as)','');
+
+		END ;
+/*最后处理*/
+		CASE
+			WHEN CAST(@p1_body AS CHAR) REGEXP  CONCAT_WS('','\\b',funcid,'2JSON\\b(?=\\s*from\\()') THEN
+			SET @p1_body= CONCAT_WS('\n'
+									,CONCAT('select json_object(',QUOTE(funcid),',json_arrayagg(JSON_EXTRACT(',CONCAT(funcid,'2JSON'),',"$"))) as dblob\nfrom(')
+									,@p1_body
+									,') as 聚合');
+	
+			WHEN funcid  NOT REGEXP 'help|json$'  && REGEXP_substr(@p1_body,'(?is-m)^\\s*SELECT.+?(?m)^\\s*FROM') REGEXP '[\\w\\)]`?\\s+`?dblob`?\\b(?=\\s*)'  THEN
+			SET 	@p1_body =CONCAT_WS('\t','SELECT\tCAST(COLUMN_json(COLUMN_create(',QUOTE(IF(IFNULL(COLUMN_get(b,'dom'AS CHAR),'')='','dblob',COLUMN_get(b,'dom'AS CHAR)))
+,CONCAT_WS('',',a.dblob))AS CHAR)AS dblob\tFROM(\n',@p1_body,'\n)AS A '));
+
+			IF CAST(@p1_body AS CHAR) IS NULL THEN SET @p1_body = CONVERT(@p1_body USING gbk);END IF;
+			ELSE SET @p1_body= @p1_body;
+		END CASE ;
+		
+-- 
+SELECT cast(p AS CHAR),@p1_body AS s,REGEXP_substr(@p1_body ,r('`Sart-End`')) AS core,'3' ;-- LEAVE p;
+
+	PREPARE p_stmt from  @p1_body;COMMIT;EXECUTE p_stmt ;		DEALLOCATE PREPARE p_stmt ;-- 
+
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `p_copy1`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `p_copy1`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `p_copy1`(IN `p` MEDIUMBLOB)
+p:BEGIN
+	DECLARE `p2` BLOB DEFAULT json_extract(p,'$**.p2'); DECLARE `funcid` VARCHAR(60) DEFAULT j(`p2`,'funcid');DECLARE `b` BLOB DEFAULT NULL;
+	DECLARE `p1` BLOB DEFAULT NULL;
+
+  DECLARE CONTINUE HANDLER FOR  SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22' , SQLSTATE	'HY000'-- ,SQLSTATE	'22007'
+	bl:BEGIN GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;SET  @`sqlstate` = JSON_OBJECT('sqlstate',@`sqlstate`,'errno',@errno,'text',@text);
+				SET @`errsql` = @p1_body,@funcid =  NULL;
+				SET @funcid = CONCAT_WS(' ','Error: ',(SELECT CONCAT_WS(', ',a.note,CONCAT_WS('',UPPER(SUBSTR(a.`name`,1,1)),LOWER(substr(a.`name`,2))),a.id) FROM mysq1_schema.qs AS a WHERE a.`name` = `funcid`)
+									, ' p' ),
+				@pp = QUOTE(`p`);
+				CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp,'SQL',@`errsql`,'err',@`sqlstate`,'l',1));END;/**/
+
+/*	
+START TRANSACTION;
+SET @funcid = CONCAT_WS(' ',(SELECT CONCAT_WS(', ',a.note,CONCAT_WS('',UPPER(SUBSTR(a.`name`,1,1)),LOWER(substr(a.`name`,2))),a.id) FROM mysq1_schema.qs AS a WHERE a.`name` = `funcid`)
+							, ' p' ),
+		@pp = QUOTE(`p`);
+INSERT INTO plogs (Function_Name,parameter) VALUES (@funcid,@pp);
+ -- CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp AS CHAR));
+COMMIT;
+*/
+
+
+	IF IFNULL(`p2`,'')= '' or !json_valid(p2)  THEN CALL Error('p :no p2 or courseNo');	ELSE SET @p1_body = '';END IF;
+
+	IF j(p2,'keyword') <> '' THEN BEGIN 
+			DECLARE k TEXT DEFAULT j(p2,'keyword');DECLARE k1 TEXT DEFAULT NULL;
+			SET k1 :=  REGEXP_replace(k,'(?:([^\\x4e00-\\x9fa5]+))','|\\\\\\\\Q\\1\\\\\\\\\E'),
+					k1 := REGEXP_replace(k1,'^\\s*\\|\\s*|\\s*\\|\\s*$',''),
+					p2 = REGEXP_replace(p2,'(?i)(?<="keyword":)("(?:\\\\.|[^"])+")',json_quote(k1));
+
+	END;END IF;
+
+
+	IF (@p0 := json_keys(p)) REGEXP '"p1"' THEN  
+			SET @P0	=	json_query(p,'$.p1');
+
+	   	SET @P0	:=	CONCAT_WS(''	,'SELECT  "k1":',REGEXP_replace(REGEXP_replace(@P0
+																,CONCAT_WS('|',REGEXP_replace(r('`kvP`'),'\\Q.*?(?:[{]?)\\E',''),'(?:[{,])((?4))(?::\\{)')
+																,'\\1\\3\\4\\6\\7'),'(?<=")\\}(?=")','UNION ALL \nSELECT "k1":')),
+					@p0 := REGEXP_replace(@p0,'(?is)"(?=(?:"(?:\\\\.|[^"])+"|\d+):)','",'),
+					@P0	:=	CONCAT_WS('',REGEXP_replace(REGEXP_SUBSTR(@P0,r('`aline`')) ,r('`kv`'),'\\4 AS \\2 ') -- head
+															,REGEXP_replace(REGEXP_replace(@P0,r('`aline`'),''),r('`kv-k`'),'\\1') -- other
+												),
+					@P0 = REGEXP_replace(REGEXP_REPLACE(@P0,'\\}+$',''),'(?im)(?<=^|,)""(?=(?:\\s+AS\\s+[^\\n\\r]*?)?(?:,|$))','NULL')/**/ ;
+			SET `p` = JSON_COMPACT(json_set(`p`,'$.p1',@P0));
+	END IF;
+
+
+
+
+
+	IF p2 REGEXP '(?i)"bid":"(?:\\\\.|[^"])+"' THEN
+		SET `b` = r8(j(p2,"bid"));
+
+
+		sc:BEGIN
+			DECLARE `pl` VARCHAR(200) DEFAULT REGEXP_replace(REGEXP_replace(COLUMN_list(b),'(?:^|,)`[^`]*(?<!\\d)`(?=,|$)',''),'^,|,$','');
+			DECLARE `oP`  VARCHAR(60) DEFAULT NULL; DECLARE `s` BLOB DEFAULT column_get(b,'s'AS CHAR);DECLARE parameter BLOB DEFAULT column_get(b,'parameter'AS CHAR);
+
+			IF IFNULL(parameter,'')<>'' AND IFNULL(s,'')<>'' THEN 
+
+					SET @s = `s`;
+					SET parameter = r5(parameter,p);
+					EXECUTE immediate parameter;
+					SET `s` = @s;
+			END IF;
+
+			SET	@p1_body = COLUMN_get(`b`,'sql'AS CHAR);
+
+			IF IFNULL(@p1_body,'') <> '' THEN SET	@p1_body = r5(@p1_body,p);ELSE LEAVE sc; END IF; 
+
+			IF CAST(@p1_body AS CHAR) IS NULL THEN SET @p1_body = CONVERT(@p1_body USING gbk);END IF;
+-- SELECT @p1_body AS s,REGEXP_substr(@p1_body ,r('`Sart-End`')) AS core ;-- LEAVE p;
+			PREPARE scp_stmt from  @p1_body;COMMIT;EXECUTE scp_stmt ;		DEALLOCATE PREPARE scp_stmt ;
+
+			l1:LOOP
+
+				SET `oP` = REPLACE(REGEXP_SUBSTR(`pl`, '^`[^`]+`'),'`',''),@s = NULL;
+
+				IF IFNULL(`oP`,'') = ''  THEN  LEAVE l1; ELSE SET `pl` = REGEXP_replace(`pl`, '^`[^`]+`,?','');END IF;
+
+				SET @p1_body := NULL,
+						@p1_body = COLUMN_get(b,op AS CHAR);
+
+				IF IFNULL(@p1_body,'') = '' THEN ITERATE l1; END IF;
+
+        IF `s` <>'' THEN 	SET @p1_body = REGEXP_replace(@p1_body,'(?i)(?<=FROM)\\s*(?:\\(\\s*)?`SQL`(?:\\s*\\))?\\s*(?=as\\s+[\\w]\\b)',CONCAT_WS('\n','\\1(','-- Start',REGEXP_replace(QUOTE(s),'^[\'"]|[\'"]$',''),'-- End',')'));				END IF;
+
+				SET @p1_body = CAST(r5(@p1_body,p) AS CHAR);
+
+				IF CAST(@p1_body AS CHAR) IS NULL THEN SET @p1_body = CONVERT(@p1_body USING gbk);END IF;
+
+-- SELECT @p1_body AS s,REGEXP_substr(@p1_body ,r('`Sart-End`')) AS core ; LEAVE p;	-- 
+
+		 	PREPARE scp_stmt from  @p1_body;COMMIT;EXECUTE scp_stmt ;		DEALLOCATE PREPARE scp_stmt ;COMMIT;
+			END LOOP;
+		END;
+		SET `b` = NULL ;
+	END IF;
+
+	SET `b` = r8(`funcid`);
+	SET @p1_body = COLUMN_get(`b`,'sql'AS CHAR);
+
+
+
+
+	IF @p1_body IS NULL THEN SET @p1_body  = CONVERT("No sql!" USING gbk);SIGNAL SQLSTATE 'HY000' SET MYSQL_ERRNO =12345 , MESSAGE_TEXT =  @p1_body ; END IF;
+		BEGIN DECLARE `plist` VARCHAR(200) DEFAULT REGEXP_replace(REGEXP_replace(COLUMN_list(b),'(?:^|,)`[^`]*(?<!\\d)`(?=,|$)',''),'^,|,$','');
+					DECLARE `oneP`  VARCHAR(60) DEFAULT NULL;DECLARE `s` BLOB DEFAULT column_get(b,'s'AS CHAR);DECLARE parameter BLOB DEFAULT column_get(b,'parameter'AS CHAR);
+
+
+
+			IF IFNULL(parameter,'')<>'' THEN 
+
+
+					SET @s = s,parameter = r5(parameter,p);
+
+
+					EXECUTE immediate parameter;
+
+					IF IFNULL(@s,'') <> ''THEN
+						SET s = @s;
+					END IF;
+			END IF;
 
       IF s <>'' THEN 	SET @p1_body = REGEXP_replace(@p1_body,'(?i)(?<=FROM)\\s*(?:\\(\\s*)?`SQL`(?:\\s*\\))?\\s*(?=as\\s+[\\w]+\\b)',CONCAT_WS('\n','\\1(','-- Start',REGEXP_replace(QUOTE(s),'^[\'"]|[\'"]$',''),'-- End',')'));				END IF;
+-- SELECT r5(@p1_body,p),CONVERT(r5(@p1_body,p) USING utf8 ) ,CAST(r5(@p1_body,p) AS CHAR );-- LEAVE p;
+			SET @p1_body = CAST(r5(@p1_body,p)AS CHAR);
 
-			SET @p1_body = CAST(r5(@p1_body,p2)AS CHAR);
 
 			IF j(p2,'limit') <> '' THEN SET @p1_body  = REGEXP_REPLACE(@p1_body,'(?i)"\\s*(\\d+\\s*,\\s*\\d+)"','limit \\1');END IF;
 
@@ -8600,14 +12808,28 @@ SELECT 'fds';leave p;
 
 		END ;
 
-	 	SET 	@p1_body =CONCAT_WS('\t','SELECT\tCAST(COLUMN_json(COLUMN_create(',QUOTE(IF(IFNULL(COLUMN_get(b,'dom'AS CHAR),'')='','dblob',COLUMN_get(b,'dom'AS CHAR)))
-,CONCAT_WS('',',a.dblob))AS CHAR)AS dblob\tFROM(\n',@p1_body,'\n)AS A '));			
 
-		IF CAST(@p1_body AS CHAR) IS NULL THEN SET @p1_body = CONVERT(@p1_body USING gbk);END IF;
+		CASE
+			WHEN CAST(@p1_body AS CHAR) REGEXP  CONCAT_WS('','\\b',funcid,'2JSON\\b(?=\\s*from\\()') THEN
+			SET @p1_body= CONCAT_WS('\n'
+									,CONCAT('select json_object(',QUOTE(funcid),',json_arrayagg(JSON_EXTRACT(',CONCAT(funcid,'2JSON'),',"$"))) as dblob\nfrom(')
+									,@p1_body
+									,') as 聚合');
+	
+			WHEN funcid  NOT REGEXP 'help|json$' THEN
+			SET 	@p1_body =CONCAT_WS('\t','SELECT\tCAST(COLUMN_json(COLUMN_create(',QUOTE(IF(IFNULL(COLUMN_get(b,'dom'AS CHAR),'')='','dblob',COLUMN_get(b,'dom'AS CHAR)))
+,CONCAT_WS('',',a.dblob))AS CHAR)AS dblob\tFROM(\n',@p1_body,'\n)AS A '));
+
+			IF CAST(@p1_body AS CHAR) IS NULL THEN SET @p1_body = CONVERT(@p1_body USING gbk);END IF;
+			ELSE SET @p1_body= @p1_body;
+		END CASE ;
 
 
-SELECT @p1_body AS s,REGEXP_substr(@p1_body ,r('`Sart-End`')) AS core,'ok' ;LEAVE p;
-	PREPARE p_stmt from  @p1_body;COMMIT;EXECUTE p_stmt ;		DEALLOCATE PREPARE p_stmt ;
+		
+-- 
+SELECT @p1_body AS s,REGEXP_substr(@p1_body ,r('`Sart-End`')) AS core,'3' ;-- LEAVE p;
+
+	PREPARE p_stmt from  @p1_body;COMMIT;EXECUTE p_stmt ;		DEALLOCATE PREPARE p_stmt ;-- 
 
 END
 ;;
@@ -8623,12 +12845,16 @@ CREATE DEFINER=`root`@`%` PROCEDURE `q`(in `p` longblob)
 label:BEGIN
 
 	DECLARE  old_type VARCHAR(10) DEFAULT 'kjpz';
-  DECLARE p2 VARCHAR(2000) DEFAULT j(p,'p2');
-	DECLARE type_ VARCHAR(20) DEFAULT j(p2,'type');
-	DECLARE page VARCHAR(20) DEFAULT j(p2,'page');
-	DECLARE keyword VARCHAR (200) DEFAULT j(p2,'keyword');
+  DECLARE p2 VARCHAR(2000) DEFAULT j0(p,'p2');
+	DECLARE type_ VARCHAR(20) DEFAULT j0(p2,'type');
+	DECLARE page VARCHAR(20) DEFAULT j0(p2,'page');
+	DECLARE keyword VARCHAR (200) DEFAULT j0(p2,'keyword');
 
-
+/*
+start TRANSACTION;
+SET @DBLOB = p;
+CALL Audit_2('q',quotej(p),@dblob );COMMIT;
+LEAVE bl;*/
 	set 				
 				
 				@qbkbody = NULL ,
@@ -8639,7 +12865,7 @@ label:BEGIN
 
 
   CASE    
-			WHEN IFNULL(j(p2,"funcid" ),'') = ''THEN SET `keyword` = j(p2,'keyword');
+			WHEN IFNULL(j0(p2,"funcid" ),'') = ''THEN SET `keyword` = j0(p2,'keyword');
 				BEGIN
 					set @allmis = '^原(始凭证)?[[:space:]|.|,|。|，]+|^^原(始凭证)?$|^y[[:space:]|.|,|。|，]*|^y$',
 							@qbkbody1= "
@@ -8702,7 +12928,7 @@ LEFT JOIN acc_standard_1 AS c1 ON c1.missionId = c.missionId",
 
 					SET @qbkbody3 = C(CONCAT(CONCAT_WS(" AND ",type_ ), @qbkbody3,"\nGROUP BY c.missionid",
 							"\nORDER BY c1.a2+0,c1.a3+0,c1.a4,c1.a5 +0 "
-				
+				-- 			,"\nLIMIT ",`page` ,',',IF(IFNULL(`num`,'')= '',10,`num`)
 				));
 
 
@@ -8710,18 +12936,21 @@ LEFT JOIN acc_standard_1 AS c1 ON c1.missionId = c.missionId",
 
 							@qbkbody = CONCAT_WS('','SELECT a.*,@allmis := CONCAT_WS(",",QUOTE(a.missionId),@allmis) AS missionids\nFROM(',
 														@qbkbody1,@qbkbody2,@qbkbody3,'\n) AS a' );
- 
+ /*
+SELECT  @qbkbody;
+LEAVE label;
+ */
 
 					PREPARE stmt from  @qbkbody ;
 					EXECUTE stmt ;
-				
+				-- CONCAT(a1.billname,' - ',c1.node_No,'.',c2.typesort,' - ',a.missionLabel
 					SET @qbkbody1 = NULL,
 							@qbkbody2 = NULL,
 							@qbkbody3 = 
 									CONCAT_WS('',	"\nSELECT a.missionid,a.missionid AS quoteid,'bd',
 		CAST('记账凭证' AS CHAR) AS title,\n",
 				"c(COLUMN_json(column_CREATE(a1.billId,a1.billname))) as dblob,\n",
-						 "\na.pageNo,",QUOTEj(j(p2,'courseNo'))," AS courseno 
+						 "\na.pageNo,",QUOTEj(j0(p2,'courseNo'))," AS courseno 
 FROM 
 exp_courses_node AS c1 
 INNER JOIN exp_courses_node_content AS c2 ON c2.contentNo = c1.contentNo
@@ -8731,12 +12960,12 @@ WHERE c1.contentNo IS NOT NULL AND c2.missionid IN(",@allmis,")
 ");
 
 					CASE old_type
-							WHEN 'kjpz' THEN  
+							WHEN 'kjpz' THEN  -- 凭证
 								label1:BEGIN
 
-										SET @qbkbody3 = CONCAT_WS('\n', 
-				
-															"SELECT a.missionid,a.quoteid,IF(a.type = 'bk','bd',a.type),\n(CAST(CONCAT('附',a.sort,': ', \nIF(a.type IN ('bb','bk'), b1.billname,a.title) \n) AS CHAR)) AS title,\n(@s := IF(IFNULL(b1.max_page,1)>1,r7(c(COLUMN_json(COLUMN_create('pageno',a.pageNo,'billid',b1.billId,'max_page',b1.max_page AS CHAR,'type','3')))),NULL)) AS tmp,\nc(COLUMN_json(column_CREATE(\n'title',a.title\n,'type',a.type\n,'pageNo',a.pageNo\n,'missionid', a.missionid\n,'quoteid',a.quoteid\n,'sort',a.sort\n,'billId',b1.billId\n,'billname',b1.billname\n,'max_page',IF(IFNULL(b1.max_page,1)>1,b1.max_page,NULL)\n,'select',IF(@s IS NULL ,NULL ,REGEXP_replace(COLUMN_get(b1.page,'value' AS CHAR),j(@s,'reg'),REPLACE(j(@s,'REPLACEm'),'selected','checked')))))) as dblob,\na.pageNo,NULL AS courseno\nFROM acc_mission_back_information AS a\nLEFT JOIN acc_mission AS e ON a.quoteid = e.missionId \nLEFT JOIN acc_mission_backbill_1 AS b ON a.missionid = b.referencedID AND a.quoteid = b.missionId \nLEFT JOIN `mysq1_schema`.bill_list AS b1 ON b.bill_id = b1.billid OR e.billId = b1.billId \nLEFT JOIN mysq1_schema.bill_type AS b2 ON b1.billType = b2.billType",
+										SET @qbkbody3 = CONCAT_WS('\n', -- @qbkbody3,"\n",
+				-- 											"\n\t\t\t UNION ALL \n",
+															"SELECT a.missionid,a.quoteid,IF(a.type = 'bk','bd',a.type),\n(CAST(CONCAT('附',a.sort,': ', \nIF(a.type IN ('bb','bk'), b1.billname,a.title) \n) AS CHAR)) AS title,\n(@s := IF(IFNULL(b1.max_page,1)>1,r7(c(COLUMN_json(COLUMN_create('pageno',a.pageNo,'billid',b1.billId,'max_page',b1.max_page AS CHAR,'type','3')))),NULL)) AS tmp,\nc(COLUMN_json(column_CREATE(\n'title',a.title\n,'type',a.type\n,'pageNo',a.pageNo\n,'missionid', a.missionid\n,'quoteid',a.quoteid\n,'sort',a.sort\n,'billId',b1.billId\n,'billname',b1.billname\n,'max_page',IF(IFNULL(b1.max_page,1)>1,b1.max_page,NULL)\n,'select',IF(@s IS NULL ,NULL ,REGEXP_replace(COLUMN_get(b1.page,'value' AS CHAR),j0(@s,'reg'),REPLACE(j0(@s,'REPLACEm'),'selected','checked')))))) as dblob,\na.pageNo,NULL AS courseno\nFROM acc_mission_back_information AS a\nLEFT JOIN acc_mission AS e ON a.quoteid = e.missionId \nLEFT JOIN acc_mission_backbill_1 AS b ON a.missionid = b.referencedID AND a.quoteid = b.missionId \nLEFT JOIN `mysq1_schema`.bill_list AS b1 ON b.bill_id = b1.billid OR e.billId = b1.billId \nLEFT JOIN mysq1_schema.bill_type AS b2 ON b1.billType = b2.billType",
 															CONCAT("WHERE a.missionid IN(",@allmis,")")
 													);
 								END label1;
@@ -8745,7 +12974,7 @@ WHERE c1.contentNo IS NOT NULL AND c2.missionid IN(",@allmis,")
 					END CASE ;
 			END;
 
-			WHEN IFNULL(j(p2,"funcid" ),'') = "insert" THEN
+			WHEN IFNULL(j0(p2,"funcid" ),'') = "insert" THEN
 
 				SET `p` := ju(`p`,"quoteId",CONCAT('bk-',REGEXP_replace(j2(`p`,"missionId"),'^("[\\w\\-]*?)(\\d{11})(")$','\\2'),CEIL(RAND()*10000))),
 						@qbkbody3 := r5(r4('insertbk1'),`p`);
@@ -8754,12 +12983,12 @@ WHERE c1.contentNo IS NOT NULL AND c2.missionid IN(",@allmis,")
 
 				SET @qbkbody3 := r5(r4('insertbk2'),`p`);
 
-			WHEN IFNULL(j(p2,"funcid" ),'') = "update" THEN 
+			WHEN IFNULL(j0(p2,"funcid" ),'') = "update" THEN 
 
-					IF IFNULL(j(p2,'missionid'),'')= '' OR IFNULL(j(p2,'quoteid'),'')= '' THEN CALL Error('2id is null');END IF;
+					IF IFNULL(j0(p2,'missionid'),'')= '' OR IFNULL(j0(p2,'quoteid'),'')= '' THEN CALL Error('2id is null');END IF;
 
 					SET @qbkbody3 = r5(R4('updatebk'),p);
-			WHEN IFNULL(j(p2,"funcid" ),'') = "delete" THEN 
+			WHEN IFNULL(j0(p2,"funcid" ),'') = "delete" THEN 
 
 					SET @qbkbody3 := "DELETE 
 a.*
@@ -8769,7 +12998,7 @@ WHERE
 a.missionid = `missionid` AND
 INSTR(`quoteid`,a.quoteid) > 0",
 							 @qbkbody3 = r5(@qbkbody3,p);
-
+-- SELECT c(@qbkbody3);LEAVE label;
 				PREPARE stmt from  @qbkbody3 ;	EXECUTE stmt ;
 
 					SET @qbkbody3 := "UPDATE (
@@ -8785,15 +13014,17 @@ SET
 b.sort = a.sort
 WHERE b.sort<>a.sort",
 						@qbkbody3 = r5(@qbkbody3,p);
-
+-- SELECT c(@qbkbody3);LEAVE label;
 
 		ELSE CALL Error("SOMETHING IS WORNG");
 	END CASE ;
 
 
 
-
-	
+-- 	SET @qbkbody3 = CONCAT_WS("\n","CREATE TABLE temp_query_mission_2 AS",@qbkbody3); 	
+	/*SELECT c(@qbkbody3) ;		
+	LEAVE label; 
+*/
 
 	PREPARE stmt from  @qbkbody3 ;
 	EXECUTE stmt ;
@@ -8812,7 +13043,7 @@ CREATE DEFINER=`root`@`%` FUNCTION `q`(`w` longtext) RETURNS longtext CHARSET ut
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...	
 
 	RETURN CONCAT("'",REPLACE(REPLACE(w,'\\','\\\\'),'\'','\\\''),"'");
 	
@@ -8821,29 +13052,21 @@ END
 DELIMITER ;
 
 -- ----------------------------
---  Procedure definition for `qbill`
+--  Procedure definition for `q0`
 -- ----------------------------
-DROP PROCEDURE IF EXISTS `qbill`;
+DROP FUNCTION IF EXISTS `q0`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `qbill`(IN `b` varchar(2000))
-qblabel:BEGIN
-	
+CREATE DEFINER=`root`@`localhost` FUNCTION `q0`(`k` tinytext) RETURNS tinytext CHARSET utf8mb3
+    DETERMINISTIC
+BEGIN
+	#Routine body goes here...
 
-
-
-	SET	@stmt_qb = CONCAT_WS(' AND ',CONCAT('a.billType = ', j3(b,"billType")),
-																	 CONCAT('CONCAT_WS(",",a.billname)',' like "%',j(b,"keyword"),'%"')),
-			@stmt_qb = CONCAT_WS('',"
-SELECT a.billId,a.billType,a.billname,a.jsp
-FROM mysq1_schema.bill_list AS a INNER JOIN mysq1_schema.bill_type AS b ON a.billType = b.billType
-WHERE\n",@stmt_qb) ;
-
-
-	PREPARE stmt_qb from  @stmt_qb;
-	EXECUTE stmt_qb ;
-
-DEALLOCATE PREPARE stmt_qb;
-
+	RETURN  
+	  CASE  
+				WHEN IFNULL(k,'') = '' THEN k
+				WHEN k  REGEXP '`[^`]+`' THEN k 
+			ELSE CONCAT('`',REGEXP_replace(k,'`',''),'`')
+		END;
 END
 ;;
 DELIMITER ;
@@ -8857,8 +13080,13 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `qd`(`w` longtext, `a` varchar(2000),
     NO SQL
     DETERMINISTIC
 BEGIN
-	
-	RETURN CASE 
+	#Routine body goes here...	
+/*  IF w IS NULL THEN RETURN NULL; END IF;
+
+	SET w = QUOTE(w);
+  SET	w = SUBSTR(w,2,CHAR_LENGTH(w)-2),
+			w = CONCAT('"',w,'"');
+*/	RETURN CASE 
 						WHEN w IS NULL THEN NULL
 						ELSE CONCAT_ws('',`p`,'"',SUBSTR(QUOTE(w),2,CHAR_LENGTH(QUOTE(w))-2),'"',`a`)
 				END ;
@@ -8876,8 +13104,13 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `qd1`(`w` longtext, `p` varchar(200))
     NO SQL
     DETERMINISTIC
 BEGIN
-	
-	RETURN CASE 
+	#Routine body goes here...	
+/*  IF w IS NULL THEN RETURN NULL; END IF;
+
+	SET w = QUOTE(w);
+  SET	w = SUBSTR(w,2,CHAR_LENGTH(w)-2),
+			w = CONCAT('"',w,'"');
+*/	RETURN CASE 
 						WHEN w IS NULL OR w = '' THEN NULL
 						ELSE CONCAT_ws('','"',`p`,'":',"{","\"v\":",quotd(w),"}")
 				END ;
@@ -8895,32 +13128,8 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `qd2`(`p` varchar(100),`w` LONGTEXT) 
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...	
 	RETURN CONCAT(quotd(`p`) ,':',quotj(w));
-END
-;;
-DELIMITER ;
-
--- ----------------------------
---  Procedure definition for `quodd`
--- ----------------------------
-DROP FUNCTION IF EXISTS `quodd`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`%` FUNCTION `quodd`(`w` longblob) RETURNS longtext CHARSET utf8mb3
-    NO SQL
-    DETERMINISTIC
-BEGIN
-	
-  
-  IF w REGEXP '^["\']' THEN
-
-  SET w = REGEXP_replace(w,'\\\\((?(?=\\\\)\\\\))|^["\']|["\']$','\\1');
-
-	
-	END IF;
-
-	RETURN w ;
-	
 END
 ;;
 DELIMITER ;
@@ -8934,7 +13143,7 @@ CREATE DEFINER=`root`@`%` FUNCTION `quotd`(`w` longtext) RETURNS longtext CHARSE
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...	
   
   CASE 
 			WHEN w IS NULL THEN 
@@ -8961,7 +13170,7 @@ CREATE DEFINER=`root`@`%` FUNCTION `QUOTEj`(`w` LONGBLOB) RETURNS text CHARSET u
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...	
   
   CASE 
 			WHEN w IS NULL THEN RETURN NULL;
@@ -8985,7 +13194,7 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `quote_d`(`w` longtext) RETURNS longt
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...	
   IF w IS NULL THEN RETURN NULL; END IF;
 
 	SET w = QUOTE(w);
@@ -9010,7 +13219,7 @@ CREATE DEFINER=`root`@`%` FUNCTION `quotj`(`w` LONGBLOB) RETURNS text CHARSET ut
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...	
   
   CASE 
 			WHEN w IS NULL THEN RETURN NULL;
@@ -9037,7 +13246,7 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `quotn`(`w` longblob) RETURNS longtex
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...	
   
   CASE 
 			WHEN w IS NULL OR w = ''THEN 
@@ -9054,11 +13263,11 @@ END
 DELIMITER ;
 
 -- ----------------------------
---  Procedure definition for `R`
+--  Procedure definition for `r`
 -- ----------------------------
-DROP FUNCTION IF EXISTS `R`;
+DROP FUNCTION IF EXISTS `r`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` FUNCTION `R`(`k` varchar(2000)) RETURNS varchar(2000) CHARSET utf8mb3
+CREATE DEFINER=`root`@`%` FUNCTION `r`(`k` varchar(2000)) RETURNS varchar(2000) CHARSET utf8mb3
     READS SQL DATA
     DETERMINISTIC
 BEGIN
@@ -9072,10 +13281,13 @@ BEGIN
 	END IF;
 
   CASE 
-		WHEN k REGEXP '\t' THEN
+		WHEN k REGEXP '^\\-' THEN
+SET k  = REGEXP_REPLACE(k,'^\\-','');
+		SET `k` = (SELECT CONVERT(a.Reg USING gbk ) FROM reg AS a WHERE a.note REGEXP  `k1` OR a.`Code` REGEXP `k` );
+		WHEN k REGEXP '\\t' THEN
 			
-			SET `r` = REGEXP_substr(k,'\t[^\n]*'),
-					`k` = REGEXP_replace(k,'\t[^\n]*',''),
+			SET `r` = REGEXP_substr(k,'\\t[^\n]*'),
+					`k` = REGEXP_replace(k,'\\t[^\\n]*',''),
 					`k` = (
 SELECT
 CAST(CONCAT_WS('\t',a.Reg,IF( `r` REGEXP '^\\s*$',a.`replace` ,`r`))AS CHAR)
@@ -9084,7 +13296,8 @@ WHERE
 a.note REGEXP  `k1` OR a.`Code` REGEXP  `k` );
 
 		ELSE
-	SET `k` = (SELECT CONVERT(a.Reg USING gbk ) FROM mysq1_schema.reg AS a WHERE a.note REGEXP  `k1` OR a.`Code` REGEXP  `k` );
+		
+	SET `k` = (SELECT CONVERT(a.Reg USING gbk ) FROM mysq1_schema.reg AS a WHERE a.note REGEXP  `k1` OR a.`Code` REGEXP  `k` limit 1);
 	END CASE;
 
 	RETURN 
@@ -9105,7 +13318,7 @@ CREATE DEFINER=`root`@`%` FUNCTION `r0`(`k` blob) RETURNS blob
     READS SQL DATA
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 
 
 	IF IFNULL(`k`,'')='' THEN RETURN NULL; END IF;
@@ -9126,9 +13339,9 @@ CONCAT_WS('',a.`Code`,a.note) REGEXP `k` );
 	END CASE;
 
 	RETURN `k`
-
-
-
+--  REGEXP_substr(k,'\t[^\n]*')
+-- CONVERT(`k` USING utf8 )
+-- QUOTE(`k`)
 ;
 
 END
@@ -9144,7 +13357,7 @@ CREATE DEFINER=`root`@`%` FUNCTION `R1`(`funid` varchar(99)) RETURNS varchar(200
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 	
 
 	RETURN	REG1(CASE 
@@ -9163,11 +13376,11 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`%` FUNCTION `r10`(c varchar(200)) RETURNS blob
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 
 
 	RETURN 	CASE 	WHEN c REGEXP "^[\\d]+$" THEN ( SELECT a.statement FROM `mysq1_schema`.qxsql AS a WHERE a.id = c )
-								ELSE ( SELECT a.statement FROM `mysq1_schema`.qxsql AS a WHERE CONCAT(a.`subject`,a.`name`) REGEXP c) END ;
+								ELSE ( SELECT a.statement FROM `mysq1_schema`.qxsql AS a WHERE CONCAT_WS('',a.`schema`,a.`subject`,a.`name`) REGEXP c) END ;
 
 END
 ;;
@@ -9181,7 +13394,7 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`%` FUNCTION `R2`(`funid` varchar(99)) RETURNS varchar(10000) CHARSET utf8mb3
     NO SQL
 BEGIN
-	
+	#Routine body goes here...
 
 	RETURN	REG2(`funid` );
 END
@@ -9193,29 +13406,75 @@ DELIMITER ;
 -- ----------------------------
 DROP FUNCTION IF EXISTS `R3`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` FUNCTION `R3`(`r` varchar(2000)) RETURNS varchar(2000) CHARSET utf8mb3
+CREATE DEFINER=`root`@`%` FUNCTION `R3`(`r` text) RETURNS text CHARSET utf8mb3
     NO SQL
 BEGIN
-	
+	DECLARE
+		次数 int(5) DEFAULT 1;
 
-	CASE
-			WHEN r IS NULL THEN RETURN NULL;
-			WHEN r REGEXP '^`\w+`$' THEN
-				SET r = R1(r);
-			WHEN r REGEXP '(?<=\\(\\?)((?:&)(\\w+))(?=\\))|(?<=\\\\)((?:g\\{)(\\w+)\\})' THEN 
-				SET r = REGEXP_replace(r,'(?<=\\(\\?)((?:&)(\\w+))(?=\\))','R<\\2>'),
-						r = REGEXP_replace(r,'(?<=\\\\)((?:g\\{)(\\w+)\\})','k<\\2>');
-			WHEN r REGEXP '(?<=\\(\\?)((?:R<)(\\w+))(?:>)(?=\\))|(?<=\\\\)((?:k\\<)(\\w+)\\>)' THEN
-				SET r = REGEXP_replace(r,'(?<=\\(\\?)((?:R\\<)(\\w+))(?:\\>)(?=\\))','&\\2'),
-						r = REGEXP_replace(r,'(?<=\\\\)((?:k\\<)(\\w+)\\>)','g{\\2}');
-			WHEN r REGEXP "^([^$]*(\\$)\\d{1,3}[^$]*)*$" THEN
-				SET r = REGEXP_replace(r, '(?<=[^$]|^)(\\$)(?=[^$]|$)',REPEAT('\\',2));
-			WHEN r REGEXP "^(?:[^\\\\]*\\\\\\d{1,9}[^\\\\]*)*$" THEN 
-				SET r = REGEXP_replace(r, '(?<=[^\\\\]|^)(\\\\)(\\d{1,9})','$\\2');
+	set @r3自用 =  NULL;
+	多个动作:WHILE  次数>0  DO
 
-		ELSE SET r = r;
-	END CASE;
-	
+			SET 次数 = 0;
+			CASE
+					WHEN r IS NULL THEN RETURN NULL;
+					
+					WHEN  json_valid(r) && JSON_DEPTH(r)=2 && r REGEXP'^\\s*\\[' || r REGEXP '^\\w+(?:,\\w+)*$' THEN
+						SET  r = _f(r,JSON_ARRAY(
+						'"\\s*,\\s*"','|',
+						'^\\s*(?:\\[")?|(?:"\\s*\\])?\\s*$',''
+						));
+					WHEN  r REGEXP @_r3自用:=o('(?&message) message') THEN 
+
+						SET r  = _f(r,JSON_ARRAY(
+												o('(?&替换的) message')
+												,'路径为“',':'
+												,'”',''
+												,'\\\\(.)','\\1'
+												,'，',',\n'	));
+					
+					WHEN r REGEXP '^\\s*npm\\b' THEN 
+						SET r  = _f(r,JSON_ARRAY( 
+											'(?i)\\s*npm\\s+I(?:NSTALL)?','yarn add'  
+											,'(?i)(?:\\-\\-?s(ave)?)\\b',''
+											,'(?i)\\-?\\-dev\\b','-D'))
+											;
+					
+					WHEN CHAR_LENGTH(r)>500 THEN return r;
+					WHEN @r3自用 IS NOT NULL && r REGEXP @r3自用 THEN
+					   SET r =  REGEXP_replace(REGEXP_replace(r ,  @r3自用,'import from "@site\\1" '),'\\.js(?=")','')
+									,次数 = 0
+									,@r3自用 = null
+									;
+
+					WHEN r REGEXP o('(?&path) path') THEN 
+						CASE  WHEN r REGEXP '\\\\' THEN
+										SET r = REGEXP_replace(r ,'\\\\','/');
+										IF r  REGEXP @r3自用:=  o('(?x)^(?&分割)?[w]((?:(?&分割)(?&path0))+) path') THEN
+										SET 次数=1; END IF;
+
+								ELSE 
+										SET r = REGEXP_replace(r ,'/','\\\\');
+						END CASE;
+					WHEN r REGEXP '^`\w+`$' THEN
+						SET r = R1(r);
+					WHEN r REGEXP '(?<=\\(\\?)((?:&)(\\w+))(?=\\))|(?<=\\\\)((?:g\\{)(\\w+)\\})' THEN 
+						SET r = REGEXP_replace(r,'(?<=\\(\\?)((?:&)(\\w+))(?=\\))','R<\\2>'),
+								r = REGEXP_replace(r,'(?<=\\\\)((?:g\\{)(\\w+)\\})','k<\\2>');
+					
+					WHEN r REGEXP '(?<=\\(\\?)((?:R<)(\\w+))(?:>)(?=\\))|(?<=\\\\)((?:k\\<)(\\w+)\\>)' THEN
+						SET r = REGEXP_replace(r,'(?<=\\(\\?)((?:R\\<)(\\w+))(?:\\>)(?=\\))','&\\2'),
+								r = REGEXP_replace(r,'(?<=\\\\)((?:k\\<)(\\w+)\\>)','g{\\2}');
+					WHEN r REGEXP "^([^$]*(\\$)\\d{1,3}[^$]*)*$" THEN
+						SET r = REGEXP_replace(r, '(?<=[^$]|^)(\\$)(?=[^$]|$)',REPEAT('\\',2));
+					WHEN r REGEXP "^(?:[^\\\\]*\\\\\\d{1,9}[^\\\\]*)*$" THEN 
+						SET r = REGEXP_replace(r, '(?<=[^\\\\]|^)(\\\\)(\\d{1,9})','$\\2');
+
+				ELSE SET r = r;	
+			END CASE;
+
+	END while 多个动作;
+
 	RETURN r;
 END
 ;;
@@ -9229,12 +13488,1703 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`%` FUNCTION `R4`(c varchar(200)) RETURNS blob
     DETERMINISTIC
 BEGIN
+	#Routine body goes here...
+
+
+	RETURN 	-- CONVERT(
+						CASE 	WHEN c REGEXP "^[\\d]+$" THEN ( SELECT a.`blob` FROM `mysq1_schema`.qs AS a WHERE a.id = c )
+										ELSE ( SELECT CONVERT(a.`blob` USING gbk) FROM `mysq1_schema`.qs AS a WHERE CONCAT_WS('',a.`schema`,a.`subject`,a.`name`) REGEXP c) END 	
+-- 					USING gbk)
+;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `r4b`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `r4b`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `r4b`(`p` blob) RETURNS longtext CHARSET utf8mb3
+    NO SQL
+BEGIN
+	#Routine body goes here...
+	DECLARE i INT(5) DEFAULT NULL;DECLARE y INT(5) DEFAULT NULL;
+	DECLARE c0 VARCHAR(200) DEFAULT NULL;
+	DECLARE c1 VARCHAR(200) DEFAULT '${pageContext.request.contextPath}';
+	DECLARE c2 VARCHAR(200) DEFAULT CONCAT_WS('/',c1,'bill/');
+	DECLARE 一大坨 LONGTEXT DEFAULT 
+CONVERT(REGEXP_replace(CONCAT_WS('','<style type="text/css">'
+-- '	.black_line_botton {		border-left-width: 0px;		border-left-style: none;		border-bottom-width: 1px;		border-bottom-style: solid;		border-bottom-color: #006600;	}	.dashed_table {		border: 1px dashed #006600;	}	.black_line_top {		border-top-width: 1px;		border-top-style: solid;		border-top-color: #006600;		text-align: center;	}	.bian_a {		border-left-width: 2px;		border-left-style: solid;		border-left-color: #000000;	}	.STYLE1 {		font-size: 18px;		font-weight: bold;		letter-spacing: 1em;		text-indent: 1em;	}	.jiner_input {		overflow: none;		text-decoration: none;		letter-spacing: 12px;		color: #000000;		border: 0px;		text-align: right;		background: ;		width: 100%;	}	.blckground {		background-image:url("${pageContext.request.contextPath}/images/table/jz-green.gif");		background-repeat: repeat-y;		text-decoration: none;	}	.STYLE3 {		font-size: 11px;	}	.bg_grid {		background-image:url("${pageContext.request.contextPath}/images/table/jpz-green.gif");		background-repeat: repeat-y;	}	#LayerOut {		position: relative;		top: 0;		left: 0;		z-index: 0;		width: 900px;		height: 450px;	}	#paperBg {		position: absolute;		top: 0;		left: 0;		z-index: 1;		width: 900px;		height: 450px;	}	#LayerBill {		position: absolute;		top: -1px;		left: -2px;		z-index: 2;		width: 900px;		height: 450px;	}	#div_img {		position: absolute;		top: 18px;		left: 850px;		z-index: 7;		width: 35px;		height: 45px;	}	.isDate {		font-size: 12px;		background: none;		border: 0px;	}	input.input_like_checkbox {		border: 1px solid #333;		height: 16px;		width: 16px;		text-align: center;		margin: 5px;		line-height: 10px;		font-size: 10px;		cursor: hand;		color: #660066;		color: #660066;	}	* html .input_like_checkbox {		border: 1px solid #333;		height: 16px;		width: 16px;		text-align: center;		margin: 5px;		line-height: 10px;		font-size: 10px;		cursor: hand;		color: #660066;		color: #660066;	}	.isNumeric {		BORDER: 0px;		TOP: 0px;		background: none;		font-size: 11px;;		font-style: oblique;		font-weight: bold;		color: #3300FF;	}	.billtitle {		BORDER: 0px;		TOP: 0px;		background: none;		font-size: 11px;;		font-style: oblique;		font-weight: bold;		color: #3300FF;	}	.toptxt {		border-bottom: 1px solid #000000;		border-top: 0px;		border-left: 0px;		border-right: 0px;		width: 110px;}	html input{		font-family:"楷体_GB2312","楷体";		font-size: 14px;		font-weight:bold;		background-color:transparent;		background:none;		letter-spacing: 0px;		word-spacing: normal;		border: 1px none #CCCCCC;		overflow:hidden;		width:100%;		line-height:15px}	</style>	'
+,'html input{
+	font-family:"楷体_GB2312","楷体";
+	font-size: 14px;
+	font-weight:bold;
+	background-color:transparent;
+	background:none;
+	letter-spacing: 0px;
+	word-spacing: normal;
+	border: 1px none #CCCCCC;
+	overflow:hidden;
+	width:100%;
+	line-height:15px}
+</style>'
+),'[\\n\\r]+','\t')USING gbk)
+;
+
+
+
+	DECLARE sign VARCHAR(200) DEFAULT NULL;
+	
+  IF json_valid(p) THEN SET i = json_value(p,'$[0]');END IF;
+
+	 -- SET sign = CONCAT_WS('','<!--',i,'-->\n');审计
+ SET `c0` = json_value(p,'$[1][0]');
+
+
+	RETURN 
+  CASE i
+
+		WHEN 20 THEN  
+json_array(
+'19',' '
+,'#\\w+_zl_\\w+\s*{\\s+display:\\Knone','block'
+,'(?:zl|cg)_1.style.display="\\Knone','block'
+,'(?:zl|cg)_bm.style.display="\\Knone','block'
+,'(?i)(?:\\Q..\\E/image|(?:(?<=")|bill///)image)(?=/paperBg.jpg)',CONCAT_WS('','/file/images')
+,'bill/([^/]+?)/V\\d/+\\g1',CONCAT_WS('',c2,c0)
+,'bill/([^/]+?)/V\\d/+(?:netinnet_)?.*?',CONCAT_WS('',c2,c0,'/')
+,'(?im-s)(url\\s*\\()["\']?(.*?/[^\\.]+\\.\\w+)\\b["\']?(?=\\))','\\1"\\2"'
+,'bill///[^/]+/+(?=[^\\.]+\\.\\w+)',CONCAT_WS('',c2,c0,'/')
+,'netinnet_',''
+)			WHEN 19 THEN  
+json_array(
+'19','stra ','(?is)<input name=([\'"])save_data_button\\g1.+(?=</form>)',''
+
+)			WHEN 18 THEN  
+json_array(
+'18','style',"(width\\s*:\\s*[\\d]++)(?!\\s*(?:px|%))",'\\1px'
+
+)		WHEN 17 THEN  
+json_array(
+'17','style','(?m)^\\s*letter\\-spacing:\\s*\\K1(?=em;)','0.9'
+
+)		WHEN 16 THEN  
+json_array(
+'16','最后的清除','(?<![\'"><])\\$\\{.*?\\.\\w{2,3}(?=\\s*\\)\\s*;)','"\\0"'
+
+)
+
+		WHEN 15 THEN  
+json_array(
+'15','最后的清除','(?mis)<br[^>]*?>\\s*?<hr[^>]*?>|<hr[^>]*?>',''
+
+)
+		WHEN 14 THEN  
+json_array(
+'14','插入java字段2','(?i)<body[^>]*?>'
+,CONCAT_WS('','\\0\n<% DrawUtils bill = DrawUtils.getBillObject(request); bill.setPrjName(request.getContextPath()); %>	<%=bill.head1()%>	<%=bill.head3()%>	<%=bill.button1()%>	<%=bill.head2()%>${setseals}'
+,sign)
+)
+
+
+		WHEN 13 THEN  
+json_array(
+'13','插入tbn','not','"tbN"', '(?is)<table(?=[^<>]+?>(?:<(?!table)[^<>]+?>|(?<=>)[^<>]+(?=<))*?<input[^<>]*?\\bb\\d+\\b)'
+,CONCAT_WS('','<table id="tbN"',sign)
+)
+		WHEN 12 THEN  
+json_array(
+'12','插入tbn','not','"tbN"', '(?i)id\\s*=(["\'])mytable\\g1'
+,CONCAT_WS('','id="tbN"',sign)
+)
+		WHEN 11 THEN  
+json_array(
+'11','插入tbn','(?i)id\\s*=(["\'])table1\\g1'
+,CONCAT_WS('','id="tbN"',sign)
+)
+
+		WHEN 10 THEN  
+json_array(
+'10','去注释样式css','(?im-s)(?=<(?:link|img)\\s+.*?(?:showDialog|drag_resize|pen))(<[^>]*?>\\s*+)'
+,CONCAT_WS('','',sign)
+)
+
+		WHEN 0 THEN  
+json_array(
+'0','抓保留样式'
+,"(?ims)(<style[^>]*?>)\\s*\\<!--\\s*(.*?)\\s*-->\\s*(?=</style>)"
+,'<!--|-->',CONCAT_WS('','',sign)
+,'2(?=em)',CONCAT_WS(''
+,CASE WHEN json_extract(p,'$[1]')REGEXP '"kjpz_jzpz00_ty2zzy07"'  THEN  '0.9'
+ ELSE '1' END
+
+,sign))
+
+		WHEN 1 THEN  
+json_array(
+'1','插入java字段','<!DOCTYPE[^>]+>','\\0\n<%@ page language="java" import="java.util.*" pageEncoding="UTF-8" contentType="text/html; charset=UTF-8" %><%@ page import="mse.utils.DrawUtils" %>'
+)
+		WHEN 2 THEN 
+json_array(''
+,json_array(
+'2','编码','(?i)charset=GBK','charset=UTF8'
+)
+,
+json_array(
+'2','语法错误 去掉'
+	,'(?i-m)var\\s+bindType\\s+\\K=\\s*;',''
+),
+json_array(
+'2','多多 去注释','(?xs)Map\\(.*?(?:function)'
+
+	,'(?s)/\\*(.+?)\\*/','\\1'
+	,'(?i)//(?=calmap)',''
+
+)
+)
+
+		WHEN 3 THEN 
+json_array(
+'3','取注释',CONCAT_WS('|','(?is)'
+	,'\\<style\\s+type\\s*=\\s*[\'"]text/css[\'"]\\s*>\\s*\\<!--(.*)?-->\\s*</style>\\K\\s*'
+ ,'(?s)(?:(?s)<!--.*?-->|(?ms)/\\*.*?\\*/'
+,'<link[^>]+backup/netinnet.*?>'
+	,'(?im-s)<table.*?确定.*?>\\s*$|(?ism)<table[^>]*?control_table[^>]*?>.*?</table>)\\s*+'
+),''
+,'(?ms)\\s*/\\*.*?\\*/\\s*\r',''
+,'(?s)<!--.*?-->',''
+,'(<!DOCTYPE)[^>]*>','\\1 HTML>'
+,'(?mi)\\bpag\\D{0,6}1\\b[^<>}]*display:\\Knone','block'
+
+)
+		WHEN 4 THEN 
+json_array(
+'4','去script',CONCAT_WS('|'
+
+,'(?ims)<(iframe)\\s+name="BillSaveWin".*?\\g1>\\s*'
+,'(?s)\\Q<script language=\'JavaScript\'>var CHECK_VAR_DO3=0\\E.*?(?=</form>)'
+,'(?s)<script\\s*language=\'JavaScript\'[^>]*>.*?</script>\\s*+'
+
+
+),'')
+		WHEN 5 THEN 
+json_array(
+'5','style 插入','(?im)^\\s*(<style)','<LINK href="${pageContext.request.contextPath }/images/favicon.ico"type=image/x-icon rel="Shortcut Icon">\n\\1'
+)
+		WHEN 6 THEN 
+json_array(
+'-1','style 插入2','(?i-s)bill/+(?:([^?"\\\\/*<>|\\s]+)/+)*+(?:netinnet_)?(?=(?1)\\.\\w{2,3})'
+,CONCAT_WS('/',c2,json_value(p,'$[1][0]'),'',sign)
+)
+		WHEN 7 THEN 
+json_array(
+'5','style 插入','(?i)(?:bill_common)/(?:netinnet_)?','${pageContext.request.contextPath}/css/bill/n/'
+)
+		WHEN 8 THEN 
+json_array(
+'5','style 插入3'
+,'(?i)bill///(?!image)\\w+(?=/)',CONCAT_WS('','/file/bill/',c0)
+,'(?i)bill///(?=\\w+\\.\\w+)',CONCAT_WS('','/file/bill/',c0,'/')
+,'input_b b\\d',''
+,'bill///(?:netinnet_)?(?=[^/"\']+\\.\\w+)|(?<=")netinnet/netinnet_'
+,CONCAT_WS('',CONCAT_WS('/',c1,'css/bill/n/'),sign)
+
+)		
+	WHEN 9 THEN 
+json_array(
+'5','一大坨样式','(?im)^\\s*(<head>)'
+,CONCAT_WS('\n','\\1',sign,一大坨)
+)
+
+	WHEN 21 THEN 
+json_array(
+json_array(
+	'1','公式处理'
+		,'(?s)function\\s+(before)InitForm[^\\{]*(\\{(?:[^\\{}]+|(?-1))*?\\})\\K.+?(?://|function|</script)'
+		,'\n\\1InitForm()\\0'
+	)
+	,json_array(
+	'1','税率'
+		,'(?s)17%(?=税|\\s*<)','13%'
+	)	
+,json_array(
+	'1','多多税率',@rrfb:='(?si)calMap.+?FUNCTION\\s+beforeInitForm'
+
+		,'0.17'	,'0.13'
+	)
+
+)
+	WHEN 22 THEN 
+json_merge(JSON_ARRAY('1','表单个性化')
+, case 
+		WHEN `c0` = 'kjsj_zzsnssbbybnsr_ygz_dzxz01' THEN 
+		JSON_ARRAY('(?s)\\QcalMap.put("b1[1]","b1[0]");','\\0calMap.put("b1","b2+b3+(b4)");' )
+		
+		WHEN `c0` = 'odta_bqdkjxsyjgmxb_dz01' THEN 
+		JSON_ARRAY(
+		'(?s)\\QcalMap.put("b1[1]","b1[0]','\\0*.13' 
+    ,'(?s)\\QcalMap.put("b8","b9+b10','\\0*.13' 
+		)	
+		WHEN `c0` REGEXP'kjpz_skpz00_xz01|kjpz_fkpz00_xz02' THEN 
+		JSON_ARRAY(
+		'(?-s)bill///[^/]*?/(\\w+\\.\\w+)',CONCAT_WS('',c2,c0,'/\\1') 
+
+		)	
+		WHEN `c0` REGEXP'kjzb_slsmxz_slsmxz05' THEN 
+		JSON_ARRAY(
+		'#LayerBill','.i_havebackground {\nbackground-image: url("/file/bill/kjzb_slsmxz_slsmxz05/sls_blod4.gif");\nbackground-repeat: no-repeat;\n}\n\\0'
+
+		)	
+		WHEN `c0` = 'kjqt_ncpsgfphptfamxb01' THEN 
+		JSON_ARRAY(
+		'function beforeInitForm',CONCAT_WS('','function common_init_zreo(){//初始化得时候对于需要自动计算的赋值
+	  $("input[name=b3]").each(function(index){
+	  	if($("input[name=b1]").eq(index).is(":visible")&&$("input[name=b2]").eq(index).is(":visible")){
+			if($(this).val()=="") $(this).val("0.00");
+			if($("input[name=b4]").eq(index).val()=="")$("input[name=b4]").eq(index).val("0.00")
+		}
+		
+	  	
+	  }); 
+ }','\n\\0') 
+
+		)
+  ELSE NULL 
+	END
+)	
+ELSE NULL		
+
+
+
+  END
+
+;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `r4b1`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `r4b1`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `r4b1`(`p` blob) RETURNS longblob
+    NO SQL
+BEGIN
+	#Routine body goes here...
+	DECLARE i INT(5) DEFAULT NULL;DECLARE y INT(5) DEFAULT NULL;
+	DECLARE c1 VARCHAR(200) DEFAULT '${pageContext.request.contextPath}';
+	DECLARE c2 VARCHAR(200) DEFAULT CONCAT_WS('/',c1,'bill/');
+
+
+
+	DECLARE sign VARCHAR(200) DEFAULT NULL;
+	
+  IF json_valid(p) THEN SET i = json_value(p,'$[0]');END IF;
+
+	 -- SET sign = CONCAT_WS('','<!--',i,'-->\n');审计
+
 	
 
+	RETURN 
+  CASE i
 
-	RETURN 	CASE 	WHEN c REGEXP "^[\\d]+$" THEN ( SELECT a.blob FROM `mysq1_schema`.qs AS a WHERE a.id = c )
-								ELSE ( SELECT a.blob FROM `mysq1_schema`.qs AS a WHERE a.`subject` = c) END ;
 
+	
+		WHEN 0 THEN  
+json_array(
+'1','抓取sytle','(?is)\\<style\\s+[^>]+?>.+?\\</style>',''
+)		
+		WHEN 1 THEN  
+json_array(
+'2','增加','^(.)','@charset "UTF-8";\n\\1'
+)		
+		WHEN 2 THEN  
+json_array(
+'2','去sytle','(?is)\\<style\\s*[^>]+?>|</style>',''
+)
+
+
+		ELSE NULL 
+  END
+
+;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `r4b2`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `r4b2`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `r4b2`(`p` blob) RETURNS text CHARSET utf8mb3
+    NO SQL
+`la`:BEGIN
+	#Routine body goes here...
+	DECLARE i varchar(100) DEFAULT NULL;DECLARE y INT(5) DEFAULT NULL;
+	DECLARE r  text DEFAULT NULL;
+	DECLARE c , c0, c1 ,c2 ,c3 TEXT DEFAULT null;
+	DECLARE sign VARCHAR(200) DEFAULT NULL;
+
+
+
+
+  IF NOT json_valid(p) THEN RETURN NULL;  END IF;
+
+	SET i = CAST(json_value(p,'$[0]') AS CHAR)
+			,`c` :=  JSON_EXTRACT( p,'$[1]')
+			,`c0` = IF(c IS NULL ||c= 'NULL',NULL,json_value(p,'$[1][0]'))
+			,`c1` = IF(c IS NULL ||c= 'NULL',NULL,json_value(p,'$[1][1]'))
+			,`c2` = IF(c IS NULL ||c= 'NULL',NULL,json_value(p,'$[1][2]'))
+			,`c3` = IF(c IS NULL ||c= 'NULL',NULL,json_value(p,'$[1][3]'));
+
+	-- SET sign = CONCAT_WS('','<!--',i,'-->\n'); -- 审计
+
+
+	RETURN o2(
+	
+  CASE 
+	
+	WHEN `i` regexp '^抓取$' THEN 
+
+	json_array('','多多(?#抓取99999999)',
+o('(?#抓取99999999)(?#抓取99999999)(?&year1)|(?&year2)|(?&year3)|(?&year4)|(?&year5) date i')
+
+	)
+
+
+	WHEN `i` = 'iji' THEN 
+JSON_ARRAY('','react',O("(?#抓取)(?m)^,?'\\w+'\\s*,\\s*\\w+\\s*(?&r1) es6") ,'(?m)^.+$','--0--')	
+
+
+WHEN `i` = 'jsp2HOC' THEN 
+		jsp2HOC(p)
+	
+	WHEN `i` regexp '^修改时间$' THEN 
+
+	json_array('','多多',
+o('|(?&year3) date'),
+	o('\\d+|(?&cyear) date'),CONCAT('`?',`c0`,'`')
+	)
+
+  WHEN  `i` regexp '^生成单例模式$' THEN
+json_array('mission_ask简单处理'
+'\\\\r','<br/>'
+
+)
+
+  WHEN  `i` regexp '^类2组件$' THEN
+JSON_ARRAY('','',
+		JSON_ARRAY('前','',
+			CONCAT_WS('','(export\\s*(?:\\w+\\s*)?)class\\s+(',c0,')\\s+extends\\s*Component(?=\\s*\\{)'),'\\1 const \\2 = function(proos)'
+			
+	)
+		,json_array('状态','多多'
+		,o('state\\s+=\\s*(?&r2),es6')
+		,'^\\s*state\\s*=\\s*\\{|\\}$',''
+		,o('(\\w+)\\s*:\\s*((?&v))\\s*,? es6'),'const [\\1 , set\\1] = useState(\\2)'
+		)
+
+		,json_array('类2组件','多多'
+		,',\\s*set\\K[a-z]'
+		,'(?#UPPER)^[a-z]','\\0'
+		)
+		
+)		
+
+
+
+    WHEN  `i` regexp '^分割markdown$' THEN
+json_array('',''
+			,JSON_ARRAY('','','(?x)(?ms)^\\#\\s+目录(?).*?(?=\\s*(?:^\\#\\s+\\S|(?-m)$))',''
+			,'(?s-m)^(.+?)((?m)^\\#\\s+\\S+.+?(?m)$)','\\2\\1'
+			)
+		,JSON_ARRAY('装修','react'
+				,o('(?x)(?&level0) markdown')
+				,'(?m)^(\\#\\s+([^\\s\\#]+))'
+				,CONVERT(concat(
+'---
+id: \\2
+title: \\2
+description: A short description of this page
+keywords: [keywords, describing, the main topics]
+sidebar_position: trs计数器
+---
+')USING utf8)
+
+				,'(?m)^\\#(?=\\#)',''
+				,'\\{width=[^{}]+?\\}',''
+
+-- 				,	'(?ms)^(\\-{3}\\s+)(^\\#.+?<Img\\s+img)'
+-- 					,CONCAT_WS('\n','\\1',
+-- 						'import {Img} from "@site/src/components/img"\n',
+-- 						'import BrowserOnly from "@docusaurus/BrowserOnly"\n',
+-- 					
+-- 					'\\2') -- import 
+			)
+)
+
+			
+			WHEN  `i` regexp '^分割markdown-生成描述关键词$' THEN
+json_array('',''
+
+		,json_array('','react'
+		   ,'(?m)^(\\-{3}[\\n\\r]+(?m)^id(?-s).+?\\s*^title:\\s+((?-s).*?(?=\\s*(?m)$)))(?s).+?\\s*(?=(?:(?1)|(?-m)$))'
+			 ,'抓取开始',''
+			 ,'(?#抓取)(?m)^\\#{2}\\s+(\\S+)',', \\1'
+			 ,'抓取结束',''
+
+			 -- 生成描述关键词
+			,CONCAT_WS('[\\n\\r]*'
+								 ,'^抓取开始\\s*,\\s*(([^\\s,]+)(?:\\s*,\\s*(?2))*?)\\s*抓取结束(?m)$'
+								 ,'(\\-{3}'
+								 ,'\\w+:\\s*\\S+'
+								 ,'\\w+:\\s*\\S+'
+								 ,'description:\\s+).*?(?m)$'
+								 ,'(keywords:\\s+).*?(?m)$'
+						 )
+						,'\\3\\1\n\\4[\\1]'
+			 /**/
+		)
+		,json_array('修正 description','react'
+						,'(?m)^description: .*?$'
+						,',\\s*',' '
+		)
+		,json_array('修正 description keywords','react'
+						,CONCAT_WS('[\\n\\r]*'
+							,'(?m)^(?:description):\\s+.*?$'
+							,'(?m)^(?:keywords):\\s+.*?$'
+						)
+						,'\\*',''
+		)
+				
+)			
+			
+			WHEN  `i` regexp '^分割markdown-生成sql$' THEN
+json_array('',''
+
+		,json_array('','react'
+		   ,'(?m)^(\\-{3}[\\n\\r]+(?m)^id(?-s).+?\\s*^title:\\s+((?-s).*?(?=\\s*(?m)$)))(?s).+?\\s*(?=(?:(?1)|(?-m)$))'
+			 ,'(?sm)^\\--.+?^\\s*title:\\s+(.*?(?=\\s*(?m)$)).+?(?-m)$'
+				,CONCAT_WS('','SELECT \\0	INTO DUMPFILE "',REGEXP_replace(@filename,'[^/]+\.mdd?',''),'\\1.md";\n ')
+			)
+
+		,json_array('','react'
+			,'(?ims)^SELECT\\s+\\K((?!")\\S.+?)(?=(?m)\\t+INTO\\s+DUMPFILE)'
+			,'(?#quote)(?is)^.+?$','\\0'
+		)
+/**/
+)  
+
+    WHEN  `i` regexp '^md2mdx$' THEN
+JSON_ARRAY('md 2 mdx',''
+		,json_array('md 2 mdx',''
+			,'class(?=\\s*=[\'"])','\\0Name'
+			,'(?<=\\[)\\s+(?=\\S)',''-- '可疑空格'
+			,'(?<=\\d)in\\b',''
+			-- 处理图像
+			,CONCAT('(?sx)<img\\s+src=(',
+						CONCAT_WS('|','"((?:(?=\\\\).{2}|(?!\\\\|").)*?)"',
+							'\\{{1,2}(?:(?=\\\\).{2}|(?!\\\\|\\}).)*?\\}{1,2}',
+							"'(?:(?=\\\\).{2}|(?!\\\\|').)*?'",
+							'[^{}"\']+'
+							),
+						')\\s+(?1)*?\\s*/>'
+						)
+						
+						,'![](\\2)'
+			
+-- 								,'<Image img={require(\\1)}'
+--  			,CONCAT('(?sx)<[A-Z]\\w+\\s+(?:',
+-- 						CONCAT_WS('|','"(?:(?=\\\\).{2}|(?!\\\\|").)*?"',
+-- 							'\\{{1,2}(?:(?=\\\\).{2}|(?!\\\\|\\}).)*?\\}{1,2}',
+-- 							"'(?:(?=\\\\).{2}|(?!\\\\|').)*?'",
+-- 							'[^{}"\']+'
+-- 							),
+-- 						')*?\\s*/>'
+-- 						)
+-- 				,'\n<BrowserOnly>\n\t{()=>\\0}\n</BrowserOnly>\n'
+		)
+		,json_array('style','react'
+			,@r4b2:= CONCAT('(style\\s*=\\s*)','"((?:(?=\\\\\).{2}|(?!\\\\|").)*?)"','')
+			,@r4b2,'\\1{{\\2}}'
+			,';',','-- '可疑空格'
+			,'[\\d\\.]+%','"\\0"'
+		)
+		
+)
+    WHEN  `i` regexp '^mission_ask简单处理$' THEN
+json_array('mission_ask简单处理'
+'\\\\r','<br/>'
+
+)  
+
+  WHEN  `i` regexp '^[.\\d]+$' and `i` = 10 THEN
+json_array('百度 去页面'
+
+	,JSON_ARRAY('1','去'
+	,CONCAT_WS('|'
+		,'(?s)^.*?(?=<html>)'
+		,'(?s)<(head|script).+?/\\g-1>\\s*+'
+-- 		,'(?s)<script.+?/script>\\s*+'
+		,'(?s)<!--.+?-->\s*+'
+	),''
+	
+)	
+	,JSON_ARRAY('1','修补'
+			,'<(?:img|input)[^>]+[^/]{5}\\K>','/>'
+	)	
+
+	,JSON_ARRAY('1','抓取'
+	
+	,CONCAT_WS(''
+			,'(?=<[^>]+?\\Q"main-content J-content"\\E[^>]*?>)'
+			,(@`r4b2` := '(<(\\w+)[^>]*?(?:/>|>(?:(?-2)|[^<]*)*</\\g-1>))' )
+		),'\\1'
+	
+)	
+
+)  
+
+  WHEN  `i` regexp '^[.\\d]+$' and `i` = 9 THEN
+json_array('md',
+	JSON_ARRAY('-1','多多 md头',@`r4b2`:='\\bmdtitle(:\\w++)?(?=\\b)'
+	  ,@`r4b2`,CONCAT_WS('',
+'---
+`json:mdtitle`
+---
+')
+
+)	
+,JSON_ARRAY('1','多多 info',@`r4b2`:='\\bmdinfo(:\\w++)?(?=\\b)'
+	  ,@`r4b2`,CONCAT_WS('',
+':::info 要求
+`json:mdinfo`
+\n:::
+')
+)
+
+,JSON_ARRAY('1','多多 tip',@`r4b2`:='\\bmdtip(:\\w++)?(?=\\b)'
+	  ,@`r4b2`,CONCAT_WS('',
+':::tip 提示\n\n
+`json:mdtip`
+\n:::
+')
+		,'注([:：])?','\r\n  .'
+ ,'(?<g>\\w+=(?:(?<p>（|[(\\-*])\\w+(?<e>[=%)]|）)?|(?&p)?\\w+(?&e)){3,})|(?!=\\s*)\\(([^)]+)\\)|（([^）]+)）'
+ ,'$$\\1$$\n  .\\5\\6\r'
+,'[，,]','\r\n  .'
+,'(?m)^\\s*(?:\\.|。?[$]*+)\\s*[\n\r]+|[$]{4,}',''
+			,'(?m)^\\s*\\.\\s*$',''
+)
+
+
+
+
+,	JSON_ARRAY('1','多多 修补md头',@`r4b2`:='(?is-m)^(\\-\\-\\-).*?\\g1'
+		,'#','号'
+)
+,	JSON_ARRAY('1','修补标签br'
+		,'(?i)\\<br\\s*/?\\>','\n'
+)
+)  
+
+	WHEN  `i` regexp '^[.\\d]+$' and `i` = 0 || i = '去注释' THEN
+JSON_ARRAY('去注释',
+json_array(
+'2','多多抓thml css','(?is)<html.*?</html>'
+
+ 	,CONCAT_WS('','(?is)<link[^>]+?(css/bill/(?:[^/"\\\']+/)*+[\\w\\.]+)\\b[^>]*?>'),CONCAT_WS('','<style>`载入:C:/Program Files (x86)/Qianxue/QxServer7.0/Qn/Qnode/c/src/\\1`</style>',sign )
+,CONCAT_WS('','(?is)<link[^>]+?favicon.ico[^>]*?>'),CONCAT_WS('','',sign )
+,'﻿@charset "utf-8"',''
+
+)
+
+,json_array(
+'3','去注释',CONCAT_WS('|'
+	,'(?ism)<!DOCTYPE\\s+[^>]*+>'
+	,'<%.*?%>'
+  ,'(?:<!--.*?-->)|(?:/\\*.*?\\*/)'
+ 	,'(?is)\\<style\\s+type\\s*=\\s*[\'"]text/css[\'"]\\s*>\\s*\\<!--(.*)?-->\\s*</style>\\K\\s*'
+	,'\\Q${setseals}\\E'
+),'')
+
+)
+		WHEN  `i` regexp '^[.\\d]+$' and `i` = 1 || i ='抓样式' THEN 
+json_array(
+'2','多多抓thml css','(?is)<html.*?</html>'
+
+	,CONCAT_WS('|'
+				,'<%.*?%>'
+				,'<html[^>]*?>|</html>'
+			),''
+
+)
+
+		WHEN  `i` regexp '^[.\\d]+$' and `i` = 2 THEN 
+json_array('处理头部','',
+	json_array(
+	'1','抓head','(?is)<head.*?</head>'
+
+		,CONCAT_WS('|'
+					-- ,'(?is)\\<style\\s+[^>]+?>.+?\\</style>'
+					,'<meta[^>]+?>'
+					,'<(?:head)[^>]*?>|</(?:head)>'
+					,'<(title)[^>]*?>.*?</\\g1>'
+		),''
+	)
+
+)
+
+		WHEN  `i` regexp '^[.\\d]+$' and `i` = 3 THEN 
+json_array(
+'3','多多body','(?ims)(<body[^>]*?>.*?</body>)'
+,'(?ims)(<body[^>]*?>.*?</body>)',
+"import React from 'react';
+export default function qwe() {return (<>
+  \\1
+</>);}"
+,'<body[^>]*?>|</body>',''
+,'<(?:img|input)[^>]+[^/]{5}\\K>','/>'
+,'onpropertychange="setEncrypt\\(\\)"\\s*+',''
+,'sameFlag="[^"]*?"',''
+,'class=""',''
+)	
+
+		WHEN  `i` regexp '^[.\\d]+$' and `i` = 4 THEN 
+json_array('react style2`style`',
+	json_array(
+	'l33','react sytle tag1','(?s)<style.+</style>'
+
+	,'(?s)(<style[^>]*?>)(?!\\s*\\{`)(.*?)(</style>)','<style>{`\\2`}</style>'
+	)
+	,json_array(
+	'','react sytle tag','(?s)(<style[^>]*?>)(.*?)(</style>)'
+	,'[\\n\\r]+',''
+	)
+	,JSON_ARRAY(
+		'l3','react style 后置',@`r4b2` := '(?s)(<style.*?>\\{`.+?</style>\\s*)(.+?<>(?:\\s*(?1)*+))'
+		,@`r4b2`,'\\2\n\\1'
+	)
+)
+		WHEN  `i` regexp '^[.\\d]+$' and `i` = 5 THEN 
+json_array(
+'3','react -1 驼峰  ','style=(["])(?:(?=\\\\).{2}|(?:(?!\\g1|\\\\).)*?)*?\\g1'
+	,'\\w+="\\w+:"',''
+	,';;',';'
+	,'";','"'
+
+,'(?#UPPER)\\-([a-z])','\\1'
+,'(["\'])((?:(?=\\\\).{2}|(?:(?!\\g1|\\\\).)*+)*?)\\g1','{{\\2}}'
+,':\\s*([\\w_\\#!]++(?:\\s+[\\#\\w_]++)*)',':"\\1"'
+,';',','
+
+)
+
+
+		WHEN  `i` regexp '^[.\\d]+$' and `i` = 6 THEN 
+json_array(
+'3','React -2 驼峰 语法','(?s)<>.*?</>'
+,'(?-i)\\bclass\\b','className'
+,'rowspan','rowSpan'
+,'cellpadding','cellPadding'
+,'cellspacing','cellSpacing'
+,'colspan','colSpan'
+	,'tabindex="(\\d+)"','tabIndex="\\1"'
+,CONCAT_WS('','(?is)\\Q${pageContext.request.contextPath}/bill\\E/{1,2}',c0,'/'),CONCAT_WS('','/img/b/',sign )
+)
+
+		WHEN  `i` regexp '^[.\\d]+$' and `i` = 7 THEN 
+json_array(
+'6','去换行 加tbody css -> scss'
+,'(?m)(\\n\\s*?\\s){2,}',''
+,'(?m)(?:</tbody>)?\\s*(</table>)','</tbody>\\1'
+,'(?m)<table[^>]*?>(?!\\s*+<tbody)','\\0<tbody>'
+-- ,'/[\\w_]+\\.\\Kcss','scss'
+,CONCAT_WS('','(?is)\\Q${pageContext.request.contextPath}/bill\\E/{1,2}',c0,'/'),CONCAT_WS('','./',sign )
+)
+
+  WHEN  `i` regexp '^[.\\d]+$' and `i` = 8 THEN
+json_array('处理img',
+	JSON_ARRAY(
+		'1','多多',@`r4b2`:='(<img[^>]*?src=)((["\'])[\\${}\\./\\w\\-]+/(\\w+)\\.\\w+\\b\\g3)'
+		,@`r4b2`,'\\1{\\4} import \\4 from \\2 '
+	)
+	,JSON_ARRAY(
+		'1',' import 前置'
+		,@`r4b2` := '(?s)(export.+)(import\\s+\\w+\\s+from\\s*"[^"]+"\\s)','\\2\n\\1'
+	)
+)
+
+
+
+
+	WHEN  `i` regexp '^[.\\d]+$' and `i` = 22 THEN
+json_array('处理img',
+	JSON_ARRAY(
+		'1','多多',@`r4b2`:='(<img[^>]*?src=)((["\'])[\\${}\\./\\w\\-]+/(\\w+)\\.\\w+\\b\\g3)'
+		,@`r4b2`,
+':::tip
+\\1  
+:::'
+	)
+
+
+)
+
+	WHEN  `i` = '抓取json' THEN
+json_array('百度关键词'
+	,JSON_ARRAY(
+		'抓','多多抓取'
+		,@`r4b2`:= '(?#抓取)<meta name="(?:keywords|description)"[^>]*>'
+		,CONCAT_WS('','(?#抓取)',(@`r4b2`:='(?s)((["\'])(?:(?=\\\\).{2}|(?:(?!\\\\|\\g-1).)*+)*\\g-1)')),'\\0'
+	,CONCAT_WS('','("[^"]+")(',@`r4b2`,')'),',\\1:\\2'
+	)
+	,JSON_ARRAY(
+		'生成json','生成json'
+		,'(?-m)^,','{'
+		,'(?-m)"$','"}'
+	)
+)
+
+ 	WHEN  `i` = 'jsp-抓取abtinput' THEN
+json_array('jsp','abt抓abjson'
+,'(?ms)<head.*?/head>|<(?!input)(\\w+)./\\g1>|<!--.*?-->|//.*?$',''
+		,'(?si).+?(?:<input[^>]+?(?:id|name)=["\']?\\b([abt]\\d+)\\b["\']?[^>]*?>|$)'	,',"\\1"'
+		,',""',''
+)
+
+ 	WHEN  `i` = 'jsp-abt生成json' THEN
+JSON_ARRAY('bao',
+json_array('l3','生成ajson'
+		,CONCAT_WS('','(?s),"(?!',c0,').\\d+"')	,''
+		,'^,',''
+	,'(?#result)^(("b\\d+")(?:,\\g-1)++)(,(?1))+$','[]'
+	,'("(?:(b)|\\w)\\d+")(?:,"\\w+")*?(?=(?(2),\\g1|$))','[\\0]' 
+
+ 		,'(\\[[^]]+?])(,(?1))++','[\\0]'
+		,'^\\[',CONCAT_WS('',JSON_QUOTE(c0),':[')
+		,'(?<=^"b":)(\\[("\\w+")(?:,(?-1))*?])(?:,(?-1))*?$','[\\0]'
+)
+,json_array('l3','多多循环'
+,'("b\\d+")(?:,"b\\d+")*?,(\\g-2.*?])'
+,'(?#循环)(("b\\d+")(?:,"b\\d+")*?),(\\g-3.*?])','\\1],[\\3'
+)
+
+)
+
+ 	WHEN  `i` = '提取abt关系' THEN
+	JSON_ARRAY('jspabt变字段',
+		json_array('jsp','多多抓取' 
+				,@r := CONCAT_WS('','(?#抓取)(\\[("(?:(?=\\\\).{2}|(?![\\\\"]).)*?"|null|[\\-\\d\\.]+)(?:,\\s*(?-1))*?,"',c0,'\\d+"])')
+				,@r,'\\0,'
+		)
+		
+		,json_array('jsp','数组处理' 
+				,',$',']'
+				,'^.','[['
+		)
+)
+ 	WHEN  `i` = 'jspabt变字段' THEN
+
+		json_array('jsp','多多抓取' 
+				,'(?#抓取)(?<=\\[)".*?(?=])',''
+				,'.++',CONCAT_WS('',JSON_QUOTE(c0),':\\0')
+				,'","',','
+		)
+
+  	WHEN  `i` = '说明-字段' THEN
+		JSON_ARRAY('jspabt变字段',
+			json_array('jsp','多多抓取' 
+					,@r:=  '(?#抓取)(?x)>(\\s*\\w(?:[\\w\\s]|：|<br\\s*/?>)*?)(?:<(?!textarea|input)[^>]+?>\\s*)*?
+				((<(?:textarea|input)[^>]+?(?:id|name)=["\']?\\b([abt]\\d+)\\b["\']?[^>]*?>)(?:\\s*(?:<br\\s*/?>\\s*)?(?-2))*+)'
+			,@r,'["\\1","\\2"],'
+
+			,'\\s*+(?:<br\\s*/?>)\\s*+','","'
+			,'<(?:textarea|input)[^>]+?(?:id|name)=["\']?\\b([abt]\\d+)\\b["\']?[^>]*?>','\\1'
+			,'\\s+',''
+			,'(\\d)(?=[abt]\\d+)','\\1","'
+			,'","(?=\\w")|：',''
+			,'(\\w)(及\\w)','\\1","\\2'
+
+			)
+		,json_array('jsp','数组处理' 
+				,',$',']'
+				,'^.','[['
+		)
+	)
+		WHEN  `i` = '分裂数组1' THEN
+		JSON_ARRAY('分裂数组取余',
+			json_array('jsp','多多抓取' ,@rb2 := '(?i)(?#分裂数组1)\\[("[^abt]\\w*")(?:,\\s*(?-1)){1,},\\s*("[abt]\\d+")(?:,\\s*(?-1)){1,}\\]'
+					,@rb2
+			
+			)
+
+			,json_array('jsp','修正' 
+					,'\\[]',''
+			
+			)
+	)
+ 
+	WHEN  `i` = 'SELECT2update' THEN
+json_array('jsp','多多' 
+		,'(?s)SELECT.*?FROM'
+-- 		,'(?m),(.*?)(?:["\'])\\s*as\\s*(?:["\'])(\\s*\\D*?)\\s*$',',\\2=\\1'
+
+
+)
+
+ 	WHEN  `i` = '增值税处理' THEN
+	 case 
+		WHEN `c0` = '' THEN 
+json_array('jsp','   多多抓取' 
+		,'(?#抓取)(?<=\\[)".*?(?=])',''
+		,'.++',CONCAT_WS('',JSON_QUOTE(c0),':\\0')
+		,'","',','
+
+
+)
+	END
+	WHEN `i` = '公式处理' THEN 
+json_array(
+'1','公式处理'
+	,'(?s)function\\s+(before|after)InitForm[^\\{]*(\\{(?:[^\\{}]+|(?-1))*?\\})\\K.+?(?://|function|</script)'
+	,'\n\\1InitForm()\\0'
+)	
+	WHEN `i` = 'css' THEN 
+		json_array(
+		'1','-- 多多抓取' ,'(?#抓取)(?m)^[^\\{]+(\\{(?:[^\\{}]+|(?-1))*?\\})'-- ,@cssr := '(?#抓取)\\.glyphicon[^\\{]*(\\{(?:[^}\\{]|(?-1))*})|'	
+			,'(?#抓取)(?s).*(glyphicon|btn-xs|\\Q-webkit-font-smoothing\\E).+$','\\0'
+
+		)
+	WHEN `i` = 'curl' THEN 
+	JSON_ARRAY('curl','',
+		json_array(
+		'1','多多抓取' ,'(?#抓取)(?mxi)(?:-H.+?(?:
+		Referer|Cookie|content\\-Type)|--data-raw|curl
+		
+		)(?:"(?:(?=\\\\).{2}|(?!["\\\\]).)*?"|.){2,}?(?=(?:\\\\)*?\\s*$)'
+		)
+		,json_array('','','\\s*0\\s*$',''
+		,'(?<!\\\\)"','\\\\"'
+		,"'",'"'
+		)
+	)	
+	WHEN `i` = 'json格式key' THEN 
+	JSON_ARRAY('json格式key',
+		json_array('',''
+		   ,'"(\\w+)"(?=,\\s*|])','\\0,\\1'
+			,'\\[|]',''
+
+		)
+	)
+		WHEN `i` = 'json格式keyas' THEN 
+	JSON_ARRAY('json格式key',
+		json_array('',''
+		   ,'"(\\w+)"(?=,\\s*|])','\\1 AS \\1\n'
+			,'\\[|]',''
+
+		)
+	)
+		WHEN `i` = '注释样式' THEN 
+	JSON_ARRAY('注释样式',
+		json_array('',''
+		   ,'<(link[^>]+(?:bill_common)\\.css\\b[^>]*?)>'
+				 ,case WHEN c0  REGEXP '(?:kjdz_hcp000_hcp04)' THEN  '\\0'
+				 ELSE '<%--\\0--%>' END
+		)
+	)
+	WHEN `i` = 'dir变数组' THEN 
+	json_array('',
+		json_array('1','多多抓取' ,'(?#抓取)(?s).*?(\\w+\\.\\w{2,10}).*?(?=\\g<1>|$)'
+					 ,'(?#抓取)(\\w+)\\.(\\w{2,10})'
+					 ,concat('["',c0,'\\0",','"\\2",','"\\1"],')
+
+	)
+	,json_array(	'1','修补' 
+					,',\\s*$',''
+					,'^\\[','[['
+					,']$',']]'
+))	
+	WHEN `i` = '移动css' THEN 
+json_array('','移动css到js||替换',
+		json_array('1','移动css到js '
+
+			,CONCAT_WS('','(?isx)
+		((?&link))(.+?)((?&script))	
+		
+				(?(DEFINE)
+							(?<link> 
+									<link(?&i)/\\s*>)
+						(?<script> 	
+										(?:\\s*+<script(?&i)>\\s*</script>)+
+										)
+						(?<i>[^>]*',c0,'[^>]*)
+				)
+	') ,'\\2\n\n<%--\\1\\3\--%>\n\n\t\t\\1\\3\n\n'
+	)
+
+	,JSON_ARRAY(1,'多多'
+		,CONCAT_WS('','(?isx)<%--.+?--%>(*SKIP)(*F)|
+		(?&link)(?&script) 
+				
+						(?(DEFINE)
+									(?<link> 
+											<link(?&i)/\\s*>)
+								(?<script> 	
+												(?:\\s*+<script(?&i)>\\s*</script>)+
+												)
+								(?<i>[^>]*',c0,'[^>]*)
+						)')
+
+		, CONCAT_WS('','(?isx)
+		(href=.)(?&i)(/css/(?&f)',c0,'(?&f)\\b)
+					(?(DEFINE)
+							(?<i>[^>]*)
+							(?<f>[\\w+\\.]*)
+					)
+		'),CONCAT_WS('','\\1',json_value(c,'$[1]'),'\\2')	
+
+		, CONCAT_WS('','(?isx)
+		(<script(?&i)src=.)(?&i)(/i18n/(?&f)\\.js\\b)
+					(?(DEFINE)
+							(?<i>[^>]*)
+							(?<f>[\\w+\\-\\.]*)
+					)
+		'),CONCAT('\\1',json_value(c,'$[1]'),'/js\\2')
+
+		, CONCAT_WS('','(?isx)
+		(<script(?&i)src=.)(?&i)(/(?&f)',c0,'(?&f)\\.js\\b)
+					(?(DEFINE)
+							(?<i>[^>]*)
+							(?<f>[\\w+\\-\\.]*)
+					)
+		'),CONCAT('\\1',json_value(c,'$[1]'),'/js\\2')
+
+	)
+
+)
+
+	WHEN `i` = '处理目录' THEN 
+	json_array('','处理目录',
+			json_array('1','替换'
+			,'\\\\','/'
+			, '(?m)^\\s*(?:(?:\\d{4}/\\d{2}/\\d{2}\\s+[\\d:]+\\s+(?:[\\d,]+\\s+|\\Q<DIR>\\E.+$)))\\s*',''
+			,'(?m)^\\s*(?:\\d+\\s+个|驱动器|所列|卷的).+?(?=\\s*$)',''
+			,'(?m)(^[ \t]\\w:).+的目录$(?=\\s*(?1))',''
+			,"(?m)^\\s+(?=\\S|\\s*$)",''
+			,'(?m)\\s*(?:的目录)$',''
+		)
+	,JSON_ARRAY(1,'多多'
+		,CONCAT_WS('','(?ismx)(?&path).*?(?=(?&path)|(?-m)$)
+						(?(DEFINE)
+													(?<path>
+													[A-Za-z]:.+?$
+													)
+
+										)
+						')
+	,@r4b2自用:= '(?m)(?#作为参数 cd)(?m)[A-Za-z]:.+?$',''
+	,'(?m)^([\\.@{}()\\w\\-]+?)$','`参cd`/\\1'
+-- ,json_array('','else'	
+-- ,'(?m-s)([A-Za-z]:).+(\\1).*$',''
+ 	,'(?m)^.+/\\s*$\\s+',''
+-- )
+	)
+,json_array(1,'生成载入语句'
+	,CONCAT_WS('','(?m-s)^.+?/',`c0`,'/(.+?(?:\\.(\\w+))?)$')
+	,CONCAT_WS(' ','SELECT "\\1","\\2"'
+,',LOAD_FILE(CONVERT("\\0" USING gbk))' 
+	,'UNION ALL')
+	,'UNION ALL\\s*$',''
+)
+/**/
+)	
+	WHEN `i` = 'docusaurus' THEN 
+	json_array('','处理<DOCTYPE>',
+			json_array('1','去facebook'
+				,'(?ism)^(.*?)(<!DOCTYPE)\\s+(html)?[^>]*?(>)','\\2 html>\n\n\\1'
+				
+			)
+
+
+)
+	WHEN `i` = '处理DOCTYPE' THEN 
+	json_array('','处理<DOCTYPE>',
+			json_array('1','替换'
+				,'(?is-m)^(.*?)(<!DOCTYPE)\\s+(html)?[^>]*?(>)','\\2 html>\n\n\\1'
+				
+			)
+
+
+)
+	WHEN `i` = 'xml2table2表' THEN 
+	json_array('',' 抓取',
+           o (CONCAT( '(?xm)(?#抓取1)((?&k))((?=.+',c0, ')(?&vs).+\\s*)(?:^\\g1(?-1))*,xml' )),''
+					 ,o('(?#抓取1)((?&name))\\(((?&col))'),''
+					 ,'^([^(]+)\\(((\\w+)(?:,.+))',
+					CONCAT_WS(''
+						,CONCAT_ws(',','SELECT \\2',j0(c,'补充列')),' FROM \\1 WHERE 1 '
+						,CONCAT(' AND \\3=' ,JSON_QUOTE(json_value(c,'$[1]')))
+						)
+
+)
+	WHEN `i` = '修改json-1' THEN 
+	json_array('','合并 - 修改json-1',
+			json_array('1','替换'
+				,'(?is-m)^(.*?)(<!DOCTYPE)\\s+html[^>]*?(>)','\\2 html>\n\n\\1'
+				
+			)
+
+
+)
+	WHEN `i` = '@2``' THEN 
+	json_array('','@ -> ` ',
+			json_array('1',' ',
+			'\\@(\\w+)\\b(\\s*\\w*+)','`\\1`\\2'
+				
+			)
+
+
+)
+
+	WHEN `i` = '测试队列' THEN 
+	json_array('队列0','队列0',
+	    			json_array('队列1','队列1'
+							,JSON_ARRAY('对11','对11','123','321','321','处理一次')
+							,'处理一次','处理一次.5'
+						),	
+						json_array('队列2','队列2','处理一次.5','处理二次'
+					)
+					,'处理二次','处理二次.5'
+					,"done","竞赛"
+					
+)	
+			
+	WHEN `i` = '竞赛' THEN 
+
+	json_array('','@ -> ` ',
+						
+			json_array('','去掉一大坨'
+					,'(?sxm)^<bgimage.+?bgimage>',''
+					,'(?sxm)(?>^.+?CDATA\\[)(.+?)(?>\\Q]]></sql>\\E\\s*$)','\\1;'
+						,"'\\s*'",'NULL'
+						,"\\s+(?=')",''
+					,'"','\\\\\"'
+					,"(?s)'((?:[^\\\\']|\\\\.)*?)\\s*'",'"\\1"'
+					,"(?m)^insert(\\s*into\\s*)",CONCAT('REPLACE\\1`',c0,'`.')
+					,'</sqls>$',''
+					)
+)	
+	WHEN `i` = 'replace2select' THEN
+json_array('1','2',
+		json_array(	'l','多多',
+CONCAT('(?xims)^( (?&b)\\( )	((?&es)\\)(?-s).*?(?=\\s*$))(?:(\\s*^)\\g1(?2))*
+	(?(DEFINE)
+	(?<o>[^"])
+	(?<b>(?i)(?&o)+?values)
+	(?<e>(?ms)("(?:[^\\\\"]|\\\\.)*?"|null|\\b-?\\d+(?:\\.\\d+)?\\b)(?=\\s*(?:,\\s*(?-1)|\\))))
+	(?<es>(?ms)(?&e)(?:\\s*,\\s*(?&e))*)
+	)')
+	-- ,'(?s)^.+?$','--\\0--'
+			,CONCAT('(?#反复应用)','(?isx)^[^(]+?\\(,*?\\K((?&k))(.+?)((?&v))
+	(?(DEFINE)
+	(?<k>\\w+(?=\\s*,\\s*\\w+|\\)))
+	(?<v>("(?:[^\\\\"]|\\\\.)*?"|\\b-?\\d+(?:\\.\\d+)?\\b|NULL)(?=\\s*,\\s*(?-1)|\\)))
+	)')
+		,'\\2\\3 \\1'
+	)
+	,'(?mi)^replace.+?values\\(','SELECT '
+	,'(?mi)\\)(?=\\s*;\\s*$)',''
+	,'(?m);(?=\\s*^SELECT)',' UNION ALL'
+)
+
+	WHEN `i` = '反复应用' THEN
+		json_array(	'l','多多',
+CONCAT('(?xims)^( (?&b)\\( )	((?&es)\\)(?-s).*?(?=\\s*$))(?:(\\s*^)\\g1(?2))*
+	(?(DEFINE)
+	(?<o>[^"])
+	(?<b>(?i)(?&o)+?values)
+	(?<e>(?ms)("(?:[^\\\\"]|\\\\.)*?"|null|\\b-?\\d+(?:\\.\\d+)?\\b)(?=\\s*(?:,\\s*(?-1)|\\))))
+	(?<es>(?ms)(?&e)(?:\\s*,\\s*(?&e))*)
+	)')
+	-- ,'(?s)^.+?$','--\\0--'
+			,CONCAT('(?#反复应用)','(?isx)^[^(]+?\\(,*?\\K((?&k))(.+?)((?&v))
+	(?(DEFINE)
+	(?<k>\\w+(?=\\s*,\\s*\\w+|\\)))
+	(?<v>("(?:[^\\\\"]|\\\\.)*?"|\\b-?\\d+(?:\\.\\d+)?\\b|NULL)(?=\\s*,\\s*(?-1)|\\)))
+	)')
+		,'\\2\\3 \\1'
+	)	
+	
+	WHEN `i` = 'replace2create' THEN
+json_array('1','接'
+		,"done",'抓取'
+		-- ,"done",'反复应用'
+		,'(?i)^.*?\\K\\)(?=values\\()(?s).+?(?=;\\s*$)',''
+
+		,'(?i)REPLACE\\s*into\\s*(.+)(?=\\()(.+?)(?=;\\s*$)','CREATE TABLE \\1 \\2)'
+		,'\\w+(?=\\s*[,)])',CONCAT_WS(' ','\n\\0',' TINYTEXT NULL')
+		,'(?i)^CREATE\\s*TABLE(.+?)(?=\\()','DROP TABLE IF EXISTS \\1;\n\\0'		
+	)
+	
+  WHEN i= '抓取' THEN
+	JSON_ARRAY('8gu','shibai',	
+
+	o(
+		CONCAT_ws(''
+								,'(?#抓取)(?xim)^\\s*\\K(?=.+?',CONCAT('\\b(?:',json_value(c,'$[0]'),')\\b)'
+								,'((?&b)\\()((?&es)\\).*?(?=\\s*$))(?:\\s*^\\g1(?-1))*,抓取')
+								))
+					 ,'\\0'
+
+)
+	WHEN `i` = '修改t表' THEN 
+	json_array('','@ -> ` ',
+json_array(	'l','多多',
+			CONCAT('(?xms)^\\w+\\s*TABLE\\s*(?&n)\\s*(?&k)
+	(?(DEFINE)
+		(?<n>
+			`?\\b(?:',`c0`,')\\b`?
+		)
+		(?<k>\\((?:[^()]|(?&k))*?\\))
+		(?<o>^[^,\\r\\n]+,)
+	)')
+
+,'(?#直接)(?m)varchar\\((\\d+)\\)',' TINYTEXT '
+
+)
+)				
+
+
+WHEN `i` = '百家姓' THEN 
+	json_array('',''
+		,'\\b\\w\\b,?',''
+		,',','|'
+
+)
+
+WHEN `i` = '省市' THEN 
+JSON_ARRAY('','',
+json_array('','生成省市'
+		,'(?:、|，)',','
+		, '(?m)^\\s*$\\s*',''
+		,'(?m)^(.+?)(\\w+)(?=\\s*$)' ,'\t[\\1[\\2]]'
+		, '\\r\\n(?!$)',' ,\n'
+		,'(?s)^.+$','[\n\\0\n]'
+		,'\\b(?!\\d)\\w+',' "\\0" '
+),
+json_array('','生成'
+		,'(?:、|，)',','
+)
+)
+WHEN `i` = 'jalert' THEN 
+	json_array('','jalert` '
+			,json_array('1',' ',
+			 '(?xm-s)
+		(?:^|[\\(\\{]\\s*)
+		(?!.*(?://|成功))
+		.*?
+		\\K((?&关键字))
+		
+		\\(((?&值))(\\s*,\\s*(?&值))*?(?=\\s*\\))
+		
+		(?(DEFINE)
+			(?<关键字>[\\w\\.]+alert)
+			(?<值>(["\'])?.+?\\g-1))','allWarn([\\2\\3]'
+				
+			)
+			,json_array('1',' ',
+			 '(?xm-s)
+		(?:^|[\\(\\{]\\s*)
+		(?=.*(?://|成功))
+		.*?
+		\\K((?&关键字))
+		
+		\\(((?&值))(\\s*,\\s*(?&值))*?(?=\\s*\\))
+		
+		(?(DEFINE)
+			(?<关键字>[\\w\\.]*?jalert)
+			(?<值>(["\'])?.+?\\g-1))','allNotice([\\2\\3]'
+				
+			)
+)
+WHEN `i` = '去注释' THEN 
+		json_array('',''
+			,o('(?&v)(*SKIP)(*FAIL)|(?&注释),html'),''
+)
+WHEN `i` = '抓取sample' THEN 
+s('抓取sample',0)
+
+WHEN `i` = '印章指纹1' THEN 
+JSON_ARRAY('',''
+,'\\w+',CONCAT_WS('','"\\0",',CONCAT(c0,'.'),'\\0')
+,'^.*?(?=\\s*$)',CONCAT_WS('','JSON_OBJECT(\\0) ' ,CONCAT(c1))
+)
+WHEN `i` = '过滤企业' THEN 
+JSON_ARRAY('',''
+,'^\\s*(?>.*往来企业.*|\\d+|法律顾问签字章|netinnet)\\s*$','其它'
+,'^(?:.+?\\-|\\d+)',''
+
+)
+WHEN `i` = '过滤人' THEN 
+JSON_ARRAY('',''
+,'^\\s*(?>.*往来企业.*|\\d+|法律顾问签字章|netinnet)\\s*$','某人'
+,'(?:^.+?\\-\\s*|\\d+)|电子客票行程单',''
+
+)
+WHEN `i` = '过滤签章' THEN 
+JSON_ARRAY('',''
+,'^.*?(签字).*$','\\1章'
+
+
+
+)
+
+WHEN `i` = 'es6' THEN 
+JSON_ARRAY('','',
+/*		JSON_ARRAY('',CAST('多多' AS CHAR), 
+		 o('(?&zfc),es6,i'),
+			'(?s)([\'"])(.+)\\g1(?=\\s*$)','`\\2`'			
+			,o('(?x)(["\'])\\s*\\+\\s*((?&k))\\s*\\+\\s*\\g{-2},es6'),'${\\2}'
+ 			,'(?i)\\Q${\\E(null)\\}','\\1'
+			,'\\\\\(.)','\\1'
+			
+
+		)*/
+		JSON_ARRAY('',CAST(' es6 $.post' AS CHAR), 
+		 o('\\$\\.post\\s*\\((\\s*(?&zfc)\\s*),\\s*.+?\\(\\s*(\\w+).+(?=\\{)  es6 i')
+		 ,'/*es6语法注释\\0*/\nfetch(\\1,{method: "POST"}).then(res=>res.text())\n.then(\\2=>'
+
+/* 			,'(?i)\\Q${\\E(null)\\}','\\1'
+			,'\\\\\(.)','\\1'
+			
+*/
+		)
+-- 		,JSON_ARRAY('',''		,o('(?x)(?&zs)(*SKIP)(*FAIL)|(["\'])?(\\w+)\\g1:\\s*\\g2,ES6语法'),'\\2')
+
+)
+
+
+
+		ELSE NULL 
+  END
+	)
+;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `r4b3`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `r4b3`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `r4b3`(`p` blob) RETURNS longblob
+    NO SQL
+`la`:BEGIN
+	#Routine body goes here...
+	DECLARE i INT(5) DEFAULT NULL;DECLARE y INT(5) DEFAULT NULL;
+	DECLARE c0 VARCHAR(200) DEFAULT NULL;
+	DECLARE c1 VARCHAR(200) DEFAULT NULL;
+	DECLARE c2 VARCHAR(200) DEFAULT CONCAT_WS('/',c1,'bill/');
+
+
+
+	DECLARE sign VARCHAR(200) DEFAULT NULL;
+
+  IF NOT json_valid(p) THEN RETURN NULL;  END IF;
+	SET i = json_value(p,'$[0]')
+			,`c0` = json_value(p,'$[1][0]');
+
+	-- SET sign = CONCAT_WS('','<!--',i,'-->\n'); -- 审计
+
+
+
+	RETURN 
+	
+  CASE i
+
+		WHEN 0 THEN  
+		json_array(
+'3','去注释','^(.)',CONCAT_WS('','
+---
+sidebar_position: ',1,'
+---
+\\1')
+)
+/*
+*/
+		ELSE NULL 
+  END
+;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `r4b_json`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `r4b_json`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `r4b_json`(`p` blob) RETURNS longblob
+    NO SQL
+`la`:BEGIN
+	#Routine body goes here...
+	DECLARE i INT(5) DEFAULT NULL;DECLARE y INT(5) DEFAULT NULL;
+	DECLARE c0 VARCHAR(200) DEFAULT NULL;
+	DECLARE c1 VARCHAR(200) DEFAULT NULL;
+	DECLARE c2 VARCHAR(200) DEFAULT CONCAT_WS('/',c1,'bill/');
+
+
+
+	DECLARE sign VARCHAR(200) DEFAULT NULL;
+
+  IF NOT json_valid(p) THEN RETURN NULL;  END IF;
+	SET i = json_value(p,'$[0]')
+			,`c0` = json_value(p,'$[1][0]');
+
+	-- SET sign = CONCAT_WS('','<!--',i,'-->\n'); -- 审计
+
+
+
+	RETURN 
+	
+  CASE i
+
+		WHEN 0 THEN
+JSON_ARRAY(		
+		json_array(
+'3','c','`[^`]++`'
+,'(uuid).*?v4\\(\\)','varchar(200) NOT NULL DEFAULT \\1()'
+,'uuid(?=,)','varchar(200) '
+,'character varying','TINYTEXT'
+-- ,'(?<=,)\\s+CONSTRAINT\\s+"[^"]+"',''
+,'"',''
+)
+,json_array(
+'跳','跳','(?s)[^`]*+`([^`]++)`[^`]*+(?=`|$)','\n\\1;\r'
+
+)
+)
+/*
+*/
+		ELSE NULL 
+  END
+;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `r4b_mdjs`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `r4b_mdjs`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `r4b_mdjs`(`p` blob) RETURNS longblob
+    NO SQL
+`la`:BEGIN
+	#Routine body goes here...
+	DECLARE i INT(5) DEFAULT NULL;DECLARE y INT(5) DEFAULT NULL;
+	DECLARE c0 VARCHAR(200) DEFAULT NULL;
+	DECLARE c1 VARCHAR(200) DEFAULT NULL;
+	DECLARE c2 VARCHAR(200) DEFAULT CONCAT_WS('/',c1,'bill/');
+
+
+
+	DECLARE sign VARCHAR(200) DEFAULT NULL;
+
+  IF NOT json_valid(p) THEN RETURN NULL;  END IF;
+	SET i = json_value(p,'$[0]')
+			,`c0` = json_value(p,'$[1][0]');
+
+	-- SET sign = CONCAT_WS('','<!--',i,'-->\n'); -- 审计
+
+
+
+	RETURN 
+	
+  CASE i
+
+		WHEN 0 THEN
+JSON_ARRAY(		
+	'0','detail','`[^`]++`'
+	,'(?s)details(//j*.*?j//)'
+,'
+<details>
+    <summary>details</summary>
+\\1
+</details>
+'
+	,'uuid(?=,)','varchar(200) '
+	,'character varying','TINYTEXT'
+	-- ,'(?<=,)\\s+CONSTRAINT\\s+"[^"]+"',''
+	,'"',''
+)
+/*
+*/
+		ELSE NULL 
+  END
+;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `r4b_time`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `r4b_time`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `r4b_time`(`p` blob) RETURNS longblob
+    NO SQL
+`la`:BEGIN
+	#Routine body goes here...
+	DECLARE i varchar(100) DEFAULT NULL;DECLARE y INT(5) DEFAULT NULL;
+	DECLARE r  text DEFAULT NULL;
+	DECLARE `c0` VARCHAR(200) DEFAULT NULL;
+	DECLARE c1 VARCHAR(200) DEFAULT '${pageContext.request.contextPath}';
+	DECLARE c2 VARCHAR(200) DEFAULT CONCAT_WS('/',c1,'bill/');
+
+
+
+	DECLARE sign VARCHAR(200) DEFAULT NULL;
+
+  IF NOT json_valid(p) THEN RETURN NULL;  END IF;
+
+	SET i = CAST(json_value(p,'$[0]') AS CHAR)
+			,`c0` = IFNULL(json_value(p,'$[1][0]'),'"NULL"');
+
+	-- SET sign = CONCAT_WS('','<!--',i,'-->\n'); -- 审计
+
+
+
+	RETURN 
+	
+  CASE 
+
+
+  WHEN  `i` regexp '^[.\\d]+$' and `i` = 10 THEN
+
+	JSON_ARRAY('1','时间'
+	,"17%","13%"
+	,@Rjson:='@@前10年@@',`c0`-10
+	,@Rjson:='@@前5年@@',`c0`-5
+	,@Rjson:='@@前4年@@',`c0`-4
+	,@Rjson:='@@前3年@@',`c0`-3
+	,@Rjson:='@@前2年@@',`c0`-2
+	,@Rjson:='@@前1年@@',`c0`-1
+	,'@@年@@',`c0`
+	,@Rjson:='@@后1年@@',`c0`+1
+	,@Rjson:='@@后2年@@',`c0`+2
+	,@Rjson:='@@后3年@@',`c0`+3
+	,@Rjson:='@@后5年@@',`c0`+5
+	
+	,'@@U年@@',REGEXP_replace(m2c(`c0`),'[元拾佰仟万拾佰仟亿拾佰仟万拾佰仟整]','')
+	,@Rjson:='@@U后1年@@',REGEXP_replace(m2c(`c0`+1),'[元拾佰仟万拾佰仟亿拾佰仟万拾佰仟整]','')
+	,@Rjson:='@@U后5年@@',REGEXP_replace(m2c(`c0`+5),'[元拾佰仟万拾佰仟亿拾佰仟万拾佰仟整]','')
+
+	,@Rjson:='@@S年@@',substr(`c0`,3)
+	,@Rjson:='@@S后1年@@',substr(`c0`+1,3)
+	,@Rjson:='@@S后5年@@',substr(`c0`+5,3)
+	
+)	
+
+
+
+
+/*
+*/
+		ELSE NULL 
+  END
+;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `r4b_time0`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `r4b_time0`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `r4b_time0`(`p` blob) RETURNS longblob
+    NO SQL
+`la`:BEGIN
+	#Routine body goes here...
+	DECLARE i varchar(100) DEFAULT NULL;DECLARE y INT(5) DEFAULT NULL;
+	DECLARE r  text DEFAULT NULL;
+	DECLARE `c0` VARCHAR(200) DEFAULT NULL;
+	DECLARE c1 VARCHAR(200) DEFAULT '${pageContext.request.contextPath}';
+	DECLARE c2 VARCHAR(200) DEFAULT CONCAT_WS('/',c1,'bill/');
+
+
+
+	DECLARE sign VARCHAR(200) DEFAULT NULL;
+
+  IF NOT json_valid(p) THEN RETURN NULL;  END IF;
+
+	SET i = CAST(json_value(p,'$[0]') AS CHAR)
+			,`c0` = IFNULL(json_value(p,'$[1][0]'),'"NULL"');
+
+	-- SET sign = CONCAT_WS('','<!--',i,'-->\n'); -- 审计
+
+
+
+	RETURN 
+	
+  CASE 
+
+
+  WHEN  `i` regexp '^[.\\d]+$' and `i` = 0 THEN
+
+	JSON_ARRAY('1','ifa 时间'
+	,"\\b2005\\b",`c0`-2
+	,'\\b2006(?=(\\d{2,4})?\\b)',`c0`-1
+	,'\\b2006(?=年|\\d{1,4}\\b)',`c0`-1
+	,'\\b2007(?=(\\d{2,4})?\\b)',`c0`
+	,'\\b2007(?=年|\\d{1,4}\\b)',`c0`
+,'贰零零柒','贰零贰零'
+,'贰零零陆','贰零壹玖'
+)	
+
+
+
+
+/*
+*/
+		ELSE NULL 
+  END
+;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `r4b_tool`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `r4b_tool`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `r4b_tool`(`p` blob) RETURNS longblob
+    NO SQL
+`la`:BEGIN
+	#Routine body goes here...  (?#抓取)
+	DECLARE i varchar(100) DEFAULT NULL;DECLARE y INT(5) DEFAULT NULL;
+	DECLARE r  text DEFAULT NULL;
+	DECLARE `c0` VARCHAR(200) DEFAULT NULL;
+	DECLARE c1 VARCHAR(200) DEFAULT '${pageContext.request.contextPath}';
+	DECLARE c2 VARCHAR(200) DEFAULT CONCAT_WS('/',c1,'bill/');
+
+
+
+	DECLARE sign VARCHAR(200) DEFAULT NULL;
+
+  IF NOT json_valid(p) THEN RETURN NULL;  END IF;
+
+	SET i = CAST(json_value(p,'$[0]') AS CHAR)
+			,`c0` = IFNULL(json_value(p,'$[1][0]'),'"NULL"');
+
+	-- SET sign = CONCAT_WS('','<!--',i,'-->\n'); -- 审计
+
+
+
+	RETURN 
+	
+  CASE 
+
+
+	WHEN  `i` = '抓取json' THEN
+json_array('百度关键词'
+	,JSON_ARRAY(
+		'抓','多多抓取'
+		,@`r4b2`:= '(?#抓取)<meta name="(?:keywords|description)"[^>]*>'
+		,CONCAT_WS('','(?#抓取)',(@`r4b2`:='(?s)((["\'])(?:(?=\\\\).{2}|(?:(?!\\\\|\\g-1).)*+)*\\g-1)')),'\\0'
+	,CONCAT_WS('','("[^"]+")(',@`r4b2`,')'),',\\1:\\2'
+	)
+	,JSON_ARRAY(
+		'生成json','生成json'
+		,'(?-m)^,','{'
+		,'(?-m)"$','"}'
+	)
+)
+
+	  WHEN  `i` regexp '^[.\\d]+$' and `i` = 10 THEN
+
+	JSON_ARRAY('1','时间'
+	,@Rjson:='@@前10年@@',`c0`-10
+	,@Rjson:='@@前5年@@',`c0`-5
+	,@Rjson:='@@前3年@@',`c0`-3
+	,@Rjson:='@@前2年@@',`c0`-2
+	,@Rjson:='@@前1年@@',`c0`-1
+	,'@@年@@',`c0`
+	,@Rjson:='@@后1年@@',`c0`+1
+	,@Rjson:='@@后2年@@',`c0`+2
+	,@Rjson:='@@后5年@@',`c0`+5
+	
+	,'@@U年@@',REGEXP_replace(m2c(`c0`),'[元拾佰仟万拾佰仟亿拾佰仟万拾佰仟整]','')
+	,@Rjson:='@@U后1年@@',REGEXP_replace(m2c(`c0`+1),'[元拾佰仟万拾佰仟亿拾佰仟万拾佰仟整]','')
+	,@Rjson:='@@U后5年@@',REGEXP_replace(m2c(`c0`+5),'[元拾佰仟万拾佰仟亿拾佰仟万拾佰仟整]','')
+
+	,@Rjson:='@@S年@@',substr(`c0`,3)
+	,@Rjson:='@@S后5年@@',substr(`c0`+5,3)
+	
+)	
+
+
+
+
+/*
+*/
+		ELSE NULL 
+  END
+;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `r4b_X2mysql`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `r4b_X2mysql`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `r4b_X2mysql`(`p` blob) RETURNS longblob
+    NO SQL
+`la`:BEGIN
+	#Routine body goes here...
+	DECLARE i INT(5) DEFAULT NULL;DECLARE y INT(5) DEFAULT NULL;
+	DECLARE c0 VARCHAR(200) DEFAULT NULL;
+	DECLARE c1 VARCHAR(200) DEFAULT NULL;
+	DECLARE c2 VARCHAR(200) DEFAULT CONCAT_WS('/',c1,'bill/');
+
+
+
+	DECLARE sign VARCHAR(200) DEFAULT NULL;
+
+  IF NOT json_valid(p) THEN RETURN NULL;  END IF;
+	SET i = json_value(p,'$[0]')
+			,`c0` = json_value(p,'$[1][0]');
+
+	-- SET sign = CONCAT_WS('','<!--',i,'-->\n'); -- 审计
+
+
+
+	RETURN 
+	
+  CASE i
+
+		WHEN 0 THEN  
+		json_array(
+'3','去注释','^(.)',CONCAT_WS('','
+---
+sidebar_position: ',1,'
+---
+\\1')
+)
+/*
+*/
+		ELSE NULL 
+  END
+;
 END
 ;;
 DELIMITER ;
@@ -9244,67 +15194,48 @@ DELIMITER ;
 -- ----------------------------
 DROP FUNCTION IF EXISTS `r5`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` FUNCTION `r5`(`s` blob,`p` blob) RETURNS mediumblob
+CREATE DEFINER=`root`@`%` FUNCTION `r5`(`s` blob,`p` blob) RETURNS longblob
     NO SQL
     DETERMINISTIC
 BEGIN
-	
-
 		DECLARE `re`	MEDIUMBLOB DEFAULT NULL;DECLARE `part`	BLOB DEFAULT NULL;DECLARE `r`	VARCHAR(500)DEFAULT
-		'(?si)^((?:(?:(?:@|\\bas\\s+|\\w\\.)`[^`]+`)|[^`])*?)(?:((?:(?:(?<![\'"])`)|\\br\\([\'"])((?:(?<=[\'"])`)?(?:\\\\.|[^"`\'])+(?:`(?=[\'"]))?)(?:(?:`(?![\'"]))|[\'"]\\)))|$)';
+'(?six)^((?:(?:(?:@|\\bas\\s+|\\w\\.)`[^`]+`)|[^`])*?)
+(?:((?:(?:(?<![\'"])`)|\\br\\([\'"])((?:(?<=[\'"])`)?(?:\\\\.|[^"`\'])+(?:`(?=[\'"]))?)(?:(?:`(?![\'"]))|[\'"]\\)))|$)';
 
-
+-- INSERT plogs( Function_Name,summary) SELECT 'r5',CONCAT_WS(',',QUOTE(`s`),QUOTE(`p`));
 
 		IF IFNULL(p,'')='' THEN
 				RETURN REGEXP_replace(`s`,REGEXP_REPLACE(`r`,'^\\([^)]+\\)\\K(\\^)',''),'\\1@`\\2`');
 		END IF;
 
 		l:LOOP
+
 			SET	`part` = REGEXP_substr(s,r);
 
 			IF IFNULL(`part`,'') = '' THEN LEAVE l; END IF;
-
-			SET	`s`	=	REGEXP_REPLACE(s,r,''),
-					`re`	= CONCAT_WS('',`re`	,REGEXP_REPLACE(`part`,r,'\\1')
-																		,CASE		WHEN REGEXP_REPLACE(`part`,r,'\\2') = '' THEN NULL
-																						WHEN `part` REGEXP '(?i)\\br\\((?:"(?:\\\\.|[^"])+"|\'(?:\\\\.|[^\'])+\')\\)$' THEN IF(IFNULL((@r5part := json_QUOTE(r(REGEXP_REPLACE(`part`,`r`,'\\3')))),'') <> '' ,@r5part,REGEXP_REPLACE(`part`,`r`,'\\2'))
-																				ELSE  j2(p,REGEXP_REPLACE(`part`,`r`,'\\3')) 
-																			END
-														);
+-- RETURN j2(p,REGEXP_REPLACE(`part`,`r`,'\\3'));
+			SET	`s`	=	REGEXP_REPLACE(`s`,`r`,''),
+					`re`	= CONCAT_WS(''
+							,`re`	
+							,REGEXP_REPLACE(`part`,`r`,'\\1')
+							,CASE		WHEN REGEXP_REPLACE(`part`,`r`,'\\2') = '' THEN NULL
+											WHEN `part` REGEXP '(?i)\\br\\((?:"(?:\\\\.|[^"])+"|\'(?:\\\\.|[^\'])+\')\\)$' THEN 
+											IF(IFNULL((@r5part := json_QUOTE(r(REGEXP_REPLACE(`part`,`r`,'\\3')))),'') <> '' 
+												,@r5part
+												,REGEXP_REPLACE(`part`,`r`,'\\2'))
+									ELSE IF((@r5part := REGEXP_REPLACE(`part`,`r`,'\\3')) REGEXP '^p1$'
+											,j0(`p`,@r5part), 
+											j2(`p`,@r5part))
+								END
+						);
 		END loop;
 		
-		RETURN CONCAT_WS('',`re`,`s`);
-END
-;;
-DELIMITER ;
-
--- ----------------------------
---  Procedure definition for `r5_copy`
--- ----------------------------
-DROP FUNCTION IF EXISTS `r5_copy`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`%` FUNCTION `r5_copy`(`s` blob,`p` varchar(2000)) RETURNS mediumblob
-    NO SQL
-    DETERMINISTIC
-BEGIN
-	
-
-
-		DECLARE `result`	MEDIUMBLOB DEFAULT NULL;
-		DECLARE `part`	BLOB DEFAULT NULL;
-		DECLARE `r`	VARCHAR(2000)DEFAULT  '(?s)^(.*?)`(.*?)`';
-		
-		l:LOOP
-			SET	`part` = REGEXP_substr(s,r);
-			IF IFNULL(`part`,'') = '' THEN LEAVE l; END IF;
-			SET	`s`	=	REGEXP_REPLACE(s,r,''),`result`	= CONCAT_WS('',`result`,REGEXP_REPLACE(`part`,r,'\\1'),
-      IF( (@j:= j2(p,@k:=REGEXP_REPLACE(`part`,r,'\\2'))) ='null',CONCAT('`',@k,'`'),@j)
-
-);
-
-		END loop;
-		
-		RETURN CONCAT_WS('',`result`,`s`) ;
+		RETURN 
+REGEXP_replace(CONCAT_WS('',`re`,`s`),'(?mxs)
+^((?&s)-{2}[ 	]+((["])(?>[^\\\\"]|\\\\.)*?\\g-1|\\w+)(?&s):(?&s))(?!\\g-2)(?-2).*?$
+\\K.*?(?=(?-3)|(?-m)$)
+(?(DEFINE)(?<s>[ 	]*))','')
+		;
 END
 ;;
 DELIMITER ;
@@ -9318,7 +15249,7 @@ CREATE DEFINER=`root`@`%` FUNCTION `R6`(`s` blob,`p` varchar(2000)) RETURNS medi
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 	DECLARE `result`	MEDIUMBLOB DEFAULT NULL;
 	DECLARE `part`	BLOB DEFAULT NULL;
 	DECLARE `r`	VARCHAR(2000)DEFAULT  '(?s)^(.*?)`(.*?)`';
@@ -9327,7 +15258,7 @@ BEGIN
 		SET	`part` = REGEXP_substr(s,r);
 		IF IFNULL(`part`,'') = '' THEN LEAVE l; END IF;
 
-		SET	`s`	=	REGEXP_REPLACE(s,r,''),`result`	= CONCAT_WS('',`result`,REGEXP_REPLACE(`part`,r,'\\1'),j(p,REGEXP_REPLACE(`part`,r,'\\2')));
+		SET	`s`	=	REGEXP_REPLACE(s,r,''),`result`	= CONCAT_WS('',`result`,REGEXP_REPLACE(`part`,r,'\\1'),j0(p,REGEXP_REPLACE(`part`,r,'\\2')));
 
 	END loop;
 	
@@ -9345,16 +15276,20 @@ CREATE DEFINER=`root`@`%` FUNCTION `r7`(`p` blob) RETURNS text CHARSET utf8mb3
     NO SQL
     DETERMINISTIC
 l:BEGIN
-	
-	DECLARE `pageno` VARCHAR(8) DEFAULT j(p,'pageno');
+	#Routine body goes here...
+	DECLARE `pageno` VARCHAR(8) DEFAULT j0(p,'pageno');
 	DECLARE `rm` VARCHAR(2000) DEFAULT '[^<]+<[^>/]*\\d)(/>[^<]+';
 
 
+/*
+start TRANSACTION;
+SET @DBLOB = p;
+CALL Audit_2('r7',quotej(p),@dblob);COMMIT;
+LEAVE l;*/
 
-
-		SET @billid := j(p,'billid') 
-		,@max_page := j(p,'max_page')
-		,@type = j(p,'type');
+		SET @billid := j0(p,'billid') 
+		,@max_page := j0(p,'max_page')
+		,@type = j0(p,'type');
 
 SET
 `pageno` := 
@@ -9379,7 +15314,7 @@ ELSE RPAD(LPAD(1,`pageno`,0),@max_page,0) END
 	
 		END CASE;
 
-
+-- RETURN `rm`;
 		SET @replace := 
 			CASE @replace
 					WHEN '11' THEN REGEXP_replace('12','(\\d)','$\\1\tselected=selected')
@@ -9408,8 +15343,8 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`%` FUNCTION `R8`(c varchar(200)) RETURNS blob
     DETERMINISTIC
 BEGIN
-	
-	
+	#Routine body goes here...
+	-- DECLARE d BLOB DEFAULT NULL;
 	SET @d = NULL; 
 	RETURN 	(
 SELECT
@@ -9418,11 +15353,15 @@ FROM(
 SELECT
 @d:=COLUMN_create('sql',CONVERT( `BLOB`USING gbk)),
 IF(IFNULL(parameter,'') = '' ,NULL,@d:=COLUMN_add(@d,'parameter',CONVERT(
-CASE WHEN (@r8 := REGEXP_substr( `parameter`, CONVERT('^(?:用|using)\\s+\\K[\\w]+' USING gbk))) <> ''  THEN (SELECT a.`parameter` FROM mysq1_schema.qs AS a WHERE a.`name` = @r8)
+CASE WHEN (@r8 := REGEXP_substr( `parameter` , CONVERT('(?m)^\\s*(?:用|using)\\s+\\K[\\w]+' USING gbk))) <> ''  THEN 
+(SELECT a.`parameter` FROM mysq1_schema.qs AS a WHERE a.`name` = @r8)
 ELSE a.`parameter` END USING gbk))),
 
 IF(IFNULL(`sql`,'') = '' ,NULL,@d:=COLUMN_add(@d,'s',CONVERT(
-CASE WHEN (@r8 := REGEXP_substr( `SQL`, CONVERT('^(?:用|using)\\s+\\K[\\w]+' USING gbk))) <> ''  THEN (SELECT a.`sql` FROM mysq1_schema.qs AS a WHERE a.`name` = @r8)
+CASE WHEN (@r8 := REGEXP_substr(`SQL` , CONVERT('(?m)^\\s*(?:用|using)\\s+\\K[\\w]+' USING gbk))) <> ''  THEN 
+REGEXP_replace(`SQL`  , CONVERT('(?m)^\\s*(?:用|using)\\s+[\\w]+' USING gbk),
+(SELECT a.`sql` FROM mysq1_schema.qs AS a WHERE a.`name` = @r8)
+)
 ELSE a.`sql` END USING gbk))),
 
 IF(IFNULL(a.`name0`,'') = '' ,NULL,@d:=COLUMN_add(@d,a.`name0`,CONVERT(a.blob0 USING gbk))),
@@ -9434,7 +15373,7 @@ IF(IFNULL(a.`name5`,'') = '' ,NULL,@d:=COLUMN_add(@d,a.`name5`,CONVERT(a.blob5 U
 @d AS dblob
 FROM `mysq1_schema`.qs AS a 
 WHERE IFNULL(a.`name`,'') <> ''  AND  a.`name` = c
-
+-- CONCAT_WS('',a.`schema`,a.`subject`,a.`name`) REGEXP c
 )AS a
 );
 
@@ -9450,8 +15389,8 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`%` FUNCTION `R9`(c varchar(200)) RETURNS mediumblob
     DETERMINISTIC
 BEGIN
-	
-	
+	#Routine body goes here...
+	-- DECLARE d BLOB DEFAULT NULL;
 	SET @d = NULL; 
 	RETURN 	(
 SELECT
@@ -9463,7 +15402,7 @@ IF(IFNULL(`SQL`,'') = '', `blob`
 ,REGEXP_replace(`blob`,'(?i)(?<=FROM)\\s*(?:\\(\\s*)?`SQL`(?:\\s*\\))?(?=\\s*as\\s+[\\w]\\b)'
 ,IF(`SQL` REGEXP '(?i)\\bselect\\b',CONCAT_WS('\n','\\1(','-- Start',`sql`,'-- End',')'),CONCAT_WS('\n','\\1',`sql`))
 ))
-USING gbk) ),
+USING gbk)/**/ ),
 IF(IFNULL(a.`name0`,'') = '' ,NULL,@d:=COLUMN_add(@d,a.`name0`,CONVERT(a.blob0 USING gbk))),
 IF(IFNULL(a.`name1`,'') = '' ,NULL,@d:=COLUMN_add(@d,a.`name1`,a.blob1)),
 IF(IFNULL(a.`name2`,'') = '' ,NULL,@d:=COLUMN_add(@d,a.`name2`,CONVERT(a.blob2 USING gbk))),
@@ -9505,11 +15444,11 @@ CREATE DEFINER=`root`@`%` FUNCTION `REG`(`funid` varchar(99)) RETURNS varchar(20
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 
 	RETURN	CONCAT('/',CASE funid
 			WHEN 'R1'   THEN CONCAT_WS('',REG1('`R11`' ),REG1('`R12`'),REG1('`R13`'))
-						
+						-- r a.$2=$3 1234，
 			WHEN '""' THEN REG1('`""`')
 			WHEN 'json' THEN REG1('`json`')
 			WHEN '2num' THEN REG1('`2num`' )
@@ -9529,30 +15468,6 @@ END
 DELIMITER ;
 
 -- ----------------------------
---  Procedure definition for `REG0`
--- ----------------------------
-DROP FUNCTION IF EXISTS `REG0`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`%` FUNCTION `REG0`(`funid` varchar(99)) RETURNS varchar(1000) CHARSET utf8mb4
-    NO SQL
-    DETERMINISTIC
-BEGIN
-	
-	RETURN	CASE funid
-			WHEN '`DOMS`' THEN 
-CONCAT_WS('\n'
-,CONCAT_WS('\t',REG1('`dom`'),'\t', '\\1=\\2')
-,CONCAT(REG1('`dom1`'),'\t', '\"\\1\":"\\2",')
-,CONCAT(',\\s*$','\t','')
-,'\n')
-
-		ELSE NULL 
-  END;
-END
-;;
-DELIMITER ;
-
--- ----------------------------
 --  Procedure definition for `REG1`
 -- ----------------------------
 DROP FUNCTION IF EXISTS `REG1`;
@@ -9561,19 +15476,19 @@ CREATE DEFINER=`root`@`%` FUNCTION `REG1`(`funid` varchar(99)) RETURNS varchar(1
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 	RETURN	CASE funid
 			WHEN '`R11`' 	THEN '(?:\\{?)' 
-					
+					-- 0 
 			WHEN '`R12`' 	THEN '("((?:[^\\\\"]|\\\\{2}|\\\\"|\\\\)*+)")'
-						
+						-- 1 "2"
       WHEN '`R13`'	THEN '(?::(((?R1))\\,?)(?:\\}?))'
-						
+						--  1, 2
 			WHEN '`""`'	THEN '"((?:[^\\\\"]|\\\\.)*)"'
 			WHEN '`"`'	THEN '(?J)(?<c0>"(?<c>(?:\\\\.|[^"])*)")'
 			WHEN '`q`'	THEN '(?J)(?<c0>(?:(?<d>")|(?<s>\'))(?(d)(?<c>(?:\\\\.|[^"])*)"|(?(s)(?<c>(?:(\\\\.)|[^\'])*)\')))'
 			WHEN '`{}`'	THEN '(?J)(?<a>(?:\\s*)\\{(?:\\s*)(?<c0>(?<k>(?:"(?<c>(?:[^\\\\"]|\\\\.)*)")(?:\\s*):(?:\\s*)(?:"(?&c)"|(?&a)))?(?:(?:\\s*),(?:\\s*)(?&k))*)\\})'
-					
+					-- "0" 1
 			WHEN '`dom`' THEN '(?iJx)(?:\\s*<(?:(?<TAG>TEXTAREA)|form[^>]*|[!\\w]+|!--[^>]*--|%[^%]*+%)(?:\\s+(?:(?:name=(?<n>(?<cm>(?(?=")(?:"(?:\\\\.|[^"])*")|(?(?=\')(?:\'(?:\\\\.|[^\'])*\')|[^\\s\\>]+))))|value=(?<v>(?&cm))|(?<r>readonly|[\\w\\-\\/%]+|(?:"(?:\\\\.|[^"])*")|\\p{P})|[\\w\\-]+=(?&cm))\\s*?)+)?>(?<v1>(?(TAG)[^<]*))(?:[^<]*</\\w+>)*)(?:[^<]*(?:</?\\w+>)*)*'
 			WHEN '`dom1`' THEN '(?imxJ)(?:<(?(?=input(?!(?:"(?:\\\\.|[^"])*"|[^>])*?type=["\']?hidden["\']?))(?:(?:(?<f>"(?:\\\\.|[^"])*"|[^>])*?)(?:(?:(?<=(?<!\\.)value=)(?:"(?<qv>(?:\\\\.|[^"])*)"|(?<nqv>[^\\s\\>]+)))|(?:(?<=name=)(?:"(?<q>(?:\\\\.|[^"])*)"|(?<nq>[^\\s\\>]+))))){2}(?&f)*?|(?&f)*?)>[^<]*+)'
 			WHEN '`kvnull`' THEN '(?:""(?::""){1,},?)++'
@@ -9628,7 +15543,7 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`%` FUNCTION `REG2`(`funid` varchar(99)) RETURNS varchar(10000) CHARSET utf8mb3
     NO SQL
 BEGIN
-	
+	#Routine body goes here...
 	RETURN	CASE funid
 			WHEN '`Dom2kw`' THEN 
 CONCAT_WS('\n'
@@ -9669,7 +15584,7 @@ CONCAT_WS('\n'
 			WHEN '`getbi`' THEN
 CONCAT_WS('\n'
 ,CONCAT(REG1('`getbi`'),'\t','\\1')
-
+-- ,CONCAT(REG1('`row&b`'),'\t','{"rowno":"",\\1},')
 ,'\n')
 			WHEN '`gett`' THEN CONCAT_WS('\n',CONCAT(REG1('`gett`'),'\t', '\\1'))
 			WHEN '`gettf`' THEN 
@@ -9714,61 +15629,9 @@ CREATE DEFINER=`root`@`%` FUNCTION `regex`(`v` varchar(2000),`r` varchar(200),`a
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 
 	RETURN REGEXP_replace(v,CONCAT("(\\Q",r,"\\E)"),CONCAT("\\1",REPLACE(a,'\\','\\\\')));
-END
-;;
-DELIMITER ;
-
--- ----------------------------
---  Procedure definition for `reglike`
--- ----------------------------
-DROP FUNCTION IF EXISTS `reglike`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`%` FUNCTION `reglike`(`k` varchar(1000),`r` varchar(200),n varchar(2)) RETURNS varchar(200) CHARSET utf8mb3
-    NO SQL
-BEGIN
-	
-  SET r = CONCAT('/(?:(?:',r,')(?.*)){',n,'}?/');
-	IF preg_check(r) THEN 
-		SET r = preg_rlike(r,k);
-		ELSE SET r = NULL;
-	END IF;
-	RETURN r;
-END
-;;
-DELIMITER ;
-
--- ----------------------------
---  Procedure definition for `Replace_For_Exp`
--- ----------------------------
-DROP FUNCTION IF EXISTS `Replace_For_Exp`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`%` FUNCTION `Replace_For_Exp`(`source_str` varchar(500)) RETURNS varchar(500) CHARSET latin1
-    NO SQL
-    DETERMINISTIC
-BEGIN
-	
-	SET @word = '',@a = NULL ,source_str = trim(',' FROM TRIM(source_str));
-	 
-	IF source_str IS NULL OR source_str = '' THEN
-		RETURN '.+';
-	END IF;
-	WHILE CHAR_LENGTH(source_str) != 0 DO
-			SET @a = LEFT(source_str,1);
-
-			IF  @a IN ('+','|','\\','*','.','$','[',']','{','}',':','=','<','>') THEN
-					SET @word  = CONCAT(@word,'\\\\',@a);
-				ELSE
-					SET @word  = CONCAT(@word,@a);
-			END IF;
-
-			SET source_str = SUBSTR(source_str,CHAR_LENGTH(@a)+1);
-			
-	END WHILE ;
-
-	RETURN @word;
 END
 ;;
 DELIMITER ;
@@ -9782,7 +15645,7 @@ CREATE DEFINER=`root`@`%` FUNCTION `replace_set_0`(`vstring` varchar(800),`tem` 
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 
 	IF Tem IS null then  SET  tem = ',';ELSE SET tem =CONCAT(',',tem); END IF;
 	case 
@@ -9802,45 +15665,6 @@ END
 DELIMITER ;
 
 -- ----------------------------
---  Procedure definition for `rp`
--- ----------------------------
-DROP FUNCTION IF EXISTS `rp`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`%` FUNCTION `rp`(`k` varchar(2000)) RETURNS varchar(2000) CHARSET utf8mb3
-    READS SQL DATA
-    DETERMINISTIC
-BEGIN
-	
-	DECLARE `r` VARCHAR(2000) DEFAULT NULL ;
-
-	IF IFNULL(`k`,'')='' THEN RETURN `r`; END IF;
-
-  CASE 
-		WHEN k REGEXP '\t' THEN
-			
-			SET `r` = REGEXP_substr(k,'\t[^\n]*'),
-					`k` = REGEXP_replace(k,'\t[^\n]*',''),
-					`k` = (
-SELECT
-CAST(CONCAT_WS('\t',a.Reg,IF( `r` REGEXP '^\\s*$',a.`replace` ,`r`))AS CHAR)
-FROM mysq1_schema.reg AS a
-WHERE 
-CONCAT_WS('',a.`Code`,a.note) REGEXP  `k` );
-
-		ELSE
-	SET `k` = (SELECT CONVERT(a.`replace` USING gbk ) FROM mysq1_schema.reg AS a WHERE CONCAT_WS('',a.`Code`,a.note) REGEXP  `k`);
-	END CASE;
-
-	RETURN 
-CONVERT(`k` USING utf8 )
-
-;
-
-END
-;;
-DELIMITER ;
-
--- ----------------------------
 --  Procedure definition for `RS`
 -- ----------------------------
 DROP FUNCTION IF EXISTS `RS`;
@@ -9848,7 +15672,7 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`%` FUNCTION `RS`(`k` varchar(2000)) RETURNS varchar(2000) CHARSET utf8mb3
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 	DECLARE r varchar(2000) DEFAULT NULL;
 
 	IF IFNULL(`k`,'')='' THEN RETURN r; END IF;
@@ -9900,8 +15724,12 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `r_com_arr`(`b` longtext,`av` longtex
     NO SQL
     DETERMINISTIC
 BEGIN
-	
-
+	#Routine body goes here...
+/*
+'"\'1\',\'12\'"','"\'1\',\'材料采购\'","\'2\',\'应交税费\'","\'3\',\'其他货币资金\'"'
+'"\'1\',\'其他货币资金\',\'12\'"','"\'1\',\'材料采购\'","\'2\',\'应交税费\'","\'3\',\'其他货币资金\'"'
+'"\'2\',\'22\'"','"\'2\',\'应交税费\'","\'3\',\'其他货币资金\'"'
+*/
 	DECLARE y TINYINT DEFAULT 0 ;DECLARE x TINYINT DEFAULT 0;
 	DECLARE i TINYINT DEFAULT 0 ;
 	DECLARE r LONGTEXT DEFAULT NULL;DECLARE ra LONGTEXT DEFAULT '';
@@ -9940,16 +15768,235 @@ DELIMITER ;
 -- ----------------------------
 DROP FUNCTION IF EXISTS `s`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` FUNCTION `s`(`money` varchar(60)) RETURNS varchar(60) CHARSET utf8mb3
+CREATE DEFINER=`root`@`localhost` FUNCTION `s`(`p` longblob,action TINYTEXT) RETURNS longblob
+    DETERMINISTIC
+BEGIN#Routine body goes here...
+	DECLARE
+		path,id,id1,id2,`mod` TINYTEXT DEFAULT NULL;
+	DECLARE r  TINYTEXT  DEFAULT '(?:^|([\\s,]+\\-?\\w+)*)\\s*$'  ;
+	DECLARE
+		次数 int(5) DEFAULT 0;
+		
+
+
+
+	IF  action  IS NULL ||  action = '0'   THEN
+	
+		SET R =  CONCAT( '\\s*,\\s*(?:\\w+|\\$?(?:\\.\\w+|\\[\\d+\\])+)(?:\\s*,\\s*\\-\\d+)?(?=\\s*$)' );
+	
+		SET action = IF(CHAR_LENGTH(p)>200, SUBSTR(p,CHAR_LENGTH(p)-200),p);
+
+
+		SET action   = REGEXP_substr(action , R),
+				p  =  REGEXP_replace(p,  r,'');
+		
+	END IF ; 
+
+SET `mod` = REGEXP_substr(action,@s专用:= '[\\s,]+\\-\\d'),action=REGEXP_replace(action,@s专用,'');  
+
+
+
+	多个动作:WHILE  次数=0  DO
+	SET 次数 = 1;
+	CASE
+			WHEN action  REGEXP  @szy:='^\\s*(?:2|p(?:ath)?|l(?:oad)?)' THEN
+
+				SET id = p;
+			
+				IF action  NOT REGEXP 'i\\s*$'THEN    
+					SET  p = ( SELECT J  FROM mysq1_schema.JSON AS j WHERE j.id = id );
+
+
+				END IF ;
+
+				IF  (NOT FOUND_ROWS() || action  REGEXP 'i\\s*$') && action  REGEXP @szy  THEN 
+
+					SET  p = JSON_ARRAY(id,'载入',cast(LOAD_FILE(convert(id USING gbk)) AS CHAR)),
+
+							 action = 'insert',次数 = 0;
+					ITERATE 多个动作;
+				END if;
+
+				RETURN p;
+			
+			WHEN action  REGEXP  '(?i)^\\s*(?:D(?:EL(?:ETE)?)?)' THEN
+				SET id1 = p;
+				
+				DELETE a.* FROM mysq1_schema.json  AS a  WHERE a.id = id1; 
+				
+				RETURN FOUND_ROWS();
+			WHEN action  = '3' THEN
+				SET action := REGEXP_substr(p,@自用:= '[\\s,]+(\\w+)$'),
+						p = REGEXP_replace(p,@自用,''),
+						action  = REGEXP_replace(action,@自用,'\\1');
+				RETURN p;
+
+		WHEN action  REGEXP '^\\s*(?:5|replacemant)\\s*$' THEN
+
+		set p =  REGEXP_substr(p,'\\.\\K\\w+$');		
+		SET p =o1(p,null);
+		
+		WHEN action  REGEXP '^\\s*(?:4|写出)\\s*$' THEN
+
+				SET id := p ;
+	-- 			SELECT 	a.j  INTO DUMPFILE  @id 	 FROM     mysq1_schema.json AS a  WHERE 	a.id = id;
+					
+
+				RETURN  '写出';
+
+			WHEN action  REGEXP '(?i)^\\s*,?\\s*(?:I(:NSERT)?|1)' THEN
+
+					IF json_length(p) = 4 THEN SET id2 =json_value( CAST(p AS CHAR),'$[2]') ,p = json_remove(p,'$[2]'); END IF;
+
+					SET id = IF(JSON_value( p, '$[0]' ) REGEXP '(?i)(%[a-z0-9]{2}){2,}' ,urldecode(JSON_value( p, '$[0]' )),JSON_value( p, '$[0]' ));
+
+					IF IFNULL(id ,'')='' THEN  SIGNAL SQLSTATE 'HY000' SET MYSQL_ERRNO =123456 , MESSAGE_TEXT = '无主键';END IF;    				
+					SET id1 = 	JSON_value(p,'$[1]'),p= json_value(p,'$[2]');
+		
+					SET p = CASE 
+											WHEN  json_valid(p) THEN
+												case 	WHEN JSON_DEPTH(p)=1 AND p REGEXP '^\\s*"' THEN  JSON_UNQUOTE(CAST(p AS CHAR))
+															WHEN JSON_DEPTH(p)>1 AND JSON_LENGTH(p) = 1 THEN json_extract(p,'$[0]') 
+													ELSE p 
+												END
+											ELSE p  
+									END;
+
+					SET p = IF(`mod` REGEXP '-'  
+													,REGEXP_replace(p,'(?-m)^\\s*.*?(?=\\s*(?m)$)','')
+													,p);
+
+					SET @s专用 = (SELECT a.id FROM mysq1_schema.`JSON` AS a  WHERE  a.id = id);	
+
+					IF FOUND_ROWS() THEN
+						UPDATE  mysq1_schema.JSON  AS a  
+								 SET 	j =  p,stamptime = now()
+						WHERE  a.id = id;
+					ELSE
+
+						INSERT INTO mysq1_schema.JSON ( id, id1,id2, j )
+							VALUES 	(id,id1,CAST(id2 AS CHAR),p);
+					END if;
+
+
+
+			ELSE 
+
+			IF action REGEXP '^\\s*f\\s*' THEN SET path = null,`mod` = 'f' ;ELSE SET PATH =  action; END IF ;
+			
+
+			SET path =
+				CASE
+						WHEN path REGEXP '\\$' THEN path 
+						WHEN path REGEXP ( @SR := '^\\$?\\[' ) THEN
+						REGEXP_REPLACE ( path, '^\\$?\\[', '$[' ) 
+						WHEN path REGEXP @SR := '^\\$?(\\w)' THEN
+						REGEXP_REPLACE ( path, '^\\$?(\\w)', '$.\\1' ) ELSE CONCAT( '$', path ) 
+				END;
+
+			SET id = p;
+		SET  p = ( SELECT J  FROM mysq1_schema.JSON AS j WHERE j.id = id );
+
+      IF  NOT FOUND_ROWS()  THEN   
+					-- QUOTE(REGEXP_replace(o('(?&path) path'),'\\s+',''))
+					IF   id REGEXP '(?i)^\\s*\\[a-zA-Z]:[/\\\\]' &&  id REGEXP  '(?x)(?&path)(?(DEFINE)(?<w>^(?&分割)?[w]\\K(?:(?&分割)(?&path0))+)(?<头>(?i)(?:(?:[a-z]|https?)\\:)?+)(?<分割1>/+)(?<分割2>[\\\\]+)(?<分割>(?:(?&分割1)|(?&分割2)))(?<path0>[^\\\\/]+)(?<path1>(?&头)(?:(?&分割1)(?&path0))+)(?<path2>(?&头)(?:(?&分割2)(?&path0))+)(?<path>(?&头)(?:(?&分割)(?&path0))+)(?<url>https?(?:(?&分割2)(?&path0))+))' THEN
+					SET action = 'path',p = id,次数=0 ;  iterate 多个动作;
+					END IF;
+				RETURN "no_ROWS";
+			END if;
+
+			SET  P = IF(JSON_VALID(P),JSON_EXTRACT(P,PATH ) ,P); 
+	END CASE;
+
+	SET action = REGEXP_replace(action ,'^[\\s,]+\\w+',''); 
+	END while 多个动作;
+
+
+SET  p =  CASE 
+											WHEN  json_valid(p) THEN
+												case 	WHEN JSON_DEPTH(p)=1 AND p REGEXP '^\\s*"' THEN  JSON_UNQUOTE(cast(p as CHAR))
+															WHEN JSON_DEPTH(p)>1 AND JSON_LENGTH(p) = 1 THEN json_extract(p,'$[0]') 
+													ELSE p 
+												END
+											ELSE p  
+									END;
+--	RETURN CONCAT_WS('__',FOUND_ROWS(),ROW_COUNT());
+-- 	IF `mod` = 'f'  THEN  SET p = f(id, action);end IF;
+
+	RETURN p;-- IF(json_valid(p)&& JSON_LENGTH(p)=1 && JSON_DEPTH(p)=2,json_value(p,'$[0]'),p);
+		
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `s2a`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `s2a`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`::1` FUNCTION `s2a`(s varchar(200)) RETURNS varchar(200) CHARSET utf8mb3
+    NO SQL
+BEGIN
+	-- RETURN REGEXP_substr(s,'^\\d{1,3}(?=\\s\\d+)');
+CASE 
+							WHEN s REGEXP '^\\d+\\s' THEN  SET s = REGEXP_replace(FORMAT(REGEXP_replace(s,'^\\d+\\s(?=\\d+)',''),REGEXP_substr(s,'^\\d{1,3}(?=\\s\\d+)')),',','');
+						 	WHEN s REGEXP '^-?\\d+(.\\d+)?$' THEN SET s = CONCAT('￥',FORMAT(s,2));
+							WHEN s REGEXP '^￥[\\-\\.,\\d]+$' THEN SET s = REGEXP_REPLACE(s,'[$,]|￥','');
+	ELSE SET s = s; 
+END CASE ;
+
+	RETURN s;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `s2d`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `s2d`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `s2d`(`s` longblob) RETURNS tinytext CHARSET utf8mb3
     NO SQL
     DETERMINISTIC
 BEGIN
+	#Routine body goes here...
 	
-	SET `money` = 
-				CASE WHEN `money` IS NULL OR `money` =0 THEN NULL
-					ELSE FORMAT(`money`,2) END;
-						
-	RETURN  `money`;
+	RETURN IF(IFNULL(s,'')='',null,REGEXP_replace(REGEXP_substr(CAST(s AS CHAR),'￥?\\-?[\\d,]+(?:\\.\\d+)?'),'[^\\d\\.\\-]',''));
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `s2dp`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `s2dp`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `s2dp`(`s` tinytext) RETURNS tinytext CHARSET utf8mb3
+    NO SQL
+    DETERMINISTIC
+BEGIN
+	#Routine body goes here...
+
+	RETURN IF(IFNULL(s,'')='',null,REGEXP_replace(s,'[^\\d\\-]',''));
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `s2j`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `s2j`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `s2j`(i int(1),`j` blob) RETURNS text CHARSET utf8mb3
+    DETERMINISTIC
+BEGIN
+	#Routine body goes here...
+
+	RETURN  CASE    
+					WHEN  i IS null OR i = 0  THEN regexp_replace(regexp_replace(cast(j AS CHAR) ,'\\\\(.)','\\1'),'"(?=\\[)|(?<=])"','') 
+					WHEN  i = 1 THEN regexp_replace(regexp_replace(regexp_replace(cast(j AS CHAR) ,'\\\\(.)','\\1'),'"(?=\\[)|(?<=])"','') ,'(^\\[|,\\s*)\\K\\[+|]+(?=,\\s*[\\["n\\d]|]$)','')
+					
+					else  j  end ;
 END
 ;;
 DELIMITER ;
@@ -9963,7 +16010,7 @@ CREATE DEFINER=`root`@`%` FUNCTION `s2m`(`s` varchar(2000),`a&b` varchar(5),`f` 
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 
 	RETURN 	CASE 
 						 WHEN IFNULL(s,'') = '' THEN s
@@ -9978,26 +16025,103 @@ END
 DELIMITER ;
 
 -- ----------------------------
+--  Procedure definition for `s2sql`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `s2sql`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `s2sql`(`type` varchar(100),`p0` tinyblob,`p` longBLOB) RETURNS longblob
+    NO SQL
+BEGIN
+DECLARE `res` longblob DEFAULT NULL;DECLARE `factor` TINYtext DEFAULT NULL;
+	#Routine body goes here...
+	SET p = REGEXP_replace(p,'""','null') ; 
+	
+	CASE 
+			WHEN !json_valid(`p0`) OR  !json_valid(p) THEN  
+				SET res = NULL;
+
+			WHEN`type` REGEXP  '1|UPDATE' THEN 
+				SET `factor` =REGEXP_substr(`type`,',\\K\\d');
+
+
+				CASE WHEN `type` = 3 THEN
+						SET `factor` = null;
+					ELSE 
+							SET `factor` = null;
+				END CASE ;
+
+				
+				SET `res`:= REGEXP_replace(json_extract(CAST(`p` AS CHAR),'$[*][1]','$[*][2]'),'("([abt]\\d+)"),\\s*(.*?)(?=,\\s*"[abt]\\d+"|])','\\2=\\3')
+							,`res` = substr(`res`,2,char_length(`res`)-2);
+
+
+				SET `res`:= CONCAT_WS('\t'
+				,CONCAT('UPDATE ' ,REGEXP_substr(json_value(`p0`,'$.type'),'\\w+(?=\\s*$)'))
+				,CONCAT('SET ',res)
+				,json_value(`p0`,'$.WHERE'),';'
+				);
+
+
+			ELSE 
+				SET `res`:= REGEXP_replace(json_extract(CAST(`p` AS CHAR),'$[*][0]','$[*][1]','$[*][2]' ),'"(\\w+)",\\s*"(\\w+)",\\s*(.*?)(?=,\\s*"\\w+"|])','\\2,\\3 as \\1')
+						,`res` = substr(`res`,2,char_length(`res`)-2);
+						
+				SET `res`:= CONCAT_WS('\t'
+				,'SELECT '
+				,CONCAT_WS(','
+						,CONCAT(json_extract(p0,'$.billname'),' AS billname'),CONCAT(json_extract(p0,'$.code'),' AS code'),CONCAT(json_extract(p0,'$.sort'),' AS sort')
+					,regexp_replace(REGEXP_replace(REGEXP_replace(json_value(p0,'$.WHERE'),'WHERE\\s+',''), '(\\w+)\\s*=\\s*(.*?)(?=\\s*AND|$)','\\2 as \\1'),'(?i)ANd',',')
+					,`res`)
+				,CONCAT('FROM ' ,REGEXP_substr(json_value(`p0`,'$.type'),'\\w+(?=\\s*$)'))
+				,json_value(`p0`,'$.WHERE')
+				);
+				
+	END CASE;
+	
+	RETURN res;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
 --  Procedure definition for `SaveOrUpdate`
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `SaveOrUpdate`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `SaveOrUpdate`(IN `STATU` varchar(1) ,IN `table_name` varchar(30),IN `key_fields` varchar(140),IN `key_values` varchar(120),IN `field_Names` longtext,IN `field_values` longtext)
+CREATE DEFINER=`root`@`%` PROCEDURE `SaveOrUpdate`(IN `FUNCID` varchar(1) ,IN `table_name` varchar(30),IN `key_fields` varchar(140),IN `key_values` varchar(120),IN `field_Names` longtext,IN `field_values` longtext)
     READS SQL DATA
 label1:BEGIN
-	
+	#Routine body goes here...
 
 
 
+  DECLARE CONTINUE HANDLER FOR  SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22' , SQLSTATE	'HY000'-- ,SQLSTATE	'22007'
+	BEGIN GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;SET  @`sqlstate` = JSON_OBJECT('sqlstate',@`sqlstate`,'errno',@errno,'text',@text);
+				SET @`errsql` = @3in1_body;
+				SET @funcid = CONCAT_WS(' ','Error: ', ' SaveOrUdate ' ,`funcid`),
+				@pp =CONCAT_WS(',',QUOTE(`funcid`) , QUOTE(table_name) , QUOTE(key_fields) , QUOTE(key_values) , QUOTE(field_Names) , QUOTE(field_values));
+				CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp,'SQL',@`errsql`,'err',@`sqlstate`));
+	END;
+
+START TRANSACTION;
+				SET @funcid = CONCAT_WS(' ', ' SaveOrUdate' ,`funcid`),
+				@pp =CONCAT_WS(',',QUOTE(`funcid`) , QUOTE(table_name) , QUOTE(key_fields) , QUOTE(key_values) , QUOTE(field_Names) , QUOTE(field_values));
+CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp));COMMIT;/**/
 
 
 
-	SET @statu = NULL,
+START TRANSACTION;
+CALL Audit("SaveOrUpdate",CONCAT_WS(',',QUOTE(`funcid`) , QUOTE(table_name) , QUOTE(key_fields) , QUOTE(key_values) , QUOTE(field_Names) , QUOTE(field_values)),
+ QUOTE(`funcid`) , QUOTE(table_name) , QUOTE(key_fields) , QUOTE(key_values) , QUOTE(field_Names) , QUOTE(field_values));
+COMMIT;/*
+*/-- expid 异常
+
+	SET @`funcid` = NULL,
 			@statu = Fetch_Set(key_values,1,NULL) = "''" OR Fetch_Set(key_values,1,NULL) = 'NULL';
 
 	IF IFNULL(@statu,1) = 1  THEN
 
-		CALL audit('SaveOrUpdate-expid为空',CONCAT_WS(',',QUOTE(STATU) , QUOTE(table_name) , QUOTE(key_fields) , QUOTE(key_values) , QUOTE(field_Names) , QUOTE(field_values)),					QUOTE(STATU) , QUOTE(table_name) , QUOTE(key_fields) , QUOTE(key_values) , QUOTE(field_Names) , QUOTE(field_values));
+		CALL audit('SaveOrUpdate-expid为空',CONCAT_WS(',',QUOTE(`funcid`) , QUOTE(table_name) , QUOTE(key_fields) , QUOTE(key_values) , QUOTE(field_Names) , QUOTE(field_values)),					QUOTE(`funcid`) , QUOTE(table_name) , QUOTE(key_fields) , QUOTE(key_values) , QUOTE(field_Names) , QUOTE(field_values));
 
 		SELECT 1,key_fields ,key_values ;
 
@@ -10005,13 +16129,13 @@ label1:BEGIN
 
 	END IF ;
 
-
+-- missionid 异常
 	SET @statu = NULL,
 			@statu = Fetch_Set(key_values,2,NULL) = "''" OR Fetch_Set(key_values,2,NULL) = 'NULL' ;
 
 	IF IFNULL(@statu,1) = 1 THEN
 
-		CALL audit('SaveOrUpdate-missionid 为空',CONCAT_WS(',',QUOTE(STATU) , QUOTE(table_name) , QUOTE(key_fields) , QUOTE(key_values) , QUOTE(field_Names) , QUOTE(field_values)),					QUOTE(STATU) , QUOTE(table_name) , QUOTE(key_fields) , QUOTE(key_values) , QUOTE(field_Names) , QUOTE(field_values));
+		CALL audit('SaveOrUpdate-missionid 为空',CONCAT_WS(',',QUOTE(`funcid`) , QUOTE(table_name) , QUOTE(key_fields) , QUOTE(key_values) , QUOTE(field_Names) , QUOTE(field_values)),					QUOTE(`funcid`) , QUOTE(table_name) , QUOTE(key_fields) , QUOTE(key_values) , QUOTE(field_Names) , QUOTE(field_values));
 
 		SELECT 1,key_fields ,key_values ;
 
@@ -10028,7 +16152,7 @@ label1:BEGIN
 
 	IF @fields_ IS NULL THEN 
 
-		CALL audit('SaveOrUpdate-@fields_为空 异常真多 ！fileds_update_temp ',CONCAT_WS(',',QUOTE(STATU) , QUOTE(table_name) , QUOTE(key_fields) , QUOTE(key_values) , QUOTE(field_Names) , QUOTE(field_values)),					QUOTE(STATU) , QUOTE(table_name) , QUOTE(key_fields) , QUOTE(key_values) , QUOTE(field_Names) , QUOTE(field_values));
+		CALL audit('SaveOrUpdate-@fields_为空 异常真多 ！fileds_update_temp ',CONCAT_WS(',',QUOTE(`funcid`) , QUOTE(table_name) , QUOTE(key_fields) , QUOTE(key_values) , QUOTE(field_Names) , QUOTE(field_values)),					QUOTE(`funcid`) , QUOTE(table_name) , QUOTE(key_fields) , QUOTE(key_values) , QUOTE(field_Names) , QUOTE(field_values));
 
 		SELECT 1,key_fields ,key_values ;
 
@@ -10036,23 +16160,20 @@ label1:BEGIN
 
 	END IF;
 
-
+-- acc_1;
 
 	IF `table_name` LIKE 'acc_1' THEN
-
-
 
 			SET @stmt_save_update = concat("SELECT 1 \n",
 																		 "   into @STATU\n",
 																		 "FROM acc_1\n",
 																		 "where ", @fields_ ," limit 1");
-
 			PREPARE stmt1 FROM @stmt_save_update;
 			EXECUTE stmt1 ;
 
 			IF @statu = 1 THEN
-
-
+-- 更新
+/**/
 					SET @stmt_save_update = concat("DELETE a.* \n",
 																		 "FROM ", expid2b(REPLACE(Fetch_Set(key_values,1,NULL),'\'','')) ," AS a \n",
 																		 "where ", @fields_ );
@@ -10082,8 +16203,6 @@ label1:BEGIN
 			EXECUTE stmt1 ;
 
 			IF IFNULL(@statu_,'') = '' THEN
-
-
 				SELECT 1,'走了','leave';
 				LEAVE label1;
 
@@ -10104,7 +16223,7 @@ label1:BEGIN
 	DEALLOCATE PREPARE stmt1; 
 
 
-
+-- 返回结果
  SELECT 1,@field1,@field2;
 
 END
@@ -10119,7 +16238,11 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `seacher1`(IN `co_no`  varchar(60), IN `missionid_` varchar(60) ,IN `type` varchar(10),IN `keyword` varchar(60),in `page` int(4),in `num` int(6))
     READS SQL DATA
 label:BEGIN
- 
+ /*
+CALL Audit( "seacher1" , @ ,co_no, missionid_ , type  , keyword , page , num);
+LEAVE label;
+
+*/
 
 
 	set 	@num = num ,																	
@@ -10177,7 +16300,7 @@ label:BEGIN
 		END IF;
 	END IF ;
 
-
+-- SELECT  @stmtbody2, KEYWORD ; -- LEAVE label;
 
 					set @stmtbody1= "SELECT  count(DISTINCT a.missionid )
 													into @totalnum ",
@@ -10261,7 +16384,7 @@ end")));
 	END CASE;
 
 	set @stmtbody = concat(@stmtbody1,@stmtbody2);
- 
+ -- SELECT  @stmtbody ; LEAVE label;
 	PREPARE stmt from  @stmtbody ;
 	EXECUTE stmt ;
 	DEALLOCATE PREPARE stmt;
@@ -10270,7 +16393,7 @@ end")));
 	CASE  when  @type = 'bb' then 
 					set @stmtbody  = concat("SELECT DISTINCT
 @totalnum as totalnum,
-@offset1 := @offset1 +1 as rowid ,
+@offset1 := @offset1 +1 as rowNo ,
 a.missionId,
 CAST(CONCAT_WS(' ; ',
 CONCAT(b.billname,
@@ -10355,7 +16478,7 @@ limit ?,? ");
 						set @stmtbody  = concat("
 														SELECT
 															@totalnum as totalnum,
-																@offset1 := @offset1 +1 as rowid ,
+																@offset1 := @offset1 +1 as rowNo ,
 																a.Pkid,
 																a.missionId,
 																a.missback_title,
@@ -10373,7 +16496,7 @@ limit ?,? ");
 
 	ELSE SELECT NULL ;
 	END CASE;
-
+-- SELECT  @stmtbody ; -- LEAVE label;
 
 
 	PREPARE stmt from  @stmtbody ;
@@ -10432,12 +16555,12 @@ BEGIN
 	EXECUTE stmt ;
 	DEALLOCATE PREPARE stmt;
 
-
+-- 							if(d.missionId IS NULL,'无','有') AS havinganser,#答案
 
 					set @stmtbody  = concat("
 													SELECT DISTINCT
 															@totalnum as totalnum,
-															@offset1 := @offset1 +1 as rowid ,
+															@offset1 := @offset1 +1 as rowNo ,
 															a.missionId,
 															a.missionLabel,-- 任务名称
 															b.billname,#表单名称
@@ -10485,10 +16608,14 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `seacher4`(IN `co_no` varchar(60),IN `missionid` varchar(60) ,IN `keyword` varchar(600),in `page` int(4),in `num` int(6))
     READS SQL DATA
 label:BEGIN
+-- 1054 1064 SQLSTATE 1139 - Got error 'empty (sub)expression' from regexp
+-- 锁定课程 
+-- '671100000238042252009156563918','2.5 明细 原材料',1,1000
+/*
+start TRANSACTION;
+CALL Audit_2('seacher4',CONCAT_WS(',',QUOTE(co_no),QUOTE(missionid),QUOTE(keyword),QUOTE(page),QUOTE(num)),@a );COMMIT;
 
-
-
-
+*/
 	set 				
 				@num = num ,											
 				@stmtbody = NULL ,
@@ -10508,7 +16635,7 @@ label:BEGIN
 
 	IF IFNULL(keyword ,'') != '' THEN 
 			SET keyword = REPLACE(REPLACE(keyword,' ','|'),'.','\\.');
-
+-- SELECT keyword;
 			SET  @stmtbody3  = concat("
 					and  case 
 										when  cast(CONCAT_WS('',CONCAT(e1.node_No,'.',d.typesort ),a.missionLabel,b.billname,c.billTypeSay,a.createtime,a.updatetime ,a.mission_ask,"			
@@ -10569,7 +16696,7 @@ CONCAT("f1.courseno = '",co_no,"' AND "),
 	PREPARE stmt from  @stmtbody ;
 	EXECUTE stmt ;
 	set @totalnum = FOUND_ROWS();
-
+-- 	DEALLOCATE PREPARE stmt;
 
 
 
@@ -10605,74 +16732,274 @@ DELIMITER ;
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `seacher5`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `seacher5`(IN `classNo` varchar(60) ,IN `keyword` varchar(160),in `page` int(4),in `num` int(6))
+CREATE DEFINER=`root`@`localhost` PROCEDURE `seacher5`(IN `classNo` varchar(60) ,IN `keyword` varchar(2000),in `page` int(4),in `num` int(6))
     READS SQL DATA
 sl5:BEGIN
 
+	DECLARE  weight VARCHAR(60) DEFAULT NULL;DECLARE  expnos MEDIUMTEXT DEFAULT NULL;
 
-
+ START TRANSACTION;
+CALL Audit_1('seacher5',CONCAT_WS(',',QUOTE( `classNo`),QUOTE(`keyword`),QUOTE(`page`),QUOTE(`num`)),'ok');
+ COMMIT;
+/**/
+START TRANSACTION;
+SET @all := null,@all = REGEXP_substr(keyword,'\\+'),`keyword`  = REGEXP_replace(`keyword`,'搜索|\\+','');
 	set 	
 				@offset2 = (IF(page=0,1,page)-1)*num,
-				@num = num ,											
+				@num = num ,				
 
-				@keyword	= if(keyword is null, '', trim(keyword)),	
+				keyword	:= REGEXP_replace(IFNULL(keyword,''),'([()$.\\-{}\\?])','\\\\\\1'),
+				weight = REGEXP_substr(keyword,'(?:\\d+(?:(?<=\\d)\\.\\d+)?)(?=%)'),-- |(?:\\*\\d+(?:\\.\\d+)?))
+	 			keyword = REGEXP_replace(keyword,'(?:\\d+(?:(?<=\\d)\\.\\d+)?%)|^\\s++|\\s++$',''),-- |(?:\\*\\d+(?:\\.\\d+)?))',''),
 				@stmtbody = NULL ,
-				@classNo = IF(classNo is null ,'%',TRIM(classNo)),  
+				classNo = IF(classNo is null ,'',TRIM(classNo)),  
 			@totalnum = 0 ;
 
-				set @totalnum = calcuscore(@classNo,null) ;
-				set @stmtbody1  = "
-							SELECT count(*) 
-							into @totalnum 	
-												",
-						@stmtbody2  = CONCAT_WS('',
-"
-FROM exp_experimentclassstudent as a
-left join mysq1_schema.exp_classstudent as c on a.studentNo = c.stuNo
-left join mysq1_schema.exp_class as d on c.classno = d.classNo
-where  a.classNo = ",QUOTE(@classNo),"
-and
-case 
-when @keyword = '' then 1
-when CONCAT_WS('',d.classNo,d.className) REGEXP ",QUOTE(@keyword)," then 1
-when concat(c.stu_name,a.studentNo) like ",QUOTE(concat('%',@keyword,'%'))," then 1 
+			SET @totalnum = NULL,@maxtime = NULL,@maxstatu =NULL;
+
+			SET @stmtbody = CONCAT_WS('\n',"SET @stmtbody = ("	
+,"SELECT
+json_arrayagg(json_array(a.classNo,a.studentNo,a.expno,a.teacherScore,b.difficulty_level))
+FROM exp_experimentclassstudent AS a0 
+INNER JOIN exp_experimentclassstudent as a ON a0.studentNo  = a.studentNo"
+,IF(IFNULL(@all,'')='+',NULL,CONCAT_WS('',' and ',"a.classNo = ",QUOTE(classNo)))
+,"INNER JOIN exp_experimentclass AS b ON a.classNo = b.classNo
+INNER join mysq1_schema.exp_classstudent as c on a.studentNo = c.stuNo
+INNER join mysq1_schema.exp_class as d on c.classno = d.classNo
+WHERE "	
+,CONCAT_WS('',"a0.classNo = ",QUOTE(classNo))
+/*,CONCAT_WS('',"CASE 
+WHEN IFNULL(" ,QUOTE(`keyword` ),",'')= '' THEN 1 
+when CONCAT_WS('|',d.classNo,d.className)!='' AND CONCAT_WS('|',d.classNo,d.className)REGEXP ",QUOTE(`keyword` )," then 1
+when CONCAT_WS('|',c.stu_name,a.studentNo)  != '' AND CONCAT_WS('|',c.stu_name,a.studentNo) REGEXP ",QUOTE(`keyword` ),"  then 1 
 else 0
-end "),
-							@stmtbody  = concat(@stmtbody1,@stmtbody2);
+end")*/	
+,')'	);
+-- SELECT REGEXP_replace(keyword,'%','');
+			EXECUTE immediate @stmtbody;
+			set expnos = @stmtbody;
+
+			DROP TEMPORARY TABLE if EXISTS `a`;
+
+				SET @stmtbody = CONCAT_WS('\n',"CREATE TEMPORARY TABLE `a` AS\nSELECT\na.statu,\na.expNo,\na.studentNo,\nsum(b.mission_result) mission_result,\nsum(b.resultCount) resultCount,\nsum(b.read_ans_size) read_ans_size,\nsum(b.score) score,\nCOUNT(missionid) 题\n,d.mission_total \nFROM\nexp_experimentclassstudent AS a\nINNER JOIN exp_experimentclass AS d ON a.classNo = d.classNo\nLEFT JOIN acc_1 AS b ON b.expID = a.expNo"
+				,"WHERE -- a.statu IS NOT NULL AND "
+				,CONCAT_WS('\n','instr(',quote(expNos),',a.expNo)>0')
+				,"GROUP BY expNo"
+				);
+
+				EXECUTE immediate   @stmtbody ;
+
+				SET @DISABLE_TRIGGERS =1;
+				SET @stmtbody = CONCAT_WS('',"UPDATE \n`a` AS a\nINNER JOIN exp_experimentclassstudent AS d ON d.expNo = a.expNo\nseT\nd.statu = NULL ,\nd.mission_result = a.mission_result,\nd.read_ans_size = a.read_ans_size,\nd.score = a.score,\nd.missionscore = IF(IFNULL(mission_total,0)= 0,NULL,a.score/mission_total),\nd.done = 题"
+				-- ,CONCAT_WS('',"WHERE a.statu IS NOT NULL")
+				);
+				EXECUTE immediate  @stmtbody;
+
+				SET @DISABLE_TRIGGERS =NULL;
+
+				SET @stmtbody  = CONCAT_WS('\n',"SELECT count(*)\ninto @totalnum ","FROM exp_experimentclassstudent as a\n INNER JOIN exp_experimentclass AS b ON a.classNo = b.classNo\nLEFT join mysq1_schema.exp_classstudent as c on a.studentNo = c.stuNo\nLEFT join mysq1_schema.exp_class as d on c.classno = d.classNo",'where',CONCAT_WS('\n','instr(',quote(expNos),',a.expNo)>0'));
+
+				EXECUTE  immediate @stmtbody ;
 
 
+			set @stmtbody  := CONCAT_WS('\n'
+,"SELECT 
+@totalnum as total,
+IF( IFNULL(A.SCORE,0)=0 ,'-',rowid)rowid ,
+a.classNo,
+className AS className,
+a.studentNo,
+stu_name AS stu_name,
+a.expNo,
+IF(A.SCORE1 IS null OR A.SCORE =0,'',score1) AS score,
+IF(A.read_ans_size IS null OR A.read_ans_size =0,'',read_ans_size) read_ans_size,
+IF(A.mission_result IS null OR A.mission_result =0,'',mission_result) mission_result,
+IF(A.log_count IS null OR A.log_count =0,'',log_count) log_count,
+IF(a.teacherScore IS NULL OR a.teacherScore=0,'',a.teacherScore) AS teacherScore
+FROM(
+SELECT
+dense_rank()  OVER (ORDER BY IFNULL(SUM(score),0)+ IFNULL(SUM(score1)/COUNT(score1),0)   DESC) rowid,
+studentNo
+,CONCAT_WS(',',IFNULL(score,'--'), ROUND(SUM(score1)/COUNT(score1),2)) score1
+,ROUND(IFNULL(SUM(score),0)+ IFNULL(SUM(score1)/COUNT(score1),0),2) score
+,a.classNo,className,stu_name, expNo,read_ans_size,mission_result,log_count,teacherScore
+FROM(
+SELECT 
 
-				PREPARE stmt from  @stmtbody ;
-				EXECUTE stmt ;
+@totalnum as total,
+@rowNo= 1,@score = 0,
+a.classNo,
+IFNULL(d.className,'') className,
+a.studentNo,
+ifnull(c.stu_name,'')stu_name, 
+a.expNo,"
+,"@score := a.missionscore,"
+,CONCAT_WS('',"ROUND(IF(b.classNo = ",QUOTE(classNo),",@score,NULL),2) AS score,")
+,CONCAT_WS('',"ROUND(IF(b.classNo = ",QUOTE(classNo),",NULL,@score),2)AS score1,")
+,CONCAT_WS('',"IF(b.classNo = ",QUOTE(classNo),",ifnull(a.read_ans_size,0),0) AS read_ans_size,")
+,CONCAT_WS('',"IF(b.classNo = ",QUOTE(classNo),",ifnull(a.mission_result,0),0) AS mission_result,")
+,CONCAT_WS('',"IF(b.classNo = ",QUOTE(classNo),",ifnull(a.done,0),0) AS log_count,")
+,"teacherScore
+FROM exp_experimentclassstudent as a
+INNER JOIN exp_experimentclass AS b ON a.classNo = b.classNo
+INNER join mysq1_schema.exp_classstudent as c on a.studentNo = c.stuNo
+INNER join mysq1_schema.exp_class as d on c.classno = d.classNo"
+,"WHERE ",CONCAT_WS('\n','instr(',quote(expNos),',a.expNo)>0')
+,')as a 
+GROUP BY studentNo-- ,a.expNo
+ORDER BY score DESC
+)AS A'
+,"WHERE "
+,CONCAT_WS('',"CASE 
+WHEN IFNULL(" ,QUOTE(`keyword` ),",'')= '' THEN 1 
+when CONCAT_WS('|',classNo,className)!='' AND CONCAT_WS('|',classNo,className)REGEXP ",QUOTE(`keyword` )," then 1
+when CONCAT_WS('|',stu_name,studentNo)  != '' AND CONCAT_WS('|',stu_name,studentNo) REGEXP ",QUOTE(`keyword` ),"  then 1 
+else 0
+end")
+);
+
+-- SELECT @stmtbody ;-- LEAVE sl5;
+EXECUTE immediate @stmtbody ;
+commit;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `seacher5_copy`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `seacher5_copy`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `seacher5_copy`(IN `classNo` varchar(60) ,IN `keyword` varchar(2000),in `page` int(4),in `num` int(6))
+    READS SQL DATA
+sl5:BEGIN
+
+	DECLARE  weight VARCHAR(60) DEFAULT NULL;DECLARE  expnos MEDIUMTEXT DEFAULT NULL;
+/*
+ START TRANSACTION;
+CALL Audit_1('seacher5',CONCAT_WS(',',QUOTE( `classNo`),QUOTE(`keyword`),QUOTE(`page`),QUOTE(`num`)),'ok');
+ COMMIT;
+/**/
+START TRANSACTION;
+SET @all := null,@all = REGEXP_substr(keyword,'\\+'),`keyword`  = REGEXP_replace(`keyword`,'搜索|\\+','');
+	set 	
+				@offset2 = (IF(page=0,1,page)-1)*num,
+				@num = num ,				
+
+				keyword	:= REGEXP_replace(IFNULL(keyword,''),'([()$.\\-{}\\?])','\\\\\\1'),
+				weight = REGEXP_substr(keyword,'(?:\\d+(?:(?<=\\d)\\.\\d+)?)(?=%)'),-- |(?:\\*\\d+(?:\\.\\d+)?))
+	 			keyword = REGEXP_replace(keyword,'(?:\\d+(?:(?<=\\d)\\.\\d+)?%)|^\\s++|\\s++$',''),-- |(?:\\*\\d+(?:\\.\\d+)?))',''),
+				@stmtbody = NULL ,
+				classNo = IF(classNo is null ,'',TRIM(classNo)),  
+			@totalnum = 0 ;
+
+			SET @totalnum = NULL,@maxtime = NULL,@maxstatu =NULL;
+
+			SET @stmtbody = CONCAT_WS('\n',"SET @stmtbody = ("	
+,"SELECT
+json_arrayagg(json_array(a.classNo,a.studentNo,a.expno,a.teacherScore,b.difficulty_level))
+FROM exp_experimentclassstudent AS a0 
+INNER JOIN exp_experimentclassstudent as a ON a0.studentNo  = a.studentNo"
+,IF(IFNULL(@all,'')='+',NULL,CONCAT_WS('',' and ',"a.classNo = ",QUOTE(classNo)))
+,"INNER JOIN exp_experimentclass AS b ON a.classNo = b.classNo
+INNER join mysq1_schema.exp_classstudent as c on a.studentNo = c.stuNo
+INNER join mysq1_schema.exp_class as d on c.classno = d.classNo
+WHERE "	
+,CONCAT_WS('',"a0.classNo = ",QUOTE(classNo))
+/*,CONCAT_WS('',"CASE 
+WHEN IFNULL(" ,QUOTE(`keyword` ),",'')= '' THEN 1 
+when CONCAT_WS('|',d.classNo,d.className)!='' AND CONCAT_WS('|',d.classNo,d.className)REGEXP ",QUOTE(`keyword` )," then 1
+when CONCAT_WS('|',c.stu_name,a.studentNo)  != '' AND CONCAT_WS('|',c.stu_name,a.studentNo) REGEXP ",QUOTE(`keyword` ),"  then 1 
+else 0
+end")*/	
+,')'	);
+-- SELECT REGEXP_replace(keyword,'%','');
+			EXECUTE immediate @stmtbody;
+			set expnos = @stmtbody;
+
+			DROP TEMPORARY TABLE if EXISTS `a`;
+
+				SET @stmtbody = CONCAT_WS('\n',"CREATE TEMPORARY TABLE `a` AS\nSELECT\na.statu,\na.expNo,\na.studentNo,\nsum(b.mission_result) mission_result,\nsum(b.resultCount) resultCount,\nsum(b.read_ans_size) read_ans_size,\nsum(b.score) score,\nCOUNT(missionid) 题\n,d.mission_total \nFROM\nexp_experimentclassstudent AS a\nINNER JOIN exp_experimentclass AS d ON a.classNo = d.classNo\nLEFT JOIN acc_1 AS b ON b.expID = a.expNo"
+				,"WHERE -- a.statu IS NOT NULL AND "
+				,CONCAT_WS('\n','instr(',quote(expNos),',a.expNo)>0')
+				,"GROUP BY expNo"
+				);
+
+				EXECUTE immediate   @stmtbody ;
+
+				SET @DISABLE_TRIGGERS =1;
+				SET @stmtbody = CONCAT_WS('',"UPDATE \n`a` AS a\nINNER JOIN exp_experimentclassstudent AS d ON d.expNo = a.expNo\nseT\nd.statu = NULL ,\nd.mission_result = a.mission_result,\nd.read_ans_size = a.read_ans_size,\nd.score = a.score,\nd.missionscore = IF(IFNULL(mission_total,0)= 0,NULL,a.score/mission_total),\nd.done = 题"
+				-- ,CONCAT_WS('',"WHERE a.statu IS NOT NULL")
+				);
+				EXECUTE immediate  @stmtbody;
+
+				SET @DISABLE_TRIGGERS =NULL;
+
+				SET @stmtbody  = CONCAT_WS('\n',"SELECT count(*)\ninto @totalnum ","FROM exp_experimentclassstudent as a\n INNER JOIN exp_experimentclass AS b ON a.classNo = b.classNo\nLEFT join mysq1_schema.exp_classstudent as c on a.studentNo = c.stuNo\nLEFT join mysq1_schema.exp_class as d on c.classno = d.classNo",'where',CONCAT_WS('\n','instr(',quote(expNos),',a.expNo)>0'));
+
+				EXECUTE  immediate @stmtbody ;
 
 
+			set @stmtbody  := CONCAT_WS('\n'
+,"SELECT 
+@totalnum as total,
+IF( IFNULL(A.SCORE,0)=0 ,'-',rowid)rowid ,
+a.classNo,
+className AS className,
+a.studentNo,
+stu_name AS stu_name,
+a.expNo,
+IF(A.SCORE1 IS null OR A.SCORE =0,'',score1) AS score,
+IF(A.read_ans_size IS null OR A.read_ans_size =0,'',read_ans_size) read_ans_size,
+IF(A.mission_result IS null OR A.mission_result =0,'',mission_result) mission_result,
+IF(A.log_count IS null OR A.log_count =0,'',log_count) log_count,
+IF(a.teacherScore IS NULL OR a.teacherScore=0,'',a.teacherScore) AS teacherScore
+FROM(
+SELECT
+dense_rank()  OVER (ORDER BY IFNULL(SUM(score),0)+ IFNULL(SUM(score1)/COUNT(score1),0)   DESC) rowid,
+studentNo
+,CONCAT_WS(',',IFNULL(score,'--'), ROUND(SUM(score1)/COUNT(score1),2)) score1
+,ROUND(IFNULL(SUM(score),0)+ IFNULL(SUM(score1)/COUNT(score1),0),2) score
+,a.classNo,className,stu_name, expNo,read_ans_size,mission_result,log_count,teacherScore
+FROM(
+SELECT 
 
-			set @stmtbody1  = "
-							SELECT 
-										@totalnum as total,
-										#ifnull(a.rowid,'--') as rowid,
-@rowid := IF(IFNULL(a.missionscore,0) <>@score ,@rowid+1, @rowid) AS rowid,
-										a.classNo,
-										d.className,
-										a.studentNo,
-										c.stu_name,
-										a.expNo,
-@score := IF(ifnull(a.missionscore,0) <>@score,ifnull(a.missionscore,0) ,@score) AS score,
-										ifnull(a.read_ans_size,0) AS read_ans_size,
-										ifnull(a.mission_result,0) AS mission_result,
-										ifnull(a.log_count,0) AS log_count,
-										a.teacherScore
-											",
-					@stmtbody2  = CONCAT(@stmtbody2,"
-										ORDER BY case when a.missionscore is null then 1 else 0 end ASC ,a.missionscore DESC,a.studentNo ASC
-										LIMIT ?,?"),
-					@stmtbody = concat(@stmtbody1,@stmtbody2);
-SET @rowid = 0,@score=0 ;
+@totalnum as total,
+@rowNo= 1,@score = 0,
+a.classNo,
+IFNULL(d.className,'') className,
+a.studentNo,
+ifnull(c.stu_name,'')stu_name, 
+a.expNo,"
+,"@score := a.missionscore,"
+,CONCAT_WS('',"ROUND(IF(b.classNo = ",QUOTE(classNo),",@score,NULL),2) AS score,")
+,CONCAT_WS('',"ROUND(IF(b.classNo = ",QUOTE(classNo),",NULL,@score),2)AS score1,")
+,CONCAT_WS('',"IF(b.classNo = ",QUOTE(classNo),",ifnull(a.read_ans_size,0),0) AS read_ans_size,")
+,CONCAT_WS('',"IF(b.classNo = ",QUOTE(classNo),",ifnull(a.mission_result,0),0) AS mission_result,")
+,CONCAT_WS('',"IF(b.classNo = ",QUOTE(classNo),",ifnull(a.done,0),0) AS log_count,")
+,"teacherScore
+FROM exp_experimentclassstudent as a
+INNER JOIN exp_experimentclass AS b ON a.classNo = b.classNo
+INNER join mysq1_schema.exp_classstudent as c on a.studentNo = c.stuNo
+INNER join mysq1_schema.exp_class as d on c.classno = d.classNo"
+,"WHERE ",CONCAT_WS('\n','instr(',quote(expNos),',a.expNo)>0')
+,')as a 
+GROUP BY studentNo-- ,a.expNo
+ORDER BY score DESC
+)AS A'
+,"WHERE "
+,CONCAT_WS('',"CASE 
+WHEN IFNULL(" ,QUOTE(`keyword` ),",'')= '' THEN 1 
+when CONCAT_WS('|',classNo,className)!='' AND CONCAT_WS('|',classNo,className)REGEXP ",QUOTE(`keyword` )," then 1
+when CONCAT_WS('|',stu_name,studentNo)  != '' AND CONCAT_WS('|',stu_name,studentNo) REGEXP ",QUOTE(`keyword` ),"  then 1 
+else 0
+end")
+);
 
-			PREPARE stmt from  @stmtbody ;
-			EXECUTE stmt USING  @offset2  , @num;
-			DEALLOCATE PREPARE stmt;
-
+-- 
+SELECT @stmtbody ;-- LEAVE sl5;
+EXECUTE immediate @stmtbody ;
+commit;
 END
 ;;
 DELIMITER ;
@@ -10686,8 +17013,10 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `seacher6`(in expid varchar(70))
     READS SQL DATA
 BEGIN
 
-	set @expid = expid ,@rowid= calcuscore(NULL,expid),@rowid = NULL,@statu= NULL;
+	insert plogs (Function_Name , parameter)value('seach 6', exppid);
 
+	set @expid = expid ,@rowid= calcuscore(NULL,expid),@rowid = NULL,@statu= NULL;
+-- SELECT @expid ;
 						SELECT a.rowid, b.statu INTO @rowid,@statu
 							FROM 	exp_experimentclassstudent AS a
 							INNER JOIN exp_experimentclass AS b ON a.classNo = b.classNo
@@ -10695,7 +17024,7 @@ BEGIN
 
 
 
-
+-- dyna sort  select @rowid,@statu
 
 			IF @statu IS NOt NULL THEN
 					SELECT 	count(DISTINCT b.missionscore)+1  INTO @rowid
@@ -10703,7 +17032,7 @@ BEGIN
 					inner JOIN exp_experimentclassstudent AS b ON a.classNo = b.classNo 
 					where a.expNo = @expid and a.missionscore < b.missionscore ;
 			END IF;
-
+-- 
 			SELECT
 					if(e.classType=1 ,null, @rowid) as rowid,
 					a.classNo,
@@ -10735,6 +17064,7 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `seacher7`(IN `classNo` varchar(60) ,IN `keyword` varchar(60),in `page` int(4),in `num` int(6))
     READS SQL DATA
 BEGIN
+	-- insert plogs (Function_Name , parameter)value('seach 7',CONCAT_WS('', QUOTE(`classNo`) ,QUOTE(`keyword`) ,`page` ,`num` ));
 
 	set 	
 				@offset2 = (IF(page=0,1,page)-1)*num,
@@ -10769,14 +17099,20 @@ BEGIN
 				EXECUTE stmt ;
 				DEALLOCATE PREPARE stmt;
 
+/*										a.expNo,
 
-
+										ifnull(a.missionscore,0) AS score,
+										ifnull(a.read_ans_size,0) AS read_ans_size,
+										ifnull(a.mission_result,0) AS mission_result,
+										ifnull(a.log_count,0) AS log_count,
+*/
+-- 									a.rowNo,
 
 
 			set @stmtbody1  = "
 							SELECT 
 										@totalnum as total,
-										#ifnull(a.rowid,'--') as rowid,
+										#ifnull(a.rowNo,'--') as rowid,
 
 										c.classNo,
 										d.className,
@@ -10800,6 +17136,176 @@ END
 DELIMITER ;
 
 -- ----------------------------
+--  Procedure definition for `search55`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `search55`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `search55`(IN `classNo` varchar(60) ,IN `keyword` varchar(2000),in `page` int(4),in `num` int(6))
+    READS SQL DATA
+sl5:BEGIN
+
+	DECLARE  weight VARCHAR(60) DEFAULT NULL;
+/*
+START TRANSACTION;
+CALL Audit_1('seacher5',CONCAT_WS(',',QUOTE( `classNo`),QUOTE(`keyword`),QUOTE(`page`),QUOTE(`num`)),'ok');
+COMMIT;
+*/
+
+	set 	
+				@offset2 = (IF(page=0,1,page)-1)*num,
+				@num = num ,				
+
+				@keyword	:= REGEXP_replace(IFNULL(keyword,''),'([()$.\\-{}\\?])','\\\\\\1'),
+				weight = REGEXP_substr(@keyword,'(?:\\d+(?:(?<=\\d)\\.\\d+)?)(?=%)'),-- |(?:\\*\\d+(?:\\.\\d+)?))
+	 			@keyword = REGEXP_replace(@keyword,'(?:\\d+(?:(?<=\\d)\\.\\d+)?%)',''),-- |(?:\\*\\d+(?:\\.\\d+)?))',''),
+				@stmtbody = NULL ,
+				@classNo = IF(classNo is null ,'',TRIM(classNo)),  
+			@totalnum = 0 ;
+
+			SET @totalnum = NULL,@maxtime = NULL,@maxstatu =NULL;
+
+SELECT
+-- a.classNo,Count(*),a.mission_total,a.statu,
+CONCAT_WS('','UPDATE exp_experimentclass  SET mission_total = ',Count(*),',statu = NULL WHERE classNo = ',QUOTE(a.classNo))
+INTO @stmtbody
+FROM
+exp_experimentclass AS a
+INNER JOIN exp_experimentclass_course AS b ON b.classNo = a.classNo
+INNER JOIN exp_courses_node AS c ON b.courseNo = c.node_courseNo
+INNER JOIN exp_courses_node_content AS d ON d.contentNo = c.contentNo
+LEFT JOIN exp_cour_node_cont AS e ON e.classNo = b.classNo AND e.courseNo = b.courseNo AND e.classNo = b.classNo AND e.courseNo = b.courseNo AND e.contentNo = d.contentNo AND e.typesort = d.typesort AND e.missionid = d.missionid AND e.classNo = b.classNo AND e.courseNo = b.courseNo
+WHERE 1
+AND a.classNo = `classNo`
+AND d.contentType != 'edit'
+AND e.classNo IS NULL;
+
+
+EXECUTE immediate @stmtbody;
+
+EXECUTE immediate "DROP TEMPORARY TABLE if EXISTS TEMPORARY ";
+
+
+
+
+SET @stmtbody = CONCAT_WS('\n',
+"
+CREATE TEMPORARY TABLE TEMPORARY AS
+SELECT
+a.statu,
+a.expNo,
+a.studentNo,
+sum(b.mission_result) mission_result,
+sum(b.resultCount) resultCount,
+sum(b.read_ans_size) read_ans_size,
+sum(b.score) score,
+COUNT(*) 题
+,d.mission_total 
+FROM
+exp_experimentclassstudent AS a
+INNER JOIN exp_experimentclass AS d ON a.classNo = d.classNo
+LEFT JOIN acc_1 AS b ON b.expID = a.expNo
+WHERE
+a.statu IS NOT NULL"
+,CONCAT('AND a.classNo = ',quote(classNo))
+,"GROUP BY expNo"
+);
+
+
+				EXECUTE immediate   @stmtbody ;
+SET @DISABLE_TRIGGERS =1;
+EXECUTE immediate "
+UPDATE 
+TEMPORARY AS a
+INNER JOIN exp_experimentclassstudent AS d ON d.expNo = a.expNo
+seT
+d.statu = NULL ,
+d.mission_result = a.mission_result,
+d.read_ans_size = a.read_ans_size,
+d.score = a.score,
+d.missionscore = IF(IFNULL(mission_total,0)= 0,NULL,a.score/mission_total),
+d.done = 题
+WHERE
+a.statu IS NOT NULL";
+
+
+				SET @stmtbody1  = "
+SELECT count(*) 
+into @totalnum 	
+					",
+						@stmtbody2  = CONCAT_WS('',"
+FROM exp_experimentclassstudent as a
+INNER JOIN exp_experimentclass AS b ON a.classNo = b.classNo
+LEFT JOIN exp_experimentclass_course AS b1 ON b1.classNo = b.classNo
+LEFT join mysq1_schema.exp_classstudent as c on a.studentNo = c.stuNo
+LEFT join mysq1_schema.exp_class as d on c.classno = d.classNo
+WHERE b.classNo = ",QUOTE(@classNo),"
+AND
+case 
+when (@keyword:=",QUOTE(@keyword), ")='' then 1
+when CONCAT_WS('',d.classNo,d.className) REGEXP @keyword  then 1
+when concat(c.stu_name,a.studentNo) REGEXP @keyword  then 1 
+else 0
+end  ",'\nGROUP BY a.expno'),
+							@stmtbody  = concat(@stmtbody1,@stmtbody2);
+
+
+
+
+			set @stmtbody1  := CONCAT_WS('\n',
+"SELECT 
+@totalnum as total,
+@rowNo := IF(IFNULL(a.score,0) <>@score ,@rowid+1, @rowid) AS rowid,
+a.classNo,
+className AS className,
+a.studentNo,
+stu_name AS stu_name,
+a.expNo,
+@SCORE := IFNULL(A.SCORE,0) AS score,
+a.read_ans_size,
+a.mission_result,
+IF(done =1,0,done) log_count,
+IF(a.teacherScore IS NULL,'',a.teacherScore) AS teacherScore
+
+
+FROM(
+SELECT 
+done,
+@totalnum as total,
+@rowNo= 1,@score = 0,
+a.classNo,
+d.className,
+a.studentNo,
+c.stu_name,
+a.expNo,"
+,CONCAT_WS('',"a.missionscore",CONCAT('*',IF(`weight`='',NULL,`weight`),"/100"))," AS score,
+ifnull(a.read_ans_size,0) AS read_ans_size,
+ifnull(a.mission_result,0) AS mission_result,
+ifnull(a.log_count,0) AS log_count,
+a.teacherScore
+FROM exp_experimentclassstudent as a
+INNER JOIN exp_experimentclass AS b ON a.classNo = b.classNo
+LEFT join mysq1_schema.exp_classstudent as c on a.studentNo = c.stuNo
+LEFT join mysq1_schema.exp_class as d on c.classno = d.classNo"
+,CONCAT_WS('',"WHERE b.classNo = ",QUOTE(@classNo)),
+"AND CASE 
+when (@keyword:=",QUOTE(@keyword), ")='' then 1
+when CONCAT_WS('',d.classNo,d.className) REGEXP @keyword  then 1
+when concat(c.stu_name,a.studentNo) REGEXP @keyword  then 1 
+else 0
+end",'GROUP BY a.expno',
+"ORDER BY case when a.missionscore is null then 1 else 0 end ASC ,a.missionscore DESC,a.studentNo ASC"
+,CONCAT_WS('',"LIMIT ",CONCAT_WS(',',@offset2,@num))
+,')AS A'),
+					@stmtbody = concat(@stmtbody1);
+SET @rowid = 0,@score=0 ;
+
+	EXECUTE immediate @stmtbody ;
+
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
 --  Procedure definition for `Select_ErrFields`
 -- ----------------------------
 DROP FUNCTION IF EXISTS `Select_ErrFields`;
@@ -10808,12 +17314,15 @@ CREATE DEFINER=`root`@`%` FUNCTION `Select_ErrFields`(`statu` varchar(1),`a_n` i
     DETERMINISTIC
     SQL SECURITY INVOKER
 BEGIN
-	
+	#Routine body goes here...
 
 	DECLARE w1 VARCHAR(20);
 	DECLARE w2 VARCHAR(200);
 
-
+/*
+绿色： #00FF00
+红色： #FF9999 
+*/
 
 	SET @fields_ = '';
 
@@ -10857,22 +17366,27 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `Select_ErrStat`(IN `STATU` varchar(5),IN `key_fields` varchar(140),IN `key_values` varchar(120),IN `field_Names` varchar(400),IN `field_values` longtext)
     MODIFIES SQL DATA
 select_arr: BEGIN
-
-
-
-
+#  1164 ; 1054;1139
+#  NULL 比较
+# 1 提交
+# 3 读取
 
   DECLARE CONTINUE HANDLER FOR  SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22' , SQLSTATE	'HY000', SQLSTATE	'22007'
 	BEGIN 
 		GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;SET  @`sqlstate` = JSON_OBJECT('sqlstate',@`sqlstate`,'errno',@errno,'text',@text);
-		SET @funcid = 'Select_ErrStat',
+		SET @funcid = 'Select_ErrStat',@`errsql` = @p1_body,
 				@p = CONCAT_WS(',',QUOTE(`STATU`) ,QUOTE(`key_fields`) ,QUOTE(`key_values`),QUOTE(`field_Names`),QUOTE(`field_values`));
 		CALL `Audit_3`(COLUMN_create('m',CONCAT_WS(': ','Error',CONCAT_WS(', ',@funcid,'  P2')),'err', @`sqlstate`,'SQL', @select_err_body,'pp',@`p`)	);
 	END;
 
+/*
+start TRANSACTION;
+SET @funcid = 'Select_ErrStat',@p = CONCAT_WS(',',QUOTE(`STATU`) ,QUOTE(`key_fields`) ,QUOTE(`key_values`),QUOTE(`field_Names`),QUOTE(`field_values`));
+CALL Audit_3(COLUMN_create('m',CONCAT_WS(' : ',@funcid),'pp',@p));COMMIT;
+SELECT NULL;CALL Audit_1('Select_ErrStat',CONCAT_WS(',',QUOTE(`STATU`) ,QUOTE(`key_fields`) ,QUOTE(`key_values`),QUOTE(`field_Names`),QUOTE(`field_values`)),`field_values`);
+COMMIT;*/
 
-
-
+-- SELECT NULL; LEAVE select_arr;
 
 
 
@@ -10882,11 +17396,13 @@ select_arr: BEGIN
 			@a_t = Fetch_Set(key_values,3,'\''),
 			@select_err_body = 'select null';
 
-
+ -- SELECT  CONCAT_WS(',',QUOTE(@missionid),'0','@a_fields','@a_n','@a_value');LEAVE select_arr;	
 		CALL Generate_One_En(@missionid,'0',@a_fields,@a_n,@a_value);
+-- SELECT  @select_err_body; LEAVE select_arr;
 
-
+-- SELECT @select_err_body;
 		IF IFNULL(@a_fields,'') != '' THEN
+
 				CALL Fetch_Set_values(@a_value,'0',@a_values_1);
 				SET @field_name = CONCAT('\'',REPLACE(field_names,',','\',\''),'\'');
 
@@ -10906,19 +17422,17 @@ select_arr: BEGIN
 
 
 
-	PREPARE err_select FROM @select_err_body;
-	EXECUTE err_select;
-
-
+-- SELECT  @select_err_body; LEAVE select_arr;
+	EXECUTE immediate @select_err_body;
 
 	SET @a = null,
 			@select_err_body =CONCAT("
 	SELECT mission_result  INTO @a
 	FROM acc_1 WHERE expid = ",Fetch_Set( `key_values` ,1,',')," AND missionid = ",QUOTE(@missionid));
- 
+ -- LEAVE select_arr;
 
-	PREPARE err_select FROM @select_err_body;
-	EXECUTE err_select;
+
+	EXECUTE immediate @select_err_body;
 
 	IF FOUND_ROWS() = 0 THEN 
 			SET @select_err_body =  CONCAT("
@@ -10931,7 +17445,8 @@ select_arr: BEGIN
 			WHERE expid = ",Fetch_Set( `key_values` ,1,',')," AND missionid = ",QUOTE(@missionid));
 	END IF;
 
-	PREPARE err_select FROM @select_err_body;	EXECUTE err_select;	DEALLOCATE PREPARE err_select;
+		EXECUTE immediate @select_err_body;
+
 END
 ;;
 DELIMITER ;
@@ -10942,44 +17457,256 @@ DELIMITER ;
 DROP PROCEDURE IF EXISTS `SpeedDial`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `SpeedDial`(IN `funcid` varchar(60),IN `p` varchar(500))
-sdl:BEGIN
+`l`:BEGIN
 
+/*
+funcid
+0 - 上翻
+1 - 下翻
+2 - 刷新 NULL
+3 -  岗位 
 
+'*/
 
-
+DECLARE CONTINUE HANDLER FOR  SQLSTATE 'HY000', SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22'	
+bl:BEGIN GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;SET  @`sqlstate` = JSON_OBJECT('sqlstate',@`sqlstate`,'errno',@errno,'text',@text);SET @funcid := NULL,
+		@funcid = CONCAT_WS(' ','Error：','Speedial',`funcid`  ,ELT(`funcid` +1,'上翻','下翻','刷新 NULL','岗位')),@`errsql` = @sql_body,
+		@pp = CONCAT_WS(',',QUOTE(`funcid`),QUOTE(`p`));
+CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp,'SQL',@`errsql`,'err',@`sqlstate`));END; 
+SET @开始时间 = SYSDATE(6);
+/*
+START TRANSACTION; 
+		SET @funcid = CONCAT_WS(' ','Speedial',`funcid`  ,ELT(`funcid` +1,'上翻','下翻','刷新 NULL','岗位')),@`errsql` = @sql_body,
+		@pp = CONCAT_WS(',',QUOTE(`funcid`),QUOTE(`p`));
+CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp));COMMIT;
+LEAVE `l`; 
+*/
+SET @start:=sysdate(6);
 
 	SET @sql_body = NULL;
 
 
 	CASE 
 			WHEN  `funcid` = 3 THEN 
-			BEGIN
-				DECLARE `p2` BLOB DEFAULT j(`p`,'p2');
-
-				IF IFNULL(`p2`,'')= '' OR IFNULL(@courseNo := j(`p`,"courseNo"),'')= '' THEN CALL Error('sp:no p2 or courseNo');END IF;
-
-				SET	@sql_body := r4('gangwei'),
-						@sql_body = CONVERT(r5( 
-IF((@roleids := j(p,'roleids')) IS  NULL, @sql_body,REGEXP_replace(@sql_body
-,@r:='(?is)\\((?=\'enterlis\')(.*?)(?<=CAST\\()(.*?)(?=\\)AS\\s+CHAR\\)as\\sroleli)'
-,CONCAT_WS('',"('roleids','",@roleids,"',\\1REGEXP_replace(\\2 ),CONCAT_WS('','(?i)\\\\\\\\s(?=roleid=\"(",@roleids,")\")'),' checked '")
-))
-,`p`)USING gbk);
-
-
-			END;
+			CALL flow(REGEXP_replace( `p`,'(?<=p2":){','{"funcid":"3",'));
+-- 		 SELECT REGEXP_replace( p,'(?<=p2":){','{"funcid":"3",');
+			LEAVE `l`;
 
 		ELSE
 		
  
 	SET @sql_body = NULL,@requirement1 = NULL,@requirement2 = NULL,@expId = NULL,@classNo = NULL,@courseNo = NULL,@nodeNo = NULL,@contentNo = NULL;
 
-	SET	@expId = j(`p`,"expId"),
-			@classNo = j(`p`,"classNo"),
-			@courseNo = j(`p`,"courseNo"),
-			@nodeNo = j(`p`,"nodeNo"),
-			@contentNo = j(`p`,"contentNo"),
+	SET	@expId = j0(`p`,"expId"),
+			@classNo = j0(`p`,"classNo"),
+			@courseNo = j0(`p`,"courseNo"),
+			@nodeNo = IF(IFNULL(j0(`p`,"nodeNo"),'')='',NULL,j0(`p`,"nodeNo")),
+			@contentNo = j0(`p`,"contentNo"),
 			@nodenum = Stati_ch(@nodeNo,'.');
+	SET @requirement1 = CONCAT_WS(' AND\n',CONCAT('a.expNo = ',quote_d(@expId)),
+																	CONCAT('a.studentNo = ',json_extract(p,'$.stuNo')),
+																		CONCAT('a1.classNo = ',quote_d(@classNo)),
+																		IF(`funcid` = 0 AND IFNULL(@nodeNo,'')='',NULL,
+																		CONCAT('b.node_courseNo = ',quote_d(@courseNo))
+																		)
+/*																		,CASE `funcid` = 0 
+																				WHEN @nodenum > 0 THEN
+																					CONCAT('b.node_No like "',SUBSTRING_INDEX(@nodeNo,".",@nodenum),'.%"')
+																				WHEN @nodeNo IS NOT NULL OR @courseNo IS NULL THEN NULL
+																			ELSE CONCAT('b.node_No like "',@nodeNo,'.%"')
+																		END
+*/																);
+
+
+IF RAND()*10>0 THEN 
+		SET	@sql_body = CONCAT_WS("",	"REPLACE INTO abc(expID,classNo,courseNo,cabc_node_No,node_No,contentNo,practic,test,per1,courseware,perRate,perscore,statu)\n",
+																	"SELECT a.expNo AS expID,a1.classNo,a2.courseNo,cabc(b.node_No) AS cabc_node_No,b.node_No,b.contentNo,\n",
+																	"Count(IF(c1.contentType = 'kj' AND c6.billType <> 'kjxt',c1.missionid,NULL)) AS practic,\n",
+																	"Count(IF(c1.contentType = 'kj' AND c6.billType = 'kjxt',c1.missionid,NULL)) AS test,\n",
+																	"Sum(IF(c5.billid IS NOT NULL , 1,0)) AS per1,\n",
+																	"Count(c2.unique_id) AS courseware,\n",
+																	"Count(c4.missionId) AS perRate,\n",
+																	"Sum(IF(a1.classType != 1,IF(c4.score<0,0,c4.score),NULL)) AS perscore,NULL\n",
+																	"FROM exp_experimentclassstudent AS a\n",
+																	"INNER JOIN exp_experimentclass AS a1 ON a.classNo = a1.classNo\n",
+																	"INNER JOIN exp_experimentclass_course AS a2 ON a2.classNo = a1.classNo\n",
+																	"INNER JOIN exp_courses_node AS b ON a2.courseNo = b.node_courseNo\n",
+																	"LEFT JOIN abc AS b1 ON b1.classNo = a2.classNo AND b1.courseNo = a2.courseNo AND b1.courseNo = b.node_courseNo AND b1.node_No = b.node_No AND b1.contentNo = b.contentNo AND b1.expID = a.expNo\n",
+																	"INNER JOIN exp_courses_node_content AS c1 ON c1.contentNo = b.contentNo\n",
+																	"LEFT JOIN exp_cour_node_cont AS c0 ON a1.classNo = c0.classNo AND c1.contentNo = c0.contentNo AND c1.typesort = c0.typesort AND c1.missionid = c0.missionid AND b.node_courseNo = c0.courseNo\n",
+																	"LEFT JOIN acc_mission AS c5 ON c5.missionId = c1.missionid\n",
+																	"LEFT JOIN mysq1_schema.bill_list AS c6 ON c5.billId = c6.billId\n",
+																	"LEFT JOIN exp_courseware_cells AS c2 ON c1.missionid = c2.unique_id\n",
+																	"LEFT JOIN acc_1 AS c4 ON c4.expID = a.expNo AND c1.missionid = c4.missionId\n",
+																	"WHERE ",@requirement1," AND b.contentNo IS NOT NULL AND (b1.expID IS NULL OR b1.statu IS NOT NULL)  AND c0.missionid IS NULL\n",
+																	"GROUP BY a1.classNo ,a.expNo,a2.courseNo,b.node_No");
+-- SELECT  @sql_body ;
+	 	EXECUTE immediate @sql_body ;
+END IF;
+
+
+		SET	@nodenum = Stati_ch(@nodeNo,'.'),
+				@requirement1 = CONCAT_WS(' AND ',CONCAT('b.expId = ',quote_d(@expId)),
+													CONCAT('b.classNo = ',quote_d(@classNo))),
+				@sql_body = CONCAT_WS('',
+						",\nSum(b.practic) AS practic,\n",
+						"Sum(b.courseware) AS courseware,\n",
+						"Sum(b.test) AS test,\n",
+						"ROUND(SUM(b.perScore)/(SUM(b.practic) + Sum(b.test))) AS perscore,\n",
+						"ROUND(SUM(b.perRate)/(SUM(b.practic)+ Sum(b.test))*100) AS perRate,\n",
+						"a.node_type,a.node_tip,a.ico_url,a.node_isChapter,\n",
+						"CAST(CONCAT_ws('&nbsp&nbsp&nbsp',\n",
+						"				IF(Sum(b.practic) = 0 ,NULL,CONCAT('实训题 - ', Sum(b.practic))),\n",
+						"				IF(Sum(b.test) = 0 ,NULL,CONCAT('客观题 - ', Sum(b.test))),\n",
+						"--				IF(Sum(b.test) !=0 AND Sum(b.courseware) != 0 AND Sum(test)  !=0 ,'<br>',NULL),\n",
+						"				IF(Sum(b.courseware) = 0 ,NULL,CONCAT('课件 - ', Sum(b.courseware)))\n",
+						" )AS CHAR) AS Str_total\n",
+						"FROM exp_courses_node AS a\n",
+						"LEFT JOIN exp_courses AS a1 ON a.node_courseNo = a1.courseNo\n");
+
+		IF IFNULL(@classNo,'') = '' THEN
+					 SET @sql_body = CONCAT_WS('',@sql_body,"LEFT JOIN(\n","SELECT\nc1.contentNo,\nCount(IF(c1.contentType = 'kj' AND c6.billType <> 'kjxt',c1.missionid,NULL)) AS practic,\nCount(IF(c1.contentType = 'kj' AND c6.billType = 'kjxt',c1.missionid,NULL)) AS test,\nSum(IF(c5.billid IS NOT NULL , 1,0)) AS per1,\nCount(c2.unique_id) AS courseware,\nnull AS perRate,\nNULL AS perscore,\na.node_courseNo\nFROM\nqianxue_test.exp_courses_node_content AS c1\nINNER JOIN qianxue_test.exp_courses_node AS a ON c1.contentNo = a.contentNo\nLEFT JOIN qianxue_test.acc_mission AS c5 ON c5.missionId = c1.missionid\nLEFT JOIN mysq1_schema.bill_list AS c6 ON c5.billId = c6.billId\nLEFT JOIN qianxue_test.exp_courseware_cells AS c2 ON c1.missionid = c2.unique_id\nWHERE \na.node_courseNo = ",QUOTE(@courseNo),"\nGROUP BY\nc1.contentNo","\n) AS b ON b.contentNo = a.contentNo");
+			ELSE SET	@sql_body = CONCAT_WS('',@sql_body,"INNER JOIN exp_experimentclass_course AS a2 ON a2.classNo = ",quote_d(@classNo)," AND a2.courseNo = a1.courseNo\n",
+						"LEFT JOIN abc AS b ON ",@requirement1," AND b.courseNo = a.node_courseNo AND b.node_No = a.node_No AND b.contentNo = a.contentNo");
+		END IF;
+
+
+-- 	SET @sql_body = CONCAT_WS('',CONCAT(',',@a_body),@sql_body);
+
+	SET @requirement1 = CONCAT("a.node_courseNo = ",quote_d(@courseNo)),
+			@a_body = NULL;
+
+	CASE 
+			WHEN @nodenum > 0 AND  `funcid` = 0  THEN
+					SET @requirement2 = CONCAT_WS('','SUBSTRING_INDEX(a.node_No,".",',@nodenum+1,')'),
+							@a_body = CONCAT_WS('',"/*n0*/SELECT ",QUOTE(@expId)," AS expID,",QUOTE(@classNo)," AS classNo,",
+															"a.node_courseNo AS courseNo,a.node_No ,a.node_url,a.contentNo,a.node_Id,a.node_parentNo,a.node_text,",QUOTE(@a_body)),
+							@requirement1 = CONCAT_WS(' AND\n',@requirement1,CONCAT('a.node_courseNo = ',quote_d(@courseNo)),
+																								CONCAT('a.node_No LIKE "',SUBSTRING_INDEX(@nodeNo,".",@nodenum),'.%"')),
+							@requirement2 = CONCAT_WS(',',CONCAT('cabc(',@requirement2,')'));
+
+			WHEN preg_rlike('/^\\d+/',@nodeNo) AND  `funcid` = 1 THEN
+					SET @requirement2 = CONCAT_WS('','SUBSTRING_INDEX(a.node_No,".",',@nodenum+2,')'),
+							@a_body = CONCAT_WS('',"/*n1*/SELECT ",QUOTE(@expId)," AS expID,",QUOTE(@classNo)," AS classNo,",
+														"a.node_courseNo AS courseNo,a.node_No,a.node_url,a.contentNo,a.node_Id,a.node_parentNo, a.node_text,",QUOTE(@a_body)),
+							@requirement1 = CONCAT_WS(' AND\n',@requirement1,CONCAT('a.node_courseNo = ',quote_d(@courseNo)),
+																				CONCAT('a.node_No LIKE "',@nodeNo,'.%"')),
+							@requirement2 = CONCAT_WS(',',CONCAT('cabc(',@requirement2,')'));
+
+			WHEN @nodeNo IS NULL  AND  `funcid` = 1 OR  @nodeNo IS NOT NULL AND `funcid` = 0  OR IFNULL(j0(`p`,'cnumber'),0) = 1 THEN
+
+					SET @a_body := NULL,
+							@a_body := CONCAT(",\n'domid',case when ifnull(a.node_text,'') = '' then null\n",REPLACE(@a_body,'`@a_body`',' when a.node_text'),' end\n'),
+							@a_body = CONCAT_WS('',"\n,CAST(COLUMN_json(COLUMN_CREATE('billid',a.billid,'before_id',a.before_id",@a_body,"))AS CHAR)");
+
+					SET @requirement2 = CONCAT_WS('','SUBSTRING_INDEX(a.node_No,".",',@nodenum+1,')'),
+							@a_body = CONCAT_WS('',"/*1z*/SELECT ",QUOTE(@expId)," AS expID,",QUOTE(@classNo)," AS classNo,",
+														"a.node_courseNo AS courseNo, a.node_No,a.node_url,a.contentNo,a.node_Id,a.node_parentNo, a.node_text\n",@a_body),
+							@requirement1 = IF(IFNULL(@courseNo,'') = '',NULL,CONCAT_WS(' AND\n',@requirement1,CONCAT('a.node_courseNo = ',quote_d(@courseNo)))),
+							@requirement2 = CONCAT_WS(',',CONCAT('cabc(',@requirement2,')'));
+
+			WHEN @courseNo IS NULL OR `funcid` = 0 OR @nodeNo IS NULL AND  `funcid` = 0 THEN 
+
+SELECT NULL INTO @a_body FROM information_schema.`TABLES` AS a WHERE a.TABLE_SCHEMA = DATABASE() AND a.TABLE_NAME =  'exp_group';
+
+IF FOUND_ROWS() THEN 
+
+SELECT '"exp_group","1"' inTO @a_body FROM exp_experimentclassstudent AS a INNER JOIN exp_group AS b ON b.expId = a.expNo
+WHERE  a.expNo  = j0(p,'expid')AND b.stuNo = j0(p,'stuNo'); 
+END IF ;
+--  SET @a_body = NULL ;
+SELECT NULLIF(CONCAT_WS(',',@a_body,GROUP_CONCAT(CONCAT(quote(a.COLUMN_NAME),',a1.',a.COLUMN_NAME) SEPARATOR ',')),'') INTO @a_body
+FROM information_schema.`COLUMNS` AS a WHERE a.TABLE_SCHEMA = DATABASE()AND a.TABLE_NAME  = 'exp_courses' AND a.COLUMN_NAME REGEXP  'before_id|billid' ;
+
+					SET @a_body = CONCAT("\nCAST(COLUMN_json(COLUMN_CREATE(",@a_body,"))AS CHAR)");
+					SET @a_body = CONCAT_WS('',"/*0c*/SELECT ",QUOTE(@expId)," AS expID,",QUOTE(@classNo)," AS classNo,",
+														"a.node_courseNo AS courseNo,NULL AS node_No,a1.img_url AS node_url,a1.courseName AS node_text,",
+														"NULL AS contentNo,a.node_Id,0 AS node_parentNo,",IF(IFNULL(@a_body,'')<>'',@a_body,'""'),' AS dblob '),
+							@requirement2 = "CONCAT(IFNULL(a1.sort,''),a.node_courseNo)"/**/ ;
+		-- 		SELECT @a_body;			
+
+		ELSE		SELECT "NOT ok"; LEAVE  `l`;
+	END CASE;
+
+ 	SET @sql_body = CONCAT_WS('',@a_body,@sql_body,CONCAT("\nWHERE ",@requirement1),"\nGROUP BY ",@requirement2,'\nHAVING str_total <> ""');
+
+
+
+	END CASE;
+  SET  @sql_body:= REGEXP_replace(@sql_body,'(?i)AS Str_total',CONCAT_WS('','AS Str_total,exetime(',QUOTE(@开始时间),CONVERT(')as zhxing汉'USING utf8)));-- leave `l`;
+ -- SELECT CAST(@sql_body AS CHAR) ;
+	EXECUTE immediate @sql_body ;
+
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `SpeedDialen`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `SpeedDialen`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SpeedDialen`(IN `funcid` varchar(60),IN `p` varchar(500))
+`l`:BEGIN
+
+/*
+funcid
+0 - 上翻
+1 - 下翻
+2 - 刷新 NULL
+3 -  岗位 
+
+'*/
+
+DECLARE CONTINUE HANDLER FOR  SQLSTATE 'HY000', SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22'	
+bl:BEGIN GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;SET  @`sqlstate` = JSON_OBJECT('sqlstate',@`sqlstate`,'errno',@errno,'text',@text);SET @funcid := NULL,
+		@funcid = CONCAT_WS(' ','Error：','Speedialen',`funcid`  ,ELT(`funcid` +1,'上翻','下翻','刷新 NULL','岗位')),@`errsql` = @sql_body,
+		@pp = CONCAT_WS(',',QUOTE(`funcid`),QUOTE(`p`));
+CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp,'SQL',@`errsql`,'err',@`sqlstate`));END; 
+SET @开始时间 = SYSDATE(6);
+
+START TRANSACTION; 
+		SET @funcid = CONCAT_WS(' ','Speedial',`funcid`  ,ELT(`funcid` +1,'上翻','下翻','刷新 NULL','岗位')),@`errsql` = @sql_body,
+		@pp = CONCAT_WS(',',QUOTE(`funcid`),QUOTE(`p`));
+CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp));COMMIT;/*
+LEAVE `l`; 
+*/
+SET @start:=sysdate(6);
+
+	SET @sql_body = NULL;
+
+
+	CASE 
+			WHEN  `funcid` = 3 THEN 
+			CALL flow(REGEXP_replace( `p`,'(?<=p2":){','{"funcid":"3",'));
+-- 		 SELECT REGEXP_replace( p,'(?<=p2":){','{"funcid":"3",');
+			LEAVE `l`;
+
+		ELSE
+		
+ 
+	SET @sql_body = NULL,@requirement1 = NULL,@requirement2 = NULL,@expId = NULL,@classNo = NULL,@courseNo = NULL,@nodeNo = NULL,@contentNo = NULL;
+
+	SET	@expId = j0(`p`,"expId"),
+			@classNo = j0(`p`,"classNo"),
+			@courseNo = j0(`p`,"courseNo"),
+			@nodeNo = j0(`p`,"nodeNo"),
+			@contentNo = j0(`p`,"contentNo"),
+			@nodenum = Stati_ch(@nodeNo,'.');
+
+ SET  @sql_body = CONCAT_WS('\t','SELECT json_array(count(*),GROUP_CONCAT(statu))\ninto @sql_body\nFROM abc0 AS a WHERE a.classNo=',json_extract(p,"$.classNo"),CONCAT(' AND a.courseNo=',json_extract(p,"$.courseNo")));
+EXECUTE immediate @sql_body ;
+
+if(json_value(@sql_body,'$[0]') = 0 OR json_value(@sql_body,'$[1]') != 'null' )THEN
+SELECT 'ok';
+
+SET @sql_body = CONCAT_WS('\n','REPLACE INTO abc0(classNo,courseNo,cabc_node_No,node_No,contentNo,classType,practic,test,per1,courseware,missionids,createtime)\nSELECT \na1.classNo,a2.courseNo,cabc(b.node_No) AS cabc_node_No,b.node_No,b.contentNo,\na1.classType,\nCount(IF(c1.contentType = \'kj\' AND c6.billType <> \'kjxt\',c1.missionid,NULL)) AS practic,\nCount(IF(c1.contentType = \'kj\' AND c6.billType = \'kjxt\',c1.missionid,NULL)) AS test,\nSum(IF(c5.billid IS NOT NULL , 1,0)) AS per1,\nCount(c2.unique_id) AS courseware\n,GROUP_CONCAT(c5.missionid) missionids\n,NOW()\nFROM  exp_experimentclass AS a1 \nINNER JOIN exp_experimentclass_course AS a2 ON a2.classNo = a1.classNo\nINNER JOIN exp_courses_node AS b ON a2.courseNo = b.node_courseNo\nINNER JOIN exp_courses_node_content AS c1 ON c1.contentNo = b.contentNo\nLEFT JOIN exp_cour_node_cont AS c0 ON a1.classNo = c0.classNo AND c1.contentNo = c0.contentNo AND c1.typesort = c0.typesort AND c1.missionid = c0.missionid AND b.node_courseNo = c0.courseNo\nLEFT JOIN acc_mission AS c5 ON c5.missionId = c1.missionid\nLEFT JOIN mysq1_schema.bill_list AS c6 ON c5.billId = c6.billId\nLEFT JOIN exp_courseware_cells AS c2 ON c1.missionid = c2.unique_id\nWHERE'
+,CONCAT_WS(' ','a1.classNo = ',json_extract(p,"$.classNo"),CONCAT(' AND\nb.node_courseNo = ',json_extract(p,"$.courseNo")) ,'AND b.contentNo IS NOT NULL\nAND c0.missionid IS NULL\nGROUP BY a1.classNo ,a2.courseNo,b.node_No'
+));
+
+EXECUTE immediate @sql_body ;
+END IF;
+
 	SET @requirement1 = CONCAT_WS(' AND\n',CONCAT('a.expNo = ',quote_d(@expId)),
 																		CONCAT('a1.classNo = ',quote_d(@classNo)),
 																		IF(`funcid` = 0 AND @nodeNo IS NULL,NULL,
@@ -10987,9 +17714,183 @@ IF((@roleids := j(p,'roleids')) IS  NULL, @sql_body,REGEXP_replace(@sql_body
 																		)
 																);
 
+-- 生成 
+-- SELECT CONCAT('b.node_No like "',SUBSTRING_INDEX(@nodeNo,".",@nodenum),'.%"');
+IF RAND()*10>0 THEN 
+		SET	@sql_body = CONCAT_WS("\n"
+	,'REPLACE INTO abc(expID,classNo,courseNo,cabc_node_No,node_No,contentNo,practic,test,per1,courseware,perRate,perscore,statu)'
+	,CONCAT_WS('','SELECT\n',json_extract(`p`,"$.expId"),' expID ,\na.classNo,a.courseNo,A.cabc_node_No,A.node_No,A.contentNo,\nA.practic,\nA.test,\nA.per1,\nA.courseware,\nCount(c4.missionId) AS perRate,\nSum(IF(a.classType != 1,IF(c4.score<0,0,c4.score),NULL)) AS perscore,NULL\nFROM abc0 AS a\nLEFT JOIN abc AS b1 ON b1.classNo = a.classNo AND b1.courseNo = a.courseNo AND b1.courseNo = a.courseNo AND b1.node_No = a.node_No AND b1.contentNo = a.contentNo AND b1.expID = "21103118595857603835"\nLEFT JOIN acc_1 AS c4 ON c4.expID = ',json_extract(`p`,"$.expId"),' AND INSTR(a.missionids,c4.missionId)')
+	,concat_ws(' ','WHERE a.classNo =', json_extract(p,"$.classNo") ,CONCAT('AND\na.courseNo = ',json_extract(p,"$.courseNo")) ,'AND (b1.expID IS NULL OR b1.statu IS NOT NULL)  \nGROUP BY a.classNo ,a.courseNo,a.node_No')
+);
+-- SELECT @sql_body ;LEAVE l;
+	 	EXECUTE immediate @sql_body ;
+END IF;
+
+
+		SET	@nodenum = Stati_ch(@nodeNo,'.'),
+				@requirement1 = CONCAT_WS(' AND ',CONCAT('b.expId = ',quote_d(@expId)),
+													CONCAT('b.classNo = ',quote_d(@classNo))),
+				@sql_body = CONCAT_WS('',
+						",\nSum(b.practic) AS practic,\n",
+						"Sum(b.courseware) AS courseware,\n",
+						"Sum(b.test) AS test,\n",
+						"ROUND(SUM(b.perScore)/(SUM(b.practic) + Sum(b.test))) AS perscore,\n",
+						"ROUND(SUM(b.perRate)/(SUM(b.practic)+ Sum(b.test))*100) AS perRate,\n",
+						"a.node_type,a.node_tip,a.ico_url,a.node_isChapter,\n",
+						"CAST(CONCAT_ws('&nbsp&nbsp&nbsp',\n",
+						"				IF(Sum(b.practic) = 0 ,NULL,CONCAT('实训题 - ', Sum(b.practic))),\n",
+						"				IF(Sum(b.test) = 0 ,NULL,CONCAT('客观题 - ', Sum(b.test))),\n",
+						"--				IF(Sum(b.test) !=0 AND Sum(b.courseware) != 0 AND Sum(test)  !=0 ,'<br>',NULL),\n",
+						"				IF(Sum(b.courseware) = 0 ,NULL,CONCAT('课件 - ', Sum(b.courseware)))\n",
+						" )AS CHAR) AS Str_total\n",
+						"FROM exp_courses_node AS a\n",
+						"LEFT JOIN exp_courses AS a1 ON a.node_courseNo = a1.courseNo\n");
+
+		IF IFNULL(@classNo,'') = '' THEN
+					 SET @sql_body = CONCAT_WS('',@sql_body,"LEFT JOIN(\n","SELECT\nc1.contentNo,\nCount(IF(c1.contentType = 'kj' AND c6.billType <> 'kjxt',c1.missionid,NULL)) AS practic,\nCount(IF(c1.contentType = 'kj' AND c6.billType = 'kjxt',c1.missionid,NULL)) AS test,\nSum(IF(c5.billid IS NOT NULL , 1,0)) AS per1,\nCount(c2.unique_id) AS courseware,\nnull AS perRate,\nNULL AS perscore,\na.node_courseNo\nFROM\nqianxue_test.exp_courses_node_content AS c1\nINNER JOIN qianxue_test.exp_courses_node AS a ON c1.contentNo = a.contentNo\nLEFT JOIN qianxue_test.acc_mission AS c5 ON c5.missionId = c1.missionid\nLEFT JOIN mysq1_schema.bill_list AS c6 ON c5.billId = c6.billId\nLEFT JOIN qianxue_test.exp_courseware_cells AS c2 ON c1.missionid = c2.unique_id\nWHERE \na.node_courseNo = ",QUOTE(@courseNo),"\nGROUP BY\nc1.contentNo","\n) AS b ON b.contentNo = a.contentNo");
+			ELSE SET	@sql_body = CONCAT_WS('',@sql_body,"INNER JOIN exp_experimentclass_course AS a2 ON a2.classNo = ",quote_d(@classNo)," AND a2.courseNo = a1.courseNo\n",
+						"LEFT JOIN abc AS b ON ",@requirement1," AND b.courseNo = a.node_courseNo AND b.node_No = a.node_No AND b.contentNo = a.contentNo");
+		END IF;
+
+
+-- 	SET @sql_body = CONCAT_WS('',CONCAT(',',@a_body),@sql_body);
+
+	SET @requirement1 = CONCAT("a.node_courseNo = ",quote_d(@courseNo)),
+			@a_body = NULL;
+
+	CASE 
+			WHEN @nodenum > 0 AND  `funcid` = 0  THEN
+					SET @requirement2 = CONCAT_WS('','SUBSTRING_INDEX(a.node_No,".",',@nodenum+1,')'),
+							@a_body = CONCAT_WS('',"/*n0*/SELECT ",QUOTE(@expId)," AS expID,",QUOTE(@classNo)," AS classNo,",
+															"a.node_courseNo AS courseNo,a.node_No ,a.node_url,a.contentNo,a.node_Id,a.node_parentNo,a.node_text,",QUOTE(@a_body)),
+							@requirement1 = CONCAT_WS(' AND\n',@requirement1,CONCAT('a.node_courseNo = ',quote_d(@courseNo)),
+																								CONCAT('a.node_No LIKE "',SUBSTRING_INDEX(@nodeNo,".",@nodenum),'.%"')),
+							@requirement2 = CONCAT_WS(',',CONCAT('cabc(',@requirement2,')'));
+
+			WHEN preg_rlike('/^\\d+/',@nodeNo) AND  `funcid` = 1 THEN
+					SET @requirement2 = CONCAT_WS('','SUBSTRING_INDEX(a.node_No,".",',@nodenum+2,')'),
+							@a_body = CONCAT_WS('',"/*n1*/SELECT ",QUOTE(@expId)," AS expID,",QUOTE(@classNo)," AS classNo,",
+														"a.node_courseNo AS courseNo,a.node_No,a.node_url,a.contentNo,a.node_Id,a.node_parentNo, a.node_text,",QUOTE(@a_body)),
+							@requirement1 = CONCAT_WS(' AND\n',@requirement1,CONCAT('a.node_courseNo = ',quote_d(@courseNo)),
+																				CONCAT('a.node_No LIKE "',@nodeNo,'.%"')),
+							@requirement2 = CONCAT_WS(',',CONCAT('cabc(',@requirement2,')'));
+
+			WHEN @nodeNo IS NULL  AND  `funcid` = 1 OR  @nodeNo IS NOT NULL AND `funcid` = 0  OR IFNULL(j0(`p`,'cnumber'),0) = 1 THEN
+
+					SET @a_body := NULL,
+							@a_body := CONCAT(",\n'domid',case when ifnull(a.node_text,'') = '' then null\n",REPLACE(@a_body,'`@a_body`',' when a.node_text'),' end\n'),
+							@a_body = CONCAT_WS('',"\n,CAST(COLUMN_json(COLUMN_CREATE('billid',a.billid,'before_id',a.before_id",@a_body,"))AS CHAR)");
+
+					SET @requirement2 = CONCAT_WS('','SUBSTRING_INDEX(a.node_No,".",',@nodenum+1,')'),
+							@a_body = CONCAT_WS('',"/*1z*/SELECT ",QUOTE(@expId)," AS expID,",QUOTE(@classNo)," AS classNo,",
+														"a.node_courseNo AS courseNo, a.node_No,a.node_url,a.contentNo,a.node_Id,a.node_parentNo, a.node_text\n",@a_body),
+							@requirement1 = IF(IFNULL(@courseNo,'') = '',NULL,CONCAT_WS(' AND\n',@requirement1,CONCAT('a.node_courseNo = ',quote_d(@courseNo)))),
+							@requirement2 = CONCAT_WS(',',CONCAT('cabc(',@requirement2,')'));
+
+			WHEN @courseNo IS NULL OR `funcid` = 0 OR @nodeNo IS NULL AND  `funcid` = 0 THEN 
+
+SELECT NULL INTO @a_body FROM information_schema.`TABLES` AS a WHERE a.TABLE_SCHEMA = DATABASE() AND a.TABLE_NAME =  'exp_group';
+
+IF FOUND_ROWS() THEN 
+
+SELECT '"exp_group","1"' inTO @a_body FROM exp_experimentclassstudent AS a INNER JOIN exp_group AS b ON b.expId = a.expNo
+WHERE  a.expNo  = j0(p,'expid')AND b.stuNo = j0(p,'stuNo'); 
+END IF ;
+--  SET @a_body = NULL ;
+SELECT NULLIF(CONCAT_WS(',',@a_body,GROUP_CONCAT(CONCAT(quote(a.COLUMN_NAME),',a1.',a.COLUMN_NAME) SEPARATOR ',')),'') INTO @a_body
+FROM information_schema.`COLUMNS` AS a WHERE a.TABLE_SCHEMA = DATABASE()AND a.TABLE_NAME  = 'exp_courses' AND a.COLUMN_NAME REGEXP  'before_id|billid' ;
+
+					SET @a_body = CONCAT("\nCAST(COLUMN_json(COLUMN_CREATE(",@a_body,"))AS CHAR)");
+					SET @a_body = CONCAT_WS('',"/*0c*/SELECT ",QUOTE(@expId)," AS expID,",QUOTE(@classNo)," AS classNo,",
+														"a.node_courseNo AS courseNo,NULL AS node_No,a1.img_url AS node_url,a1.courseName AS node_text,",
+														"NULL AS contentNo,a.node_Id,0 AS node_parentNo,",IF(IFNULL(@a_body,'')<>'',@a_body,'""'),' AS dblob '),
+							@requirement2 = "CONCAT(IFNULL(a1.sort,''),a.node_courseNo)"/**/ ;
+		-- 		SELECT @a_body;			
+
+		ELSE		SELECT "NOT ok"; LEAVE  `l`;
+	END CASE;
+
+ 	SET @sql_body = CONCAT_WS('',@a_body,@sql_body,CONCAT("\nWHERE ",@requirement1),"\nGROUP BY ",@requirement2,'\nHAVING str_total <> ""');
 
 
 
+	END CASE;
+  SET  @sql_body:= REGEXP_replace(@sql_body,'(?i)AS Str_total',CONCAT_WS('','AS Str_total,exetime(',QUOTE(@开始时间),CONVERT(')as zhxing汉'USING utf8)));-- leave `l`;
+ -- SELECT @sql_body,CAST(@sql_body AS CHAR);-- LEAVE `l`;
+	EXECUTE immediate @sql_body ;
+
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `SpeedDial_copy`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `SpeedDial_copy`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SpeedDial_copy`(IN `funcid` varchar(60),IN `p` varchar(500))
+`l`:BEGIN
+
+/*
+funcid
+0 - 上翻
+1 - 下翻
+2 - 刷新 NULL
+3 -  岗位 
+
+'*/
+
+DECLARE CONTINUE HANDLER FOR  SQLSTATE 'HY000', SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22'	
+bl:BEGIN GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;SET  @`sqlstate` = JSON_OBJECT('sqlstate',@`sqlstate`,'errno',@errno,'text',@text);SET @funcid := NULL,
+		@funcid = CONCAT_WS(' ','Error：','Speedial',`funcid`  ,ELT(`funcid` +1,'上翻','下翻','刷新 NULL','岗位')),@`errsql` = @sql_body,
+		@pp = CONCAT_WS(',',QUOTE(`funcid`),QUOTE(`p`));
+CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp,'SQL',@`errsql`,'err',@`sqlstate`));END; 
+SET @开始时间 = SYSDATE(6);
+
+START TRANSACTION; 
+		SET @funcid = CONCAT_WS(' ','Speedial',`funcid`  ,ELT(`funcid` +1,'上翻','下翻','刷新 NULL','岗位')),@`errsql` = @sql_body,
+		@pp = CONCAT_WS(',',QUOTE(`funcid`),QUOTE(`p`));
+CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp));COMMIT;/*
+LEAVE `l`; 
+*/
+SET @start:=sysdate(6);
+
+	SET @sql_body = NULL;
+
+
+	CASE 
+			WHEN  `funcid` = 3 THEN 
+			CALL flow(REGEXP_replace( `p`,'(?<=p2":){','{"funcid":"3",'));
+-- 		 SELECT REGEXP_replace( p,'(?<=p2":){','{"funcid":"3",');
+			LEAVE `l`;
+
+		ELSE
+		
+ 
+	SET @sql_body = NULL,@requirement1 = NULL,@requirement2 = NULL,@expId = NULL,@classNo = NULL,@courseNo = NULL,@nodeNo = NULL,@contentNo = NULL;
+
+	SET	@expId = j0(`p`,"expId"),
+			@classNo = j0(`p`,"classNo"),
+			@courseNo = j0(`p`,"courseNo"),
+			@nodeNo = IF(IFNULL(j0(`p`,"nodeNo"),'')='',NULL,j0(`p`,"nodeNo")),
+			@contentNo = j0(`p`,"contentNo"),
+			@nodenum = Stati_ch(@nodeNo,'.');
+	SET @requirement1 = CONCAT_WS(' AND\n',CONCAT('a.expNo = ',quote_d(@expId)),
+																	CONCAT('a.studentNo = ',json_extract(p,'$.stuNo')),
+																		CONCAT('a1.classNo = ',quote_d(@classNo)),
+																		IF(`funcid` = 0 AND IFNULL(@nodeNo,'')='',NULL,
+																		CONCAT('b.node_courseNo = ',quote_d(@courseNo))
+																		)
+/*																		,CASE `funcid` = 0 
+																				WHEN @nodenum > 0 THEN
+																					CONCAT('b.node_No like "',SUBSTRING_INDEX(@nodeNo,".",@nodenum),'.%"')
+																				WHEN @nodeNo IS NOT NULL OR @courseNo IS NULL THEN NULL
+																			ELSE CONCAT('b.node_No like "',@nodeNo,'.%"')
+																		END
+*/																);
+
+
+IF 1 THEN 
 		SET	@sql_body = CONCAT_WS("",	"REPLACE INTO abc(expID,classNo,courseNo,cabc_node_No,node_No,contentNo,practic,test,per1,courseware,perRate,perscore,statu)\n",
 																	"SELECT a.expNo AS expID,a1.classNo,a2.courseNo,cabc(b.node_No) AS cabc_node_No,b.node_No,b.contentNo,\n",
 																	"Count(IF(c1.contentType = 'kj' AND c6.billType <> 'kjxt',c1.missionid,NULL)) AS practic,\n",
@@ -11012,10 +17913,9 @@ IF((@roleids := j(p,'roleids')) IS  NULL, @sql_body,REGEXP_replace(@sql_body
 																	"WHERE ",@requirement1," AND b.contentNo IS NOT NULL AND (b1.expID IS NULL OR b1.statu IS NOT NULL)  AND c0.missionid IS NULL\n",
 																	"GROUP BY a1.classNo ,a.expNo,a2.courseNo,b.node_No");
 
+	 	EXECUTE immediate @sql_body ;
+END IF;
 
-
-	 	PREPARE sql_body FROM @sql_body;
-	 	EXECUTE sql_body ;
 
 		SET	@nodenum = Stati_ch(@nodeNo,'.'),
 				@requirement1 = CONCAT_WS(' AND ',CONCAT('b.expId = ',quote_d(@expId)),
@@ -11028,10 +17928,10 @@ IF((@roleids := j(p,'roleids')) IS  NULL, @sql_body,REGEXP_replace(@sql_body
 						"ROUND(SUM(b.perRate)/(SUM(b.practic)+ Sum(b.test))*100) AS perRate,\n",
 						"a.node_type,a.node_tip,a.ico_url,a.node_isChapter,\n",
 						"CAST(CONCAT_ws('&nbsp&nbsp&nbsp',\n",
-						"				IF(Sum(b.practic) = 0 ,NULL,CONCAT('实训 - ', Sum(b.practic))),\n",
-						"				IF(Sum(b.courseware) = 0 ,NULL,CONCAT('课件 - ', Sum(b.courseware))),\n",
-						"				IF(Sum(b.test) !=0 AND Sum(b.courseware) != 0 AND Sum(test)  !=0 ,'<br>',NULL),\n",
-						"				IF(Sum(b.test) = 0 ,NULL,CONCAT('习题 - ', Sum(b.test)))\n",
+						"				IF(Sum(b.practic) = 0 ,NULL,CONCAT('实训题 - ', Sum(b.practic))),\n",
+						"				IF(Sum(b.test) = 0 ,NULL,CONCAT('客观题 - ', Sum(b.test))),\n",
+						"--				IF(Sum(b.test) !=0 AND Sum(b.courseware) != 0 AND Sum(test)  !=0 ,'<br>',NULL),\n",
+						"				IF(Sum(b.courseware) = 0 ,NULL,CONCAT('课件 - ', Sum(b.courseware)))\n",
 						" )AS CHAR) AS Str_total\n",
 						"FROM exp_courses_node AS a\n",
 						"LEFT JOIN exp_courses AS a1 ON a.node_courseNo = a1.courseNo\n");
@@ -11043,66 +17943,71 @@ IF((@roleids := j(p,'roleids')) IS  NULL, @sql_body,REGEXP_replace(@sql_body
 		END IF;
 
 
-
+-- 	SET @sql_body = CONCAT_WS('',CONCAT(',',@a_body),@sql_body);
 
 	SET @requirement1 = CONCAT("a.node_courseNo = ",quote_d(@courseNo)),
-			@a = NULL;
+			@a_body = NULL;
 
 	CASE 
 			WHEN @nodenum > 0 AND  `funcid` = 0  THEN
 					SET @requirement2 = CONCAT_WS('','SUBSTRING_INDEX(a.node_No,".",',@nodenum+1,')'),
-							@a = CONCAT_WS('',"/*n0*/SELECT ",QUOTE(@expId)," AS expID,",QUOTE(@classNo)," AS classNo,",
-															"a.node_courseNo AS courseNo,a.node_No ,a.node_url,a.contentNo,a.node_Id,a.node_parentNo,a.node_text,",QUOTE(@a)),
+							@a_body = CONCAT_WS('',"/*n0*/SELECT ",QUOTE(@expId)," AS expID,",QUOTE(@classNo)," AS classNo,",
+															"a.node_courseNo AS courseNo,a.node_No ,a.node_url,a.contentNo,a.node_Id,a.node_parentNo,a.node_text,",QUOTE(@a_body)),
 							@requirement1 = CONCAT_WS(' AND\n',@requirement1,CONCAT('a.node_courseNo = ',quote_d(@courseNo)),
 																								CONCAT('a.node_No LIKE "',SUBSTRING_INDEX(@nodeNo,".",@nodenum),'.%"')),
 							@requirement2 = CONCAT_WS(',',CONCAT('cabc(',@requirement2,')'));
 
 			WHEN preg_rlike('/^\\d+/',@nodeNo) AND  `funcid` = 1 THEN
 					SET @requirement2 = CONCAT_WS('','SUBSTRING_INDEX(a.node_No,".",',@nodenum+2,')'),
-							@a = CONCAT_WS('',"/*n1*/SELECT ",QUOTE(@expId)," AS expID,",QUOTE(@classNo)," AS classNo,",
-														"a.node_courseNo AS courseNo,a.node_No,a.node_url,a.contentNo,a.node_Id,a.node_parentNo, a.node_text,",QUOTE(@a)),
+							@a_body = CONCAT_WS('',"/*n1*/SELECT ",QUOTE(@expId)," AS expID,",QUOTE(@classNo)," AS classNo,",
+														"a.node_courseNo AS courseNo,a.node_No,a.node_url,a.contentNo,a.node_Id,a.node_parentNo, a.node_text,",QUOTE(@a_body)),
 							@requirement1 = CONCAT_WS(' AND\n',@requirement1,CONCAT('a.node_courseNo = ',quote_d(@courseNo)),
 																				CONCAT('a.node_No LIKE "',@nodeNo,'.%"')),
 							@requirement2 = CONCAT_WS(',',CONCAT('cabc(',@requirement2,')'));
 
-			WHEN @nodeNo IS NULL  AND  `funcid` = 1 OR  @nodeNo IS NOT NULL AND `funcid` = 0  OR IFNULL(j(`p`,'cnumber'),0) = 1 THEN
+			WHEN @nodeNo IS NULL  AND  `funcid` = 1 OR  @nodeNo IS NOT NULL AND `funcid` = 0  OR IFNULL(j0(`p`,'cnumber'),0) = 1 THEN
 
-					SET @a := (
-SELECT c.json
-FROM exp_courses AS a
-INNER JOIN exp_experimentclass_course AS b ON b.courseNo = a.courseNo
-INNER JOIN mysq1_schema.bill_list AS c ON a.billid = c.billId
-WHERE
-a.courseNo = @courseNo),
-							@a := CONCAT(",\n'domid',case when ifnull(a.node_text,'') = '' then null\n",REPLACE(@a,'`@a`',' when a.node_text'),' end\n'),
-							@a = CONCAT_WS('',"\n,CAST(COLUMN_json(COLUMN_CREATE('billid',a.billid,'before_id',a.before_id",@a,"))AS CHAR)");
+					SET @a_body := NULL,
+							@a_body := CONCAT(",\n'domid',case when ifnull(a.node_text,'') = '' then null\n",REPLACE(@a_body,'`@a_body`',' when a.node_text'),' end\n'),
+							@a_body = CONCAT_WS('',"\n,CAST(COLUMN_json(COLUMN_CREATE('billid',a.billid,'before_id',a.before_id",@a_body,"))AS CHAR)");
 
 					SET @requirement2 = CONCAT_WS('','SUBSTRING_INDEX(a.node_No,".",',@nodenum+1,')'),
-							@a = CONCAT_WS('',"/*1z*/SELECT ",QUOTE(@expId)," AS expID,",QUOTE(@classNo)," AS classNo,",
-														"a.node_courseNo AS courseNo, a.node_No,a.node_url,a.contentNo,a.node_Id,a.node_parentNo, a.node_text\n",@a),
+							@a_body = CONCAT_WS('',"/*1z*/SELECT ",QUOTE(@expId)," AS expID,",QUOTE(@classNo)," AS classNo,",
+														"a.node_courseNo AS courseNo, a.node_No,a.node_url,a.contentNo,a.node_Id,a.node_parentNo, a.node_text\n",@a_body),
 							@requirement1 = IF(IFNULL(@courseNo,'') = '',NULL,CONCAT_WS(' AND\n',@requirement1,CONCAT('a.node_courseNo = ',quote_d(@courseNo)))),
 							@requirement2 = CONCAT_WS(',',CONCAT('cabc(',@requirement2,')'));
 
 			WHEN @courseNo IS NULL OR `funcid` = 0 OR @nodeNo IS NULL AND  `funcid` = 0 THEN 
-					SET @a = "\n,CAST(COLUMN_json(COLUMN_CREATE('billid',a1.billid,'before_id',a1.before_id))AS CHAR)";
-					SET @a = CONCAT_WS('',"/*0c*/SELECT ",QUOTE(@expId)," AS expID,",QUOTE(@classNo)," AS classNo,",
+
+SELECT NULL INTO @a_body FROM information_schema.`TABLES` AS a WHERE a.TABLE_SCHEMA = DATABASE() AND a.TABLE_NAME =  'exp_group';
+
+IF FOUND_ROWS() THEN 
+
+SELECT '"exp_group","1"' inTO @a_body FROM exp_experimentclassstudent AS a INNER JOIN exp_group AS b ON b.expId = a.expNo
+WHERE  a.expNo  = j0(p,'expid')AND b.stuNo = j0(p,'stuNo'); 
+END IF ;
+--  SET @a_body = NULL ;
+SELECT NULLIF(CONCAT_WS(',',@a_body,GROUP_CONCAT(CONCAT(quote(a.COLUMN_NAME),',a1.',a.COLUMN_NAME) SEPARATOR ',')),'') INTO @a_body
+FROM information_schema.`COLUMNS` AS a WHERE a.TABLE_SCHEMA = DATABASE()AND a.TABLE_NAME  = 'exp_courses' AND a.COLUMN_NAME REGEXP  'before_id|billid' ;
+
+					SET @a_body = CONCAT("\nCAST(COLUMN_json(COLUMN_CREATE(",@a_body,"))AS CHAR)");
+					SET @a_body = CONCAT_WS('',"/*0c*/SELECT ",QUOTE(@expId)," AS expID,",QUOTE(@classNo)," AS classNo,",
 														"a.node_courseNo AS courseNo,NULL AS node_No,a1.img_url AS node_url,a1.courseName AS node_text,",
-														"NULL AS contentNo,a.node_Id,0 AS node_parentNo",@a),
-							@requirement2 = "CONCAT(IFNULL(a1.sort,''),a.node_courseNo)";
-							
+														"NULL AS contentNo,a.node_Id,0 AS node_parentNo,",IF(IFNULL(@a_body,'')<>'',@a_body,'""'),' AS dblob '),
+							@requirement2 = "CONCAT(IFNULL(a1.sort,''),a.node_courseNo)"/**/ ;
+		-- 		SELECT @a_body;			
 
-		ELSE		SELECT "NOT ok"; LEAVE  sdl;
+		ELSE		SELECT "NOT ok"; LEAVE  `l`;
 	END CASE;
 
- 	SET @sql_body = CONCAT_WS('',@a,' AS dblob ',@sql_body,CONCAT("\nWHERE ",@requirement1),"\nGROUP BY ",@requirement2,'\nHAVING str_total <> ""');
+ 	SET @sql_body = CONCAT_WS('',@a_body,@sql_body,CONCAT("\nWHERE ",@requirement1),"\nGROUP BY ",@requirement2,'\nHAVING str_total <> ""');
 
 
 
 	END CASE;
-
-	PREPARE sql_body FROM @sql_body;
-	EXECUTE sql_body ;
-
+  SET  @sql_body:= REGEXP_replace(@sql_body,'(?i)AS Str_total',CONCAT_WS('','AS Str_total,exetime(',QUOTE(@开始时间),CONVERT(')as zhxing汉'USING utf8)));-- leave `l`;
+SELECT CAST(@sql_body AS CHAR) ;
+	EXECUTE immediate @sql_body ;
 
 END
 ;;
@@ -11509,6 +18414,65 @@ ENd
 DELIMITER ;
 
 -- ----------------------------
+--  Procedure definition for `state`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `state`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `state`(`state` longblob,k varchar(10)) RETURNS longblob
+    NO SQL
+    DETERMINISTIC
+BEGIN
+
+	RETURN 
+
+	CASE 	WHEN  IFnull(state,'' )=''  THEN 
+					JSON_MERGE_PATCH(
+						JSON_OBJECT('current',@state专用:=SYSDATE(6),"Period",0,'start',@state专用)
+						,JSON_OBJECT('Period',exetime(@state专用))
+						,JSON_OBJECT('current',SYSDATE(6))
+					)
+				WHEN   NOT json_valid(state) THEN
+					_s(json_array(123,'不是json')) 
+					
+				WHEN k REGEXP '^(?!0)\\d+$'  THEN
+					json_value(state,'$.counts') =k
+						
+				WHEN  k REGEXP '^\\s*\\-' THEN 
+
+							JSON_MERGE_PATCH(
+							REGEXP_replace(							
+							`state`,
+							'(?x)(?&h)(?(?=\\[)\\[(?:(?&v),\\s*)*\\K(?&v)|\\K(?&v))
+								(?(DEFINE)
+								(?<v>
+									(?:"[^"]+"|\\d+(?:\\.\\d+)?)
+								)
+								(?<h>
+									"Period":\\s*
+								)
+								)',exetime(json_value(`state`,'$.current'))),
+
+								JSON_OBJECT(
+									'counts',counts(json_value(`state`,'$.counts')),
+									'total',exetime(json_value(`state`,'$.start')),
+									'current',SYSDATE(6)
+							))
+						
+				ELSE 	JSON_MERGE_PATCH(
+								JSON_MERGE(`state` ,JSON_OBJECT('Period',exetime(json_value(`state`,'$.current')))),
+								JSON_OBJECT(
+									'current',SYSDATE(6),
+									'counts',counts(json_value(`state`,'$.counts')),
+									'total',exetime(json_value(`state`,'$.start')))
+							)
+
+	END ;
+
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
 --  Procedure definition for `Stati_ch`
 -- ----------------------------
 DROP FUNCTION IF EXISTS `Stati_ch`;
@@ -11520,7 +18484,7 @@ BEGIN
 	SET @re_=0,@chars= CHAR_LENGTH(chars) ;
 
 	label1: LOOP 
-
+-- @char_pos >0 DO
 		SET @char_pos = INSTR(lontext,CHARS);
 
 		IF @char_pos > 0 THEN
@@ -11587,6 +18551,19 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `stuerr`(`_expid` varchar(60) , idno int(4),_offset int(4), recno int(4))
 label_stuerr:BEGIN
 
+  DECLARE CONTINUE HANDLER FOR  SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22' , SQLSTATE	'HY000',SQLSTATE	'22007'
+	BEGIN GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;SET  @`sqlstate` = JSON_OBJECT('sqlstate',@`sqlstate`,'errno',@errno,'text',@text);
+				SET @`errsql` = @stmtbody;
+				SET @funcid = CONCAT_WS(' ','Error: ', ' Stuerr' ),
+				@pp = CONCAT_WS(',',QUOTE(_expid),QUOTE(idno),QUOTE(_OFFSET),QUOTE(recno));
+				CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp,'SQL',@`errsql`,'err',@`sqlstate`));
+	END;
+/*
+START TRANSACTION;
+				SET @funcid = CONCAT_WS(' ', ' Stuerr' ),
+				@pp = CONCAT_WS(',',QUOTE(_expid),QUOTE(idno),QUOTE(_OFFSET),QUOTE(recno));
+CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp));COMMIT;
+*/
 
 	set @expid = _expid ,
 			@id = idno,
@@ -11612,7 +18589,7 @@ label_stuerr:BEGIN
 				"CAST(CONCAT_WS('','<',c.node_No,'.',c1.typesort,'>',c2.missionlabel) AS CHAR) AS missionlabel,\n",
 				"c1.missionid,\n",
 				"d.score \n",
-
+-- 				"a.expno as expid\n",
 
 			"from  exp_experimentclassstudent as a \n",
 			"INNER JOIN exp_experimentclass as b on a.classno =b.classno\n",
@@ -11632,7 +18609,7 @@ label_stuerr:BEGIN
 			"					end \n",
 			"order by nabc(CONCAT(c.node_No,'.',c1.typesort))\n",
 			"limit ",_OFFSET,",",@recno);
- 
+-- SELECT  CAST(@stmtbody AS CHAR);
 
 	PREPARE stmt from  @stmtbody ;
 	EXECUTE stmt ;
@@ -11651,10 +18628,14 @@ CREATE DEFINER=`root`@`%` PROCEDURE `stuexp`(IN `stuno` varchar(20))
 BEGIN
 	set @stuno = ifnull(stuno ,''),
 			@a = stuno2score(null, stuno);
+/*
+CALL Audit_1('stuexp',QUOTE(stuno),'rig');
+*/
+SELECT a.TABLE_NAME INTO @exp_group  FROM information_schema.`TABLES` AS a WHERE a.TABLE_SCHEMA = database() AND TABLE_NAME = 'exp_group';
 
-	SET @exp_stmt =CONCAT("select \n",
+	SET @exp_stmt =CONCAT_WS('',"select \n",
 "		b.statu,\n",
-"		b.studentNo as stuNo ,\n", 
+"		",QUOTE(stuno)," AS stuNo ,\n", 
 "		d.stu_name,\n",
 "		e.className,\n", 
 "		c.classNo,b.expNo as expid,\n", 
@@ -11677,19 +18658,19 @@ BEGIN
 "COUNT(c1.classNo) AS cnumber,\n",
 "		h.courseName \n",
 "FROM exp_experimentclassstudent AS b  \n",
+IF(@exp_group = 'exp_group',CONCAT_WS('','LEFT JOIN exp_group AS g ON b.expNo = g.expId AND g.stuNo = ',QUOTE(`stuno` )),NULL),
 "LEFT JOIN exp_experimentclass AS c ON b.classNo = c.classNo \n",
 "LEFT JOIN exp_experimentclass_course AS c1 ON c.classNo = c1.classNo \n",
-"LEFT JOIN mysq1_schema.exp_classstudent AS d ON b.studentNo = d.stuNo \n",
+"LEFT JOIN mysq1_schema.exp_classstudent AS d ON ",
+IF(@exp_group = 'exp_group',"IF(IFNULL(g.stuno,'') <> '',g.stuNo , b.studentNo)",'b.studentNo')," = d.stuNo \n",
 "LEFT JOIN mysq1_schema.exp_class AS e ON d.classNo = e.classNo \n",
 "LEFT JOIN mysq1_schema.exp_teacher AS f ON e.teaNo = f.teaNo \n",
 "INNER JOIN exp_courses AS h ON c1.courseNo = h.courseNo \n",
 "WHERE  b.studentNo = ",QUOTE(@stuno),"\n",
 "GROUP BY c.classNo \n",
 "order by c.StartTime ,c.EndTime\n") ;
-
-	PREPARE exp_stmt FROM @exp_stmt;
-	EXECUTE exp_stmt;
-	DEALLOCATE PREPARE exp_stmt;
+-- SELECT @exp_stmt;
+	PREPARE exp_stmt FROM @exp_stmt;	EXECUTE exp_stmt;	DEALLOCATE PREPARE exp_stmt;
 
 END
 ;;
@@ -11703,8 +18684,8 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` FUNCTION `stuno2score`(classno varchar(20),stuno varchar(60)) RETURNS varchar(200) CHARSET utf8mb3
     MODIFIES SQL DATA
     DETERMINISTIC
-BEGIN
-
+stuno2score:BEGIN
+-- INSERT plogs (FUNCTION_name,parameter) VALUES('stuno2score',CONCAT_WS(',',QUOTE(classno),QUOTE(stuno))); 
 		CASE 
 				when  classno is not null  then 
 							SET @classno = classno, @stuno = '' ;
@@ -11726,7 +18707,7 @@ BEGIN
 							end if ;							
 
 				ELSE 
-
+-- two is null 返回 引起全算
 							RETURN NULL ;
 		end case ;
 
@@ -11735,7 +18716,7 @@ CREATE TEMPORARY TABLE cur1
 AS
 										SELECT
 										a.expNo,
-
+-- 									c.expid,
 										d.mission_total as total ,
 										Sum(c.score) AS score,
 										Sum(c.read_ans_size) AS read_ans_size,
@@ -11750,7 +18731,7 @@ AS
 										a.statu 
 										FROM exp_experimentclassstudent AS a
 										INNER JOIN acc_1 AS c ON a.expNo = c.expid
-
+-- 										INNER JOIN tmpexpcourse AS b ON a.classNo = b.classNo and c.missionid = b.missionId
 										INNER JOIN exp_experimentclass as d on a.classNo = d.classNo
 										WHERE 
 										a.statu is not NULL  AND 
@@ -11761,7 +18742,7 @@ AS
 
 		UPDATE exp_experimentclassstudent as a ,cur1 as b																																										
 					set 
-							a.missionscore = ROUND(b.score / b.total,2) ,
+							a.missionscore = IF(IFNULL(b.total,0)=0,NULL ,ROUND(b.score / b.total,2)) ,
 							a.score1 = b.score,
 							a.read_ans_size = b.read_ans_size,
 							a.mission_result = b.mission_result,
@@ -11774,6 +18755,7 @@ AS
 							a.missionperfect = b.perfect ,
 							a.statu = null 
 		where a.expNo = b.expNo  ;
+
 DROP TEMPORARY TABLE IF EXISTS cur1;
 	RETURN concat_ws('2-',FOUND_ROWS());
 
@@ -11788,7 +18770,7 @@ DROP PROCEDURE IF EXISTS `stureport`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `stureport`(IN `k` text)
 BEGIN
-	
+	#Routine body goes here...
 	SET @user_name = '王某',
 			@user_id = '账号',
 			@classNo = '实训编号',
@@ -11809,16 +18791,71 @@ DELIMITER ;
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `stuscore`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `stuscore`(IN `stuno` varchar(30))
+CREATE DEFINER=`root`@`%` PROCEDURE `stuscore`(IN `stuno` varchar(60))
     MODIFIES SQL DATA
 BEGIN
-		set @stuno = stuno ;
-	
-		
+  DECLARE CONTINUE HANDLER FOR  SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22' , SQLSTATE	'HY000'-- ,SQLSTATE	'22007'
+	bl:BEGIN GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;SET  @`sqlstate` = JSON_OBJECT('sqlstate',@`sqlstate`,'errno',@errno,'text',@text);
+				SET @`errsql` = NULL,@funcid =  NULL;
+				SET @funcid = CONCAT_WS(' ','Error: ', ' stuscore' ),
+				@pp = QUOTE(`stuno` );
+				CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp,'SQL',@`errsql`,'err',@`sqlstate`,'l',1));END;/**/
 
+	/*
+START TRANSACTION;
+				SET @funcid = CONCAT_WS(' ','Error: ', ' stuscore' ),
+				@pp = QUOTE(`stuno` );
+CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp));COMMIT;
+
+*/	
+		--  call cutmpcourse('0');
+		set @stuno = stuno ;
 		set @a = stuno2score(null, stuno);
 		SELECT 1;
 
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `sub`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `sub`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `sub`(`p` longblob) RETURNS longblob
+    NO SQL
+    DETERMINISTIC
+BEGIN
+	#Routine body goes here...
+	DECLARE i LONGBLOB DEFAULT 0;
+	DECLARE re LONGBLOB DEFAULT json_value(p,'$[0]');
+	DECLARE r0 blob  DEFAULT json_remove(p,'$[0]');
+	DECLARE r text DEFAULT NULL ;
+
+
+	IF IFNULL(r0,'')='' OR IFNULL(re ,'')=''THEN RETURN NULL;END IF;
+	SET re = json_value(p,'$[0]');
+
+	IF IFNULL(re,'')=''THEN RETURN NULL;END IF;
+
+	x:LOOP
+
+		IF i >= json_length(r0) THEN LEAVE x;END IF;
+
+		SET r = json_value(r0,CONCAT_WS('','$[',i,']')),p= NULL;
+
+		l:LOOP
+
+		IF re NOT REGEXP r OR re =''  THEN LEAVE l;END IF;
+			SET p = CONCAT_WS(',',p,REGEXP_substr(re,r))
+				,re = REGEXP_replace(re,CONCAT_WS('','(?s-m)^.*?',r),'');
+
+		END LOOP;
+		SET i=i+1,re=p;
+RETURN p;
+	END LOOP;
+
+	RETURN p;
 END
 ;;
 DELIMITER ;
@@ -11856,47 +18893,6 @@ END
 DELIMITER ;
 
 -- ----------------------------
---  Procedure definition for `TempFun`
--- ----------------------------
-DROP FUNCTION IF EXISTS `TempFun`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`%` FUNCTION `TempFun`(`fields` text) RETURNS text CHARSET utf8mb3
-    NO SQL
-    DETERMINISTIC
-BEGIN
-	
-
-	DECLARE `json` VARCHAR(100) DEFAULT NULL;
-	DECLARE `first` VARCHAR(200) DEFAULT NULL;
-
-	SET `fields` = preg_replace('/\\s+/','',`fields`)	;
-
-	
-
-  IF NOT preg_rlike(CONCAT('/^(',R1('`fields`'),',?){2,}?/'),`fields`) THEN  RETURN NULL; END IF;
-
-
-	SET	`json` = capture(CONCAT('/^',R1('`fields`'),'(?=,|$)/'),`fields`),
-			`fields` = capture('(?<=,).* ',`fields`),
-			`first` = capture(CONCAT('/^',R1('`fields`'),'(?=,|$)/'),`fields`),
-			`first` = CONCAT_WS(',',QUOTE(preg_capture(R('fields'),`first`,2)),preg_capture(R('fields'),`first`,1)),
-			`fields` = capture('(?<=,).*',`fields`);
-
-	IF  preg_rlike(CONCAT('/^(',R1('`fields`'),',?)+?/'),`fields`) THEN  
-
-			SET `fields` = CONCAT(',',preg_replace(CONCAT('/',R1('`fields`'),'(,?)/'),'$2,$1 AS CHAR $3',`fields`));
-		ELSE SET `fields` = '';
-
-  END IF;
-
-	RETURN CONCAT_WS('',`json`,' = ','COLUMN_CREATE(',`first`,' AS CHAR',`fields`,')');	
-
-
-END
-;;
-DELIMITER ;
-
--- ----------------------------
 --  Procedure definition for `Temp_Func`
 -- ----------------------------
 DROP FUNCTION IF EXISTS `Temp_Func`;
@@ -11905,11 +18901,11 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `Temp_Func`(`templates` longtext,temp
     NO SQL
     DETERMINISTIC
 BEGIN
-	
-
-
-
-
+	#Routine body goes here...
+-- createtime 13-1-2
+-- 创建模板
+-- reservation ??
+-- 生成字段
  
 
 	DECLARE StrL longtext;
@@ -11945,19 +18941,19 @@ DROP PROCEDURE IF EXISTS `Temp_Func_2`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `Temp_Func_2`(in `templates` tinytext,in temp_fields text,in `field_values` longtext,in sepre varchar(5),out `results_` longtext)
 label0:BEGIN
-	
-
-
-
-
+	#Routine body goes here...
+-- createtime 13-1-2
+-- 创建模板
+-- reservation ??
+-- 生成字段
 
 
 	DECLARE StrL MEDIUMTEXT DEFAULT NULL;
-
+-- VARCHAR(13000);
 	DECLARE v1 text;
-
+-- VARCHAR(200);
 	DECLARE v2 text;
-
+-- VARCHAR(200);
 	DECLARE i INT(3);
 
 	IF 	sepre is null THEN
@@ -11975,7 +18971,7 @@ label0:BEGIN
 			IF  v1 IS NOT NULL THEN
 
 					CALL Fetch_Set_P1(field_values,i,v2);
-
+-- select v1,v2,temp_fields,field_values,i;
 
 					IF v2 IS NULL THEN SET v2=''; END IF;
 					SET  StrL = CAST(CONCAT_WS(',',StrL,
@@ -11986,11 +18982,11 @@ label0:BEGIN
 			END IF;
 
 			SET i= i+1;
-
+-- 					StrL = CONCAT(StrL,' ',sepre);
   END LOOP ;
 
 		SET results_ = StrL;
- 
+ --  SELECT results_,temp_fields,v1,field_values,v2;LEAVE label0;
 END
 ;;
 DELIMITER ;
@@ -12002,24 +18998,39 @@ DROP PROCEDURE IF EXISTS `Temp_Func_3`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `Temp_Func_3`(in `templates` varchar(500),in `sepre1` varchar(5),in `suse` varchar(60),in `templates1` varchar(500),in `sepre2` varchar(5),in type_ varchar(20),in `a_fields` varchar(400),in `a_values` longtext,in `r_fields` longtext,in `r_values` longtext,inout results_ longtext)
 temp3:BEGIN
-	
+-- createtime 13-1-2
+-- 创建模板
+-- reservation ??
+-- 生成字段
+
+	DECLARE a_field VARCHAR(200);	DECLARE a_value LONGTEXT;	DECLARE r_value VARCHAR(400);	DECLARE i INT(3);	DECLARE ia INT(3);	DECLARE ir INT(3);-- 	DECLARE r_field VARCHAR(200);
 
 
+	DECLARE CONTINUE HANDLER FOR  SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22' , SQLSTATE	'HY000',SQLSTATE	'22007'
+	bl:BEGIN GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;SET  @`sqlstate` = JSON_OBJECT('sqlstate',@`sqlstate`,'errno',@errno,'text',@text);
+				SET @`errsql` = @3in1_body;
+				SET @funcid = CONCAT_WS(' ','Error: ', ' Temp_Func_3' ),
+				@pp =CONCAT_WS(',',quote(`templates`),quote(`sepre1`),quote(`suse`),quote(`templates1`),quote(`sepre2`),quote(`type_`),quote(`a_fields`),quote(`a_values`),quote(`r_fields`),quote(`r_values`),"@a");
+				CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp,'SQL',@`errsql`,'err',@`sqlstate`));LEAVE bl;
+	END;
+/*
+START TRANSACTION;
+				SET @funcid = CONCAT_WS(' ', ' Temp_Func_3' ),
+				@pp =CONCAT_WS(',',quote(`templates`),quote(`sepre1`),quote(`suse`),quote(`templates1`),
+quote(`sepre2`),quote(`type_`),quote(`a_fields`),quote(`a_values`),quote(`r_fields`),quote(`r_values`),"@a");
+INSERT INTO plogs (Function_Name,parameter) VALUES (@funcid,@pp);
 
-
-
-
-	DECLARE a_field VARCHAR(200);
-	DECLARE a_value LONGTEXT;
-
-	DECLARE r_value VARCHAR(400);
-	DECLARE i INT(3);
-	DECLARE ia INT(3);
-	DECLARE ir INT(3);
-
+-- CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp,'l',1));
+COMMIT;/*
+CALL Audit_1('Temp_Func_3',CONCAT_WS(',',quote(`templates`),quote(`sepre1`),quote(`suse`),quote(`templates1`),quote(`sepre2`),quote(`a_fields`),quote(`a_values`),quote(`r_fields`),quote(`r_values`),"@a"),'ok');
+*/ 
 
 	IF IFNULL(a_fields,'') = '' THEN LEAVE temp3; END IF;
-
+/*
+	IF suse IS NULL THEN
+		SET suse = NULL;
+	END IF;
+ */
 	IF 	sepre1 is null THEN
 			SET sepre1 =',';	
 	END if;
@@ -12036,48 +19047,49 @@ temp3:BEGIN
 
   LOOPNum:LOOP 
 			SET ir=NULL,r_value='',a_value=NULL;
+
 			CALL Fetch_Set_P0(a_fields,ia,a_field);
 
 			IF IFNULL(a_field,'') != '' THEN 
 
 
 					CALL Fetch_Set_P1(a_values,ia,a_value);
-
+-- SELECT  a_values,ia,a_value;
 					IF IFNULL(a_value,'') !='' THEN
 							SET @TYPE = CONCAT(type_,a_field),
   
 									ir = FIND_IN_SET(QUOTE(@type),r_fields);
+
 							IF ir > 0 THEN
 									CALL Fetch_Set_P1(r_values,ir,r_value);
+-- SELECT  r_values,ir,r_value;
 									IF r_value is NULL THEN 
 											SET r_value ='';
 									END IF;
 							END IF;
 					END IF;
+
 					SET results_  = CAST(CONCAT_WS(sepre1,RESULTS_,
 										REPLACE(REPLACE(REPLACE(templates,'????',QUOTE(r_value)),'???',QUOTE(a_value)),'??',a_field)
 											)AS CHAR),
 							@results_2 = CAST(CONCAT_WS(sepre2,@RESULTS_2,
 									REPLACE(REPLACE(REPLACE(templates1,'????',QUOTE(r_value)),'???',QUOTE(a_value)),'??',a_field)
 											)AS CHAR);
-
+--  SELECT results_,@results_2;
 					ELSE LEAVE LOOPNum;
 			END IF ;
 
-
+/* 			IF FIND_IN_SET(ia+1,a_fields) = 0 THEN END IF;*/
 			SET ia= ia+1;
-
+-- 					results_ = CONCAT(results_,sepre1),
 
   END LOOP ;
-			
+			-- SELECT @results_2;
 		IF suse IS NOT NULL THEN
 			SET @results_2 =CONCAT_WS('','\n',suse,@results_2) ;
 		END IF;
 		SET 
-				results_ = CAST(CONCAT(
-										IF(results_ IS NULL ,'',CONCAT(results_,','))
-										,IF(IFNULL(@results_2,'') = '','',@results_2) 
-										)AS CHAR);
+				results_ = CAST(CONCAT_WS(',',results_,@results_2)AS CHAR);
 
 END
 ;;
@@ -12092,11 +19104,11 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `Temp_Func_C`(`templates` varchar(200
     NO SQL
     DETERMINISTIC
 BEGIN
-	
-
-
-
-
+	#Routine body goes here...
+-- createtime 13-1-2
+-- 创建模板
+-- reservation ??
+-- 生成字段
 
 
 	DECLARE StrL VARCHAR(13000);
@@ -12129,6 +19141,89 @@ END
 DELIMITER ;
 
 -- ----------------------------
+--  Procedure definition for `test`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `test`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `test`(`p` longblob) RETURNS longblob
+    NO SQL
+    DETERMINISTIC
+BEGIN
+	#Routine body goes here...
+    RETURN        p REGEXP   '(?Xx)(?:(?:"(?:(?=\\\\).{2}|[^"\\\\]+)*?")|[null]+|[-\\.,])\\s*:("[^"]+?"),(?=(?:"(?:(?=\\\\).{2}|[^"\\\\]++)*?"|[^\\["]++)+?\\g1)'
+	;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `test1`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `test1`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `test1`(`p` BLOB) RETURNS blob
+    NO SQL
+    DETERMINISTIC
+BEGIN
+	#Routine body goes here...
+
+	RETURN p;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `tools`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `tools`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `tools`(`p` blob)
+toolSl:BEGIN
+	#Routine body goes here...
+
+	DECLARE `p2` BLOB DEFAULT j0(`p`,'p2');
+	DECLARE `r` VARCHAR(200) DEFAULT '"((?3))":("((?:\\\\.|[^"])*)")';
+	DECLARE `missionId` VARCHAR(200) DEFAULT j0(`p2`,'missionId');
+	DECLARE `expId` VARCHAR(200) DEFAULT j0(`p2`,'expId');
+	DECLARE `funcid` VARCHAR(60) DEFAULT j0(`p2`,'funcid');
+
+/*
+-- start TRANSACTION;
+CALL Audit_2('tools',CONCAT_WS(',',QUOTE(`p`)),@a);COMMIT;
+LEAVE sdl; */
+
+  IF p2 IS NULL OR IFNULL(`expid`,'')='' OR IFNULL(`expid`,'')='' THEN CALL Error('no p2 epxid missionId');
+			ELSE SET @`WHERE` = NULL;END IF;
+
+		SET 	@`WHERE` :=CONCAT_WS('\n',"WHERE",CONCAT_WS(' and ',CONCAT('a.missionid = ',QUOTE(`missionid`)),CONCAT('a.expid = ',QUOTE(`expid`)))),
+					@sql_body :=  REGEXP_replace(j0(P,'P1'),`r`, '\\1=if(ifnull(\\2,"")="",\\1,\\1+\\2+0)'),
+					@sql_body :=  CONCAT_WS('\n',"UPDATE acc_1 AS a\nSET",@sql_body,@`WHERE`)
+											;
+
+
+	PREPARE sql_stmt from  @sql_body;
+	EXECUTE sql_stmt ;
+
+	IF ROW_COUNT() = 0 THEN
+				SET 	@sql_body:=CONCAT_WS(',',p2,j0(P,'P1')),
+							@sql_body =  CONCAT_WS('\n',CONCAT_WS('','INSERT INTO ACC_1(',REGEXP_replace(@sql_body,`r`,'\\1'),')')
+														,'VALUES'
+														,REGEXP_REPLACE(CONCAT_WS('','(',REGEXP_REPLACE(@sql_body,`r`,'\\2'),')'),'""|"0"','NULL')
+													);
+	END IF;
+		
+
+--   SELECT @sql_body;
+	PREPARE sql_stmt from  @sql_body;
+	EXECUTE sql_stmt ;
+	DEALLOCATE PREPARE sql_stmt ;
+
+
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
 --  Procedure definition for `t_ckv`
 -- ----------------------------
 DROP FUNCTION IF EXISTS `t_ckv`;
@@ -12137,7 +19232,7 @@ CREATE DEFINER=`root`@`%` FUNCTION `t_ckv`(`k` varchar(100),`t` varchar(10),`c` 
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 	SET t = IF(t IS NULL OR t= 0,'quotd(','quotd(');
 	RETURN	CONCAT_WS('','CONCAT_WS("",','quotd(',QUOTE(k),'),\":{",CONCAT_WS(\",\",',
 							preg_replace('/(([^.,\\n]*)\\.((?R2)*))(,(?R1))*?/',
@@ -12158,10 +19253,10 @@ CREATE DEFINER=`root`@`%` FUNCTION `UnQ`(`v` text) RETURNS text CHARSET utf8mb3
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 	IF v IS NULL OR v REGEXP '^null$' THEN RETURN NULL;END IF;
 	SET v = REGEXP_REPLACE(v,'^[\'"]|(?<=[^\\\\])\\\\|[\'"]*$','\\1');
-	RETURN   v;
+	RETURN   v;-- '^[\'"]|(?<=[^\\\\])\\\\|[\'"]*$';
 END
 ;;
 DELIMITER ;
@@ -12175,9 +19270,184 @@ CREATE DEFINER=`root`@`%` FUNCTION `Uq`(`v` text) RETURNS text CHARSET utf8mb3
     NO SQL
     DETERMINISTIC
 BEGIN
-	
+	#Routine body goes here...
 
 	RETURN   REPLACE(REPLACE(SUBSTR(v,2,CHAR_LENGTH(v)-2),'\\\'','\''),'\\\\','\\');
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `url`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `url`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `url`(`p` tinytext) RETURNS longblob
+    DETERMINISTIC
+    SQL SECURITY INVOKER
+BEGIN
+	SET p = CONCAT_WS(' ','curl -X GET',IF(p REGEXP '^https://',null,'https://'),p);
+	
+	
+	RETURN e(p);
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `urldecode`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `urldecode`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `urldecode`(original_text text) RETURNS text CHARSET utf8mb3
+    DETERMINISTIC
+BEGIN
+  DECLARE new_text TEXT DEFAULT NULL;  
+    DECLARE pointer INT DEFAULT 1;  
+    DECLARE end_pointer INT DEFAULT 1;  
+    DECLARE encoded_text TEXT DEFAULT NULL;  
+    DECLARE result_text TEXT DEFAULT NULL;  
+    DECLARE rep_text TEXT DEFAULT NULL;  
+    DECLARE unhex_text TEXT DEFAULT NULL;  
+    SET new_text = REPLACE(original_text,'+',' ');  
+    SET new_text = REPLACE(new_text,'%0A','\r\n');  
+    SET pointer = LOCATE('%', new_text);  
+    WHILE pointer <> 0 && pointer < (CHAR_LENGTH(new_text) - 2) DO  
+        SET end_pointer = pointer + 3;  
+        WHILE MID(new_text, end_pointer, 1) = '%' DO  
+            SET end_pointer = end_pointer+3;  
+        END WHILE;  
+        SET encoded_text = MID(new_text, pointer, end_pointer - pointer);  
+        SET rep_text = REPLACE(encoded_text, '%', '');
+        SET unhex_text = UNHEX(rep_text);
+        SET result_text = CONVERT(unhex_text USING utf8mb4);  
+        SET new_text = REPLACE(new_text, encoded_text, result_text);  
+        SET pointer = LOCATE('%', new_text, pointer + CHAR_LENGTH(result_text)); 
+    END WHILE;  
+    RETURN new_text;  
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `urlencode`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `urlencode`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `urlencode`(str text) RETURNS text CHARSET utf8mb3
+    DETERMINISTIC
+BEGIN
+DECLARE sub VARCHAR(1) CHARSET utf8mb4;
+  DECLARE val BIGINT DEFAULT 0;
+  DECLARE ind INT DEFAULT 1;
+  DECLARE oct INT DEFAULT 0;
+  DECLARE ret VARCHAR(4096) DEFAULT '';
+  DECLARE octind INT DEFAULT 0;
+  IF str is NULL THEN
+      RETURN NULL;
+  ELSE SET ret = '';
+      WHILE ind <= CHAR_LENGTH(str) DO
+        SET sub = MID(str, ind, 1);
+        SET val = ORD(sub);
+        IF NOT (val BETWEEN 48 AND 57 OR 
+                val BETWEEN 65 AND 90 OR 
+                val BETWEEN 97 AND 122 OR 
+                val IN (45, 46, 95, 126)) THEN
+            SET octind = OCTET_LENGTH(sub);
+            WHILE octind > 0 DO
+              SET oct = (val >> (8 * (octind - 1)));
+              SET ret = CONCAT(ret, '%', LPAD(HEX(oct), 2, 0));
+              SET val = (val & (POWER(256, (octind - 1)) - 1));
+              SET octind = (octind - 1);
+            END WHILE;
+        ELSE
+          SET ret = CONCAT(ret, sub);
+        END IF;
+        SET ind = (ind + 1);
+    END WHILE;
+  END IF;
+  RETURN ret;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `v`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `v`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `v`(`v` longblob) RETURNS longblob
+    DETERMINISTIC
+BEGIN
+	#Routine body goes here...
+
+	RETURN NULL;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `v2t`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `v2t`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `v2t`( IN `k` TINYTEXT,IN `p` longblob)
+`l`:BEGIN
+	DECLARE `模式` , `类型` ,`name` varchar(100) DEFAULT NULL;
+
+  SET `name` := REGEXP_substr(k,'^\\s*\\w+');
+
+	
+	IF  p IS NULL|| p = '0' THEN
+
+		SET  p  = (SELECT  1  FROM	information_schema.VIEWS AS a WHERE 	a.TABLE_SCHEMA = database() AND	a.TABLE_NAME =  `name`) ;
+
+			IF FOUND_ROWS() THEN
+
+				SET  p  =  CONCAT_WS(' ',
+													'SELECT  *  ',
+													CONCAT('FROM ',`name`) 
+											);
+
+
+			end IF;
+		END IF ;
+
+
+	SET k := CONCAT_WS('','["',REGEXP_replace(k,',','","'),'"]') 
+	,类型 :=  REGEXP_substr(k ,',\\s*"\\Kt\\s*"')
+	,k:= REGEXP_replace(k ,',\\s*"t\\s*"','')
+  ,`模式` = JSON_value(k,'$[1]')
+  ,`name` =  IF(`name` REGEXP @自用 := '(?i)v0$' , REGEXP_replace(`name`,@自用 ,''), CONCAT(`name`,'v0'));
+
+
+
+SET p =  REGEXP_replace(p,'\\\\','\\\\\\\\');
+
+	CASE
+		WHEN IFnull(p,'') = ''  THEN 
+			LEAVE `l`;
+		WHEN `模式` IS NULL OR `模式` REGEXP '^(?:1|(re?)?c(reate)?)$' THEN
+			 SET 	p = CONCAT_WS('\n'
+					,CONCAT_WS(' ',"CREATE",IF(IFNULL(类型,'') REGEXP '^t', 'TEMPORARY','') ,"TABLE IF not EXISTS",`name`,"AS")
+					, cast(`p`AS char)
+					);
+			case	WHEN `模式` IS NULL THEN
+				 SET k = k;
+				 
+				WHEN `模式` REGEXP '^(?:(?:1|(re)?[rc](reate)?)|d)$' THEN 
+					EXECUTE immediate CONCAT_WS(' ','drop',IF(IFNULL(类型,'') REGEXP '^t', 'TEMPORARY','') ,'TABLE IF EXISTS',`name` );
+					IF `模式` REGEXP '^d$' THEN LEAVE `l`;END IF;
+			 END CASE; 
+		 WHEN `模式`REGEXP '(?i)^(11|l(?:ist)?)$|显示' THEN
+		  SET p = CONCAT_WS(' ','SELECT' ,JSON_QUOTE(CAST(p AS CHAR)),'AS 语句') ;
+		ELSE LEAVE `l`;
+	END CASE;
+	
+
+	EXECUTE immediate  p ;
+
+
 END
 ;;
 DELIMITER ;
@@ -12189,8 +19459,8 @@ DROP PROCEDURE IF EXISTS `v3_initial_mission`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `v3_initial_mission`(IN `expid_` varchar(20000),IN `missionid_` varchar(60),in sealNo_ Integer(3),in pageId_ varchar(30))
     READS SQL DATA
-initial_label:BEGIN
-	
+`l`:BEGIN
+	#Routine body goes here...
 
 	DECLARE db_a VARCHAR(100) DEFAULT NULL;
 	DECLARE db_b VARCHAR(100) DEFAULT NULL;
@@ -12199,15 +19469,19 @@ initial_label:BEGIN
 	DECLARE `mId1` VARCHAR(60)  DEFAULT NULL;
 
 
-
+/*
+START TRANSACTION;
+INSERT INTO plogs (Function_Name,parameter) VALUES ('v3_initial_mission',CONCAT_WS(',',QUOTE(`expid_`),QUOTE(`missionid_`),QUOTE(`sealNo_`),QUOTE(`pageId_`)));
+COMMIT;
+*/
 
 
 
 	CASE
 			WHEN expid_ IS NULL THEN
-					SELECT NULL;LEAVE initial_label;
+					SELECT NULL;LEAVE `l`;
 			WHEN missionid_ IS NULL THEN
-					SELECT NULL;LEAVE initial_label;
+					SELECT NULL;LEAVE `l`;
 
 			ELSE 
          SET @initial_body =NULL;
@@ -12225,7 +19499,7 @@ initial_label:BEGIN
 			@initial_body =
 					CONCAT_WS('',"SELECT \n",
 												"b.mission_ask,c.line,\n",
-IF(`mId1` IS NULL,
+IF(`mId1` IS NULL ,
 CONCAT_WS('',
 "@ai := CONCAT('{',CONCAT_WS(',',",
 Temp_Func('IF(IFNULL(b.init_a??,"")="",NULL,\'"??":"1"\')',1,100,NULL),
@@ -12264,26 +19538,26 @@ Temp_Func('IF(IFNULL(b.init_b??,"")="",NULL,\'"??":"1"\')',2,49,NULL),
 												"LEFT JOIN " ,db_s, " AS b ON b.expID = ",QUOTE(expid_),"\n", 
 												"AND a.pageId = b.pageId AND a.missionId = b.missionId AND a.seal_id = b.seal_Id \n",
 												"WHERE a.missionId =",QUOTE(missionid_)," AND \n",
-												"a.seal_no =",QUOTE(sealNo_), " AND \n", 
+												CONCAT("a.seal_no ='",sealNo_,"' AND \n"), 
 												"a.pageId =",QUOTE(pageId_) ,"\n", 
 												") AS d \n",
 												"WHERE a.expno =",QUOTE(expid_) 
 				);
 
-
-	PREPARE stmt_initial FROM @initial_body;
-	EXECUTE stmt_initial;
+ 
+--  SELECT  @initial_body;
+	EXECUTE immediate @initial_body;
 
 SET @t  = NULL;
 
 SET @initial_body = 
 IF(mid1 IS NULL ,
 				CONCAT_WS('',	"SELECT \n",
-											"c(column_json(COLUMN_create(",
+											"column_json(COLUMN_create(",
 Temp_Func("'t??',IF(IFNULL(a.t??,'')='',NULL,a.t??)",1,8,null),
-"))) AS t,\n",
+")) AS t,\n",
 "@bio :=",QUOTE(@ai),",\n",
-
+-- c
 "@c := 0,\n",
 'IF(IFNULL(@a := CONCAT_WS(",",',
 Temp_Func('IF(IFNULL(@a := CONCAT_WS(",",
@@ -12299,14 +19573,15 @@ CONCAT("{",@a,"}"))
 											"LEFT JOIN ",db_a," AS b ON b.expid = ",QUOTE(expid_)," AND a1.missionId = b.missionId \n"
 											"WHERE a.missionid = ",QUOTE(`mId`),CONCAT(" AND b.missionid1 = ",quote_d(`mId1`))
 ),
-
+-- 第二种 
 CONCAT_WS('',"SELECT quotj(\n",
 "CONCAT_WS(',',",Temp_Func("qd1(a.a??,??)",1,100,NULL),")) AS a\nFROM acc_a AS a",
 "\nWHERE  a.expID = ",QUOTE(expid_)," AND a.missionId = ",QUOTE(`mId`),
 " AND a.missionId1 = ",QUOTE(`mId1`)));
-
+-- SELECT  @initial_body;-- SELECT @initial_body;
 	PREPARE stmt_initial FROM @initial_body;
 	EXECUTE stmt_initial;
+
 
 IF @t = 	"{0}" THEN 
 
@@ -12317,24 +19592,24 @@ END if;
 
 
 
-	IF DATABASE() = 'qianxue_sjzh' AND `missionid_` IN('qianxue-15123110423612291','qianxue-15123115081130306','qianxue-15123115301023304' )
+	IF DATABASE() = 'qianxue_sjzh' AND `missionid_` IN('qianxue-15123110423612291','qianxue-15123115081130306','qianxue-15123115301023304'/*,'qianxue-15123115374571222'*/ )
  THEN
 	pd:BEGIN
 			SET @a = CONCAT('{',quote_d('0'),':','{',quote_d("expID"),':',quote_d(`expid_`),',',quote_d('missionId'),':',quote_d(`missionid_`),'}}');
 
 			CASE 
-
+-- 2.1
 					WHEN `missionid_` = 'qianxue-15123110423612291' THEN	CALL m_j('5',@a);
-
+-- 3.1
 					WHEN `missionid_` = 'qianxue-15123115081130306' THEN	CALL m_j('6',@a);
-
+-- 3.2
 					WHEN `missionid_` = 'qianxue-15123115301023304' THEN	CALL m_j('7',@a);
-
-
+-- 3.3
+-- 					WHEN `missionid_` = 'qianxue-15123115374571222' THEN	CALL m_j('8',@a);
 
 					ELSE LEAVE pd;
 			END CASE ;
-			LEAVE initial_label;
+			LEAVE `l`;
 		END;
 	END IF;
 
@@ -12343,10 +19618,10 @@ END if;
 			@initial_body =
  IF(mid1 IS NULL ,
 				CONCAT_WS('',	"SELECT CONCAT('{',GROUP_CONCAT(a.b),'}') AS b FROM(\nSELECT \n",
-											"IF(IFNULL(a1.rowNo,'') = '',b.rowId ,a1.rowNo) AS rowNo,\n",
-
+											"IF(IFNULL(a1.rowNo,'') = '',b.rowNo ,a1.rowNo) AS rowNo,\n",
+-- LINE
 "@bio := IF(NOT ",QUOTE(@i),",",QUOTE(@bi),",IF(@bio := preg_capture(QD(a1.rowNo,':{/','/'),@bi) IS NULL ,NULL,je2(@bi,a1.rowNo,NULL))),\n",
-
+-- c
 "@c := 0,\n",
 'IF(IFNULL(@a := CONCAT_WS(",",',
 Temp_Func('IF(IFNULL(@a := CONCAT_WS(",",
@@ -12360,12 +19635,12 @@ qd(a1.rowNo,CONCAT(":{",@a,"}"),""))
 \n AS b\n'
 											"FROM acc_mission AS a \n",
 											"LEFT JOIN ",db_b," AS b ON b.expid = ",QUOTE(expid_)," AND b.missionId =",QUOTE(`mid`),"\n",
-											"LEFT JOIN acc_standard_n AS a1 ON a.missionId = a1.missionId AND (CASE WHEN  IFNULL(b.rowId,'') <> '' AND IFNULL(b.rowId,'') <> ''THEN a1.rowno = b.rowId WHEN IFNULL(b.rowId,'') <> '' THEN b.rowId ELSE a1.rowno END)",
+											"LEFT JOIN acc_standard_n AS a1 ON a.missionId = a1.missionId AND (CASE WHEN  IFNULL(b.rowNo,'') <> '' AND IFNULL(b.rowNo,'') <> ''THEN a1.rowno = b.rowNo WHEN IFNULL(b.rowNo,'') <> '' THEN b.rowNo ELSE a1.rowno END)",
 											"WHERE a.missionid = ",QUOTE(`mid`),"\n",
 ') AS a WHERE a.b IS NOT NULL'
 ),
-
-CONCAT_WS('',"SELECT c(quotj(GROUP_CONCAT(qd2(rowId ,@a)))) AS b\n",
+-- 第二种 
+CONCAT_WS('',"SELECT quotj(GROUP_CONCAT(qd2(rowNo ,@a))) AS b\n",
 "FROM acc_b AS a",
 "\nWHERE  a.expID = ",QUOTE(expid_)," AND a.missionId = ",QUOTE(`mId`),
 " AND a.missionId1 = ",QUOTE(`mId1`)," AND \n",
@@ -12374,7 +19649,7 @@ CONCAT_WS('',"SELECT c(quotj(GROUP_CONCAT(qd2(rowId ,@a)))) AS b\n",
 )
 
 );
-
+-- SELECT @initial_body;
 	PREPARE stmt_initial FROM @initial_body;
 	EXECUTE stmt_initial;
 
@@ -12392,7 +19667,11 @@ aflowlab:BEGIN
 
 	declare shouldSeals int;  declare overSeals int; declare _PKid VARCHAR(50); declare _sealNo VARCHAR(3); declare _roleID VARCHAR(50); 
 	declare _actionNo VARCHAR(2); declare _nRoleId VARCHAR(50); declare _nSealNo VARCHAR(3); declare xSealNo int; declare xnSealNo int;
-	
+/*
+START TRANSACTION;CALL Audit_1('v5_autoFlow',CONCAT_WS(',',quote(`n_expID`),quote( `n_missionId`),quote( `isSelf`)),'ok');COMMIT;
+
+
+*/	
 
 	SET @_roleID = NULL,
 			@v5stmt = CONCAT_WS('',"SELECT DISTINCT b.roleID\n","	into @_roleID\n",
@@ -12402,7 +19681,7 @@ aflowlab:BEGIN
 		EXECUTE stmt_v5 ;
 
  IF @_roleID is not null then 
-
+--  SELECT CONCAT_WS(',',QUOTE(n_expID),QUOTE(n_missionId),QUOTE(@_roleID)); leave aflowlab;
    call v5_autoSeal(n_expID,n_missionId,@_roleID); 
  END IF;
 
@@ -12468,11 +19747,18 @@ DROP PROCEDURE IF EXISTS `v5_autoSeal`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `v5_autoSeal`(in expID VARCHAR(50),in missionId VARCHAR(50),in roleID VARCHAR(50))
 autoseal:BEGIN
+-- 半自动签章（处理为存储过程）
+-- 0)保存签章（在此处理）
+-- 1)判断是否已经签章，
+-- 2)已经签章则不做处理，未签章则添加数据
+/* 
+-- start TRANSACTION;
+
+CALL Audit_1('v5_autoSeal',CONCAT_WS(',',quote(`expID`),quote( `missionId`),quote( `roleID`)),'no blob');
 
 
-
-
-
+COMMIT;
+*/
  
 
 	SET @expID = NULL,
@@ -12482,7 +19768,7 @@ autoseal:BEGIN
 													'FROM acc_mission AS a INNER JOIN acc_mission_seal AS a1 ON a1.missionId = a.missionId\n','INNER JOIN acc_enter_seal AS b ON a1.seal_id = b.sealID\n','LEFT JOIN acc_1 AS c ON c.expID = ',QUOTE( expID),' AND a.missionId = c.missionId\n','LEFT JOIN acc_seal_1 AS c1 ON c1.expID = c.expID AND c1.missionId = a1.missionId AND c1.seal_Id = a1.seal_id AND c1.pageId = a1.pageId AND c1.missionId = a.missionId\n',
 													'WHERE a.missionId = ', QUOTE(missionId) ,'  AND b.roleID = ',QUOTE(roleID),' AND c1.seal_Id IS NULL');
 
-
+-- a.expID =', QUOTE(expID),'AND
 
 	PREPARE stmt FROM @ASB ;
 	EXECUTE stmt ;
@@ -12513,25 +19799,32 @@ DELIMITER ;
 DROP PROCEDURE IF EXISTS `v5_bk_bill_d`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `v5_bk_bill_d`(in _id VARCHAR(50))
-BEGIN
-
-
-
-
-
+p:BEGIN
+-- 用于背景表单 bb
+-- 1、获取背景表单划线联次信息
+-- 2、获取背景表单TA数据
+-- 3、获取背景表单B数据
+-- 4、获取背景表单签章数据
  
+-- 获取背景表单划线联次信息
 
-
-
-SELECT
-a.missionId,	a.step_label,	a.missionLabel,	a.bill_Id,	a.pageId,	a.is_line,	a.line_x1,	a.line_y1,	a.line_x2,	a.line_y2,	a.line_color,	a.line_type,
-b.standard_jsp,b.max_page,b.page_title1,b.page_title2,b.page_title3,b.page_title4,b.page_title5,b.page_title6,b.page_title7,b.page_title8
-FROM 	acc_mission_backbill_1 AS a
+ START TRANSACTION;
+CALL Audit_1('v5_bk_bill_d',CONCAT_WS(',',QUOTE(`_id`)),'ok');COMMIT;/*LEAVE p;
+-- 
+*/
+SET @sql=CONCAT_WS('\n'
+,'SELECT'
+,'a.missionId,	 bk.sort AS step_label, a.missionLabel,	a.bill_Id,	a.pageId,	a.is_line,	a.line_x1,	a.line_y1,	a.line_x2,	a.line_y2,	a.line_color,	a.line_type,
+b.standard_jsp,b.max_page,b.page_title1,b.page_title2,b.page_title3,b.page_title4,b.page_title5,b.page_title6,b.page_title7,b.page_title8'
+,'FROM 	acc_mission_backbill_1 AS a
 INNER JOIN mysq1_schema.bill_list AS b ON a.bill_Id = b.billId
-where a.missionId=_id;
+LEFT JOIN acc_mission_back_information AS bk on a.missionid = bk.quoteid' 
+,CONCAT_WS('','where a.missionId=' ,QUOTE(_id)));
 
+EXECUTE immediate @sql;
 
-SELECT a.missionId,a.t1,a.t2,a.t3,a.t4,a.t5,a.t6,a.t7,a.t8,
+-- 获取背景表单TA数据
+SELECT a.missionId, t1,a.t2,a.t3,a.t4,a.t5,a.t6,a.t7,a.t8,
 a.a1,a.a2,a.a3,a.a4,a.a5,a.a6,a.a7,a.a8,a.a9,a.a10,a.a11,a.a12,a.a13,a.a14,a.a15,a.a16,a.a17,a.a18,a.a19,a.a20,a.a21,a.a22,a.a23,a.a24,a.a25,
 a.a26,a.a27,a.a28,a.a29,a.a30,a.a31,a.a32,a.a33,a.a34,a.a35,a.a36,a.a37,a.a38,a.a39,a.a40,a.a41,a.a42,a.a43,a.a44,a.a45,a.a46,a.a47,a.a48,a.a49,a.a50,
 a.a51,a.a52,a.a53,a.a54,a.a55,a.a56,a.a57,a.a58,a.a59,a.a60,a.a61,a.a62,a.a63,a.a64,a.a65,a.a66,a.a67,a.a68,a.a69,a.a70,a.a71,a.a72,a.a73,a.a74,a.a75,
@@ -12539,7 +19832,7 @@ a.a76,a.a77,a.a78,a.a79,a.a80,a.a81,a.a82,a.a83,a.a84,a.a85,a.a86,a.a87,a.a88,a.
 FROM  acc_mission_backbill_1 AS a
 where  a.missionId=_id;
 
-
+-- 获取背景表单B数据
 SELECT
 a.missionId,a.rowId,
 a.b1,a.b2,a.b3,a.b4,a.b5,a.b6,a.b7,a.b8,a.b9,a.b10,a.b11,a.b12,a.b13,a.b14,a.b15,a.b16,a.b17,a.b18,a.b19,a.b20,
@@ -12548,7 +19841,7 @@ a.b41,a.b42,a.b43,a.b44,a.b45,a.b46,a.b47,a.b48,a.b49,a.b50
 FROM acc_mission_backbill_n AS a
 where a.missionId=_id  ORDER BY a.rowId;
 
-
+-- 获取背景表单签章数据
 SELECT
 b.missionId, b.seal_Id, b.content,b.shape,b.x,b.y,b.w,b.h,b.color,b.font,b.seal_ARC,b.seal_ARC_FONT,
 b.seal_BOTTOM,b.seal_BOTTOM_FONT,b.enter_simname,b.seal_name,b.pageNo,b.is_seal
@@ -12566,30 +19859,45 @@ DELIMITER ;
 DROP PROCEDURE IF EXISTS `v5_bk_bill_m`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `v5_bk_bill_m`(in _expId VARCHAR(60), in _id VARCHAR(50),in _pageNo VARCHAR(5))
-label1:BEGIN
+l:BEGIN
+-- 用于背景表单(任务表单)
+-- 1、获取背景表单划线联次信息T数据
+-- 2、获取背景表单A数据
+-- 3、获取背景表单B数据
+-- 4、获取背景表单签章数据
 
+	DECLARE `i` TINYTEXT  DEFAULT NULL;
+/*
+ START TRANSACTION;
+CALL Audit_1('v5_bk_bill_m',CONCAT_WS(',',QUOTE(`_expId`),QUOTE(`_id`),QUOTE(`_pageNo`)),'ok');
+ COMMIT;
 
+LEAVE l;
+*/
 
+		SET @a := 0;
+-- IF json_valid(_id) AND json_value(_id,'$[0]') THEN CALL v5_bk_bill_d();END IF;
 
+		SET @stmt_body = CONCAT_WS('','set @stmt_body = (SELECT bk.quoteid FROM acc_mission_back_information AS bk WHERE bk.quoteid = ',QUOTE(_id),' AND type ="bb"limit 1)');
+	  EXECUTE immediate @stmt_body; 
 
+		IF FOUND_ROWS() THEN 
 
+					SET `i` = 1 ;
 
-		SET @a := NULL;
-		SET @stmt_body =CONCAT_WS('',"SELECT \nCASE WHEN e2.classNo IS NULL THEN 1 \nWHEN IFNULL(a1.is_bk_read_answer,0) = 0 THEN 0\nWHEN IFNULL(b.score,0) < a2.max_score_size THEN 0 \nELSE 1 END\nINTO @a\nFROM exp_experimentclassstudent AS a\nLEFT JOIN exp_experimentclass AS a1 ON a.classNo = a1.classNo\nINNER JOIN `mysq1_schema`.exp_difficulty AS a2 ON a1.difficulty_level = a2.difficulty_level\nLEFT JOIN acc_1 AS b ON b.missionId = ",QUOTE(_id)," AND b.expID = a.expNo\nLEFT JOIN exp_courses_node_content AS e ON e.missionid = ",QUOTE(_id),"\nINNER JOIN exp_courses_node AS e1 ON e.contentNo = e1.contentNo\nLEFT JOIN  exp_experimentclass_course AS e2 ON e2.classNo = a1.classNo AND e1.node_courseNo = e2.courseNo\nWHERE a.expNo = ",QUOTE(_expid)) ;
+				ELSE 
+					SET @stmt_body =CONCAT_WS('',"SELECT \nCASE WHEN e2.classNo IS NULL THEN 1 \nWHEN IFNULL(a1.is_bk_read_answer,0) = 0 THEN 0\nWHEN IFNULL(b.score,0) < a2.max_score_size THEN 0 \nELSE 1 END\nINTO @a\nFROM exp_experimentclassstudent AS a\nLEFT JOIN exp_experimentclass AS a1 ON a.classNo = a1.classNo\nINNER JOIN `mysq1_schema`.exp_difficulty AS a2 ON a1.difficulty_level = a2.difficulty_level\nLEFT JOIN acc_1 AS b ON b.missionId = ",QUOTE(_id)," AND b.expID = a.expNo\nLEFT JOIN exp_courses_node_content AS e ON e.missionid = ",QUOTE(_id),"\nleft JOIN exp_courses_node AS e1 ON e.contentNo = e1.contentNo\nLEFT JOIN  exp_experimentclass_course AS e2 ON e2.classNo = a1.classNo AND e1.node_courseNo = e2.courseNo\nWHERE a.expNo = ",QUOTE(_expid)) ;
 
+					EXECUTE immediate @stmt_body;
+					IF ! ISNULL(_expId) AND  @a= 0  THEN
 
-
-		PREPARE stmt_bkb FROM @stmt_body;
-		EXECUTE stmt_bkb;
-
-
-		IF @a =0  THEN
-			CALL polling_mission(_expid,_id, _pageNo);
-			LEAVE label1;
-		END IF;
+						CALL polling_mission(_expid,_id, _pageNo);
+						LEAVE l;
+					END IF;
+		END if;
 
 		SET @stmt_body = CONCAT("SELECT ",
-										CONCAT_WS(',',"	a.missionId","a.billId","a.pageNo","a.is_line",
+										CONCAT_WS(',',"	a.missionId","a.billId AS billId ","a.pageNo pageNo","a.is_line",
 													"\n		a.line_x1","a.line_y1","a.line_x2","a.line_y2",
 													"\n		a.is_line","a.line_color","a.line_type\n		",
 													Temp_Func("a.t??",1,8,NULL),
@@ -12599,25 +19907,29 @@ label1:BEGIN
 													"\nFROM acc_mission AS a\n",
 													"INNER JOIN mysq1_schema.bill_list AS b ON a.billId = b.billId\n",
 													"WHERE a.missionId = ",QUOTE(_id));
+		IF i THEN SET @stmt_body = REPLACE(REPLACE(REPLACE(@stmt_body,'a.billId','a.bill_Id'),'a.pageNo','a.pageid'),'acc_mission','acc_mission_backbill_1');END IF;
 
-		PREPARE stmt_bkb FROM @stmt_body;
-		EXECUTE stmt_bkb;
+		exECUTE immediate @stmt_body;
+		
 
 
 		SET @stmt_body = CONCAT("SELECT a.missionId,\n",
 															Temp_Func("a.a??",1,100,NULL),"\n",
 														"FROM acc_standard_1 AS a\n",
 														"where a.missionId = ",QUOTE(_id));
+		IF i THEN SET @stmt_body = REPLACE(@stmt_body,'acc_standard_1','acc_mission_backbill_1');END IF;
 
-		PREPARE stmt_bkb FROM @stmt_body;
-		EXECUTE stmt_bkb;
-		SET @stmt_body = CONCAT("SELECT a.missionId, a.rowno AS ROWid ,\n",
+
+		EXECUTE immediate @stmt_body;
+		 
+		SET @stmt_body = CONCAT("SELECT a.missionId, a.rowno AS rowNo ,\n",
 															Temp_Func("a.b??",1,50,NULL),"\n",
 														"FROM acc_standard_n AS a\n",
 														"where a.missionId = ",QUOTE(_id));
+		IF i THEN SET @stmt_body = REPLACE(REPLACE(@stmt_body,'acc_standard_n' ,'acc_mission_backbill_n'),'a.rowno','a.rowid');END IF;
 
-		PREPARE stmt_bkb FROM @stmt_body;
-		EXECUTE stmt_bkb;
+		EXECUTE immediate @stmt_body;
+
 
 		SET @stmt_body = CONCAT("SELECT a.missionId, a.seal_id,a.x,a.y,\n\t\t",
 														"b.sealID,b.roleID,b.seal_name,b.seal_content,b.seal_shape,\n\t\t",
@@ -12628,11 +19940,10 @@ label1:BEGIN
 														"INNER JOIN acc_enter_seal AS b ON a.seal_id = b.sealID \n",
 														"WHERE a.missionId = ",QUOTE(_id )," AND \n\t\t",
 														"a.pageId = ",QUOTE(_pageNo)," AND b.seal_content NOT LIKE '%操作%'");
+		IF i THEN SET @stmt_body = REPLACE(REPLACE(@stmt_body,'acc_mission_seal' ,'acc_mission_backbill_seal'),'a.pageId','a.pageno');END IF;
+-- SELECT  @stmt_body,CURRENT_TIMESTAMP(6),REGEXP_substr(CURRENT_TIMESTAMP(6),'\\d{2}\\..*?$') - @start; LEAVE l;
 
-
-		PREPARE stmt_bkb FROM @stmt_body;
-		EXECUTE stmt_bkb;
-		DEALLOCATE PREPARE stmt_bkb;
+		EXECUTE immediate @stmt_body;
 
 
 END
@@ -12648,9 +19959,12 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `v5_bk_enter`(in _courseID VARCHAR(5
     DETERMINISTIC
 BEGIN
 
-
-
-
+/*
+START TRANSACTION;
+				SET @funcid = CONCAT_WS(' ', ' v5_bk_enter' ),
+				@pp =CONCAT_WS(',',quote(_courseID));
+CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp));COMMIT;
+*/
 
 
 SELECT
@@ -12659,7 +19973,7 @@ SELECT
 	'ee' as type,
 	acc_enter.enterSimName as title
 FROM
-acc_enter where acc_enter.courseID=_courseID;
+acc_enter where acc_enter.courseNo=_courseID;
 
 SELECT
   CAST(acc_enter.pkid AS CHAR ) as node,
@@ -12667,7 +19981,7 @@ SELECT
   'eb' as type,
 	'基本资料' as title	
 FROM
-	acc_enter where acc_enter.courseID=_courseID
+	acc_enter where acc_enter.courseNo=_courseID
 UNION ALL
 SELECT
 	CAST(bf.EnterBFid AS CHAR ) as node,
@@ -12677,7 +19991,7 @@ SELECT
 FROM
 	acc_enter_backfile bf
 INNER JOIN acc_enter on acc_enter.enter=bf.enterId
-where bf.enterId IN (SELECT acc_enter.enter FROM acc_enter where acc_enter.courseID=_courseID)
+where bf.enterId IN (SELECT acc_enter.enter FROM acc_enter where acc_enter.courseNo=_courseID)
  UNION ALL
 SELECT
 	CAST(bt.pkid AS CHAR ) as node,
@@ -12687,7 +20001,7 @@ SELECT
 FROM
 	acc_enter_backtext bt 
 INNER JOIN acc_enter on acc_enter.enter=bt.enterId
-where bt.enterId IN (SELECT acc_enter.enter FROM acc_enter where acc_enter.courseID=_courseID);
+where bt.enterId IN (SELECT acc_enter.enter FROM acc_enter where acc_enter.courseNo=_courseID);
 END
 ;;
 DELIMITER ;
@@ -12697,21 +20011,37 @@ DELIMITER ;
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `v5_bk_mission`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `v5_bk_mission`(in _missionId VARCHAR(50))
+CREATE DEFINER=`root`@`%` PROCEDURE `v5_bk_mission`(in _missionId VARCHAR(60))
 BEGIN
+-- 用于背景资料
+-- 1、获取任务背景资料（第一层）
+-- 2、获取任务背景资料（第而层）
 
 
+  DECLARE CONTINUE HANDLER FOR  SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22' , SQLSTATE	'HY000'-- ,SQLSTATE	'22007'
+	BEGIN GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;SET  @`sqlstate` = JSON_OBJECT('sqlstate',@`sqlstate`,'errno',@errno,'text',@text);
+				SET @`errsql` = NULL;
+				SET @funcid = 'Error v5_bk_mission',
+				@pp =CONCAT_WS(',',quote( `_missionId`));
+				CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp,'SQL',@`errsql`,'err',@`sqlstate`));
+	END;
+/*
+START TRANSACTION;
+				SET @`errsql` = NULL;
+				SET @funcid =  'v5_bk_mission',
+				@pp =CONCAT_WS(',',quote( `_missionId`));
+				CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp,'SQL',@`errsql`,'err',@`sqlstate`));COMMIT;
+*/
 
-
-
+-- 背景文字、背景文件、前者任务（第一层）
 SELECT
-	a.title,
+	CONCAT_WS(' ',sort,title) AS title,
 	a.quoteid as node,
   a.missionid as fnode,
-	a.type,
+	IF(a.type = 'bk','bb',a.type) AS type,
 	a.sort,
   1 as layer,
-  CAST(a.pageNo AS CHAR ) as pageNo
+  CAST(a.pageNo AS CHAR )  as pageNo
 FROM
 acc_mission_back_information AS a
 LEFT JOIN acc_mission_backbill_1 AS b1 ON a.quoteid = b1.missionId
@@ -12725,12 +20055,12 @@ b2.Pkid,
 b3.Pkid,
 b4.missionid
 ),'') != '' 
-
+-- GROUP BY a.quoteid ,a.missionid
 ORDER BY
 a.sort ASC;
 
-
-
+/*
+-- 背景任务的背景（第二层）
 SELECT
 	'表单' as title,
 	a.quoteid as node,
@@ -12754,6 +20084,7 @@ SELECT
 FROM
 	acc_mission_back_information a 
 where a.missionid in (SELECT a.quoteid FROM acc_mission_back_information a where a.missionid=_missionId and a.type in ('bk'));
+*/
 END
 ;;
 DELIMITER ;
@@ -12765,7 +20096,7 @@ DROP PROCEDURE IF EXISTS `v5_copy_answer`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `v5_copy_answer`(IN `expid_` varchar(60),IN `missionid_` varchar(60))
 label:BEGIN
-	
+	#Routine body goes here...
 
   CASE
 			WHEN IFNULL(expid_,'') = '' THEN
@@ -12818,7 +20149,7 @@ label:BEGIN
 	
 
 	SET @copy_stat =CONCAT_WS("","INSERT INTO ",expid2b(expid_),"\n",
-															"\t\t( expid,missionid,rowid,\n",
+															"\t\t( expid,missionid,rowNo,\n",
 															"\t\t ",Temp_Func("b??",1,50,NULL),"\n\t\t)\n",
 															"SELECT ",QUOTE(expid_),",",QUOTE(missionid_),",a.rowno,\n",
 															"\t\t\t",Temp_Func("a.b??",1,50,NULL),"\n",
@@ -12828,7 +20159,7 @@ label:BEGIN
 	PREPARE stmt_copy FROM @copy_stat;
 	EXECUTE stmt_copy;
 	
-
+-- 	SELECT  @copy_stat;LEAVE label;
 END
 ;;
 DELIMITER ;
@@ -12840,12 +20171,15 @@ DROP PROCEDURE IF EXISTS `v5_expStuMission`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `v5_expStuMission`(in studentNo VARCHAR(50),in classNo VARCHAR(50),in courseNo VARCHAR(50),in expId VARCHAR(50))
 expStuMlab:BEGIN
+-- 为流程添加实验用户及任务（处理为存储过程）
+-- 1)判断用户是否存在
+-- 2)不存在，则不处理
+-- 3)存在，则添加实验用户及任务
 
+/*
+ CALL Audit_1('v5_expStuMission',CONCAT_WS(',',QUOTE(`studentNo `),QUOTE(`_id`),QUOTE(`expId `)),'ok');
 
-
-
-
-
+*/
 
 	SET @vCnt = NULL ,
 			@stmt_v5 = CONCAT_WS('',"SELECT Count(*) into @vCnt\n","FROM exp_stu_mission AS a\n",
@@ -12886,7 +20220,7 @@ expStuMlab:BEGIN
      exp_courses_node.node_courseNo= ",QUOTE(courseNo));
 
 
-
+-- SELECT @stmt_v5;LEAVE expStuMlab;
 
 		PREPARE stmt_v5 FROM @stmt_v5;
 		EXECUTE stmt_v5 ;
@@ -12903,9 +20237,9 @@ DROP PROCEDURE IF EXISTS `v5_init4OptButtonLine`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `v5_init4OptButtonLine`(in _missionId VARCHAR(50),in _expID VARCHAR(50),in _sealNo Integer,in _pageId Integer)
 BEGIN
-
-
-
+-- 用于初始化界面
+-- 1、获取按钮状态
+-- 2、获取划线信息
  
  SELECT
   exp_stu_mission.mission_ask,
@@ -12947,7 +20281,7 @@ BEGIN
  LEFT JOIN
  ( SELECT ssd.shouldSeal,osd.overSeal 
    from(
-    
+    -- 指定角色应该签章情况
     SELECT count(*) as shouldSeal
     FROM acc_mission_seal
     LEFT JOIN acc_enter_seal on acc_enter_seal.sealID=acc_mission_seal.seal_id
@@ -12955,7 +20289,7 @@ BEGIN
    ) ssd 
    LEFT JOIN
    (
-     
+     -- 指定角色已经签章
      SELECT count(*) as overSeal
      FROM acc_seal_1
      INNER JOIN acc_mission_seal ON acc_mission_seal.missionId = acc_seal_1.missionId AND acc_mission_seal.pageId = acc_seal_1.pageId 
@@ -12967,7 +20301,7 @@ BEGIN
  LEFT JOIN
  ( SELECT ssd.shouldSeal as roleShouldSeal,osd.overSeal as roleOverSeal
    from(
-    
+    -- 指定角色应该签章情况
     SELECT count(*) as shouldSeal
     FROM acc_mission_seal
     LEFT JOIN acc_enter_seal on acc_enter_seal.sealID=acc_mission_seal.seal_id
@@ -12975,7 +20309,7 @@ BEGIN
    ) ssd 
    LEFT JOIN
    (
-     
+     -- 指定角色已经签章
      SELECT count(*) as overSeal
      FROM acc_seal_1
      INNER JOIN acc_mission_seal ON acc_mission_seal.missionId = acc_seal_1.missionId 
@@ -12991,7 +20325,7 @@ BEGIN
     (select s.expID from acc_seal_1  s where s.expID=_expID and s.missionId=m.missionId and s.pageId=m.pageId and s.seal_Id=m.seal_id)
    ) rpSealId on 1=1
  where exp_stu_mission.missionId=_missionId and exp_stu_mission.expId=_expID;
-  
+  -- and acc_1.missionId=_missionId and acc_1.expID=_expID;
 END
 ;;
 DELIMITER ;
@@ -13003,34 +20337,51 @@ DROP PROCEDURE IF EXISTS `v5_init4Seals`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `v5_init4Seals`(ajson varchar(2000))
 init4Seals:BEGIN
+-- 用于初始化界面
+-- 1、获取签章信息
+-- sealStat 0 不能签的，1 可以签 2 已签章 3 其他人签章
+/*
+start transaction;
+CALL Audit_1('v5_init4Seals',CONCAT_WS(',',QUOTE(`ajson`)),'ok');
+ COMMIT;
+*/
 
+	SET @init4Seals = CONCAT_WS('\n'
+		,"SELECT CASE"
+		,"WHEN  a.seal_id IS NOT NULL  THEN '2'"
+		,"WHEN  c.seal_id IS NOT NULL  THEN '1'"
+		,"ELSE '0' END AS sealStat"
+		,	",d.sealID,d.roleID,c.seal_no ,"
+		,CONCAT(json_extract(ajson,"$.seal_no")," as sealNo,")
+		,"c.pageId,"
+		,"d.seal_shape,d.seal_content,d.seal_content_arc,"
+		,"d.seal_content_arc_font,d.seal_content_bottom,d.seal_content_bottom_font,"
+		,"c.x AS seal_x,c.y AS seal_y,d.seal_w,d.seal_h,d.seal_font,d.seal_color"
+		,"FROM acc_enter_role AS d0"
+		,CONCAT_WS(' '
+				,"INNER JOIN acc_enter_seal AS d ON d.roleID = d0.roleID\nLEFT JOIN acc_mission_seal AS c ON"
+					,CONCAT_WS(' AND '
+						, CONCAT('c.seal_no = ',JSON_EXTRACT(ajson,"$.seal_no"))
+						, CONCAT('c.pageId = ',JSON_EXTRACT(ajson,"$.pageId"))
+						,CONCAT('c.missionId = ',JSON_EXTRACT(ajson,"$.missionId"))
+						,"c.seal_id = d.sealID"))
+		,CONCAT_WS(' ',"LEFT JOIN acc_seal_1 AS a ON "
+			,CONCAT_WS(' AND '
+						, CONCAT('a.missionId = ',JSON_EXTRACT(ajson,"$.missionId"))
+						, CONCAT('a.expId = ',JSON_EXTRACT(ajson,"$.expId"))
+						,"c.seal_id = a.seal_Id AND c.pageId = a.pageId")
+						)
+		 ,CONCAT_WS('\n',"WHERE "
+				,CONCAT_WS(" AND "
+					,CONCAT("d0.roleID = " ,JSON_EXTRACT(ajson,"$.roleId"))
+					,"d.seal_name NOT LIKE '%none%' AND d.seal_name NOT LIKE '%操作%' AND d.seal_content NOT LIKE '%操作%'")
+					,"AND IFNULL(seal_color,'')!='black'")
+	);
+-- SELECT 	CAST(@init4Seals AS CHAR); LEAVE init4Seals;SELECT @init4Seals;
+-- 	
+EXECUTE immediate @init4Seals;
+	
 
-
-
- 
-
-
-	SET @init4Seals = CONCAT("SELECT 	CASE WHEN  a.seal_id IS NOT NULL  THEN '2' \n	WHEN  c.seal_id IS NOT NULL  THEN '1' \n ELSE '0' END AS sealStat\n",
-																		",d.sealID,d.roleID,c.seal_no ,",j3(ajson,"seal_no")," as sealNo,c.pageId,\n",
-																		"d.seal_shape,d.seal_content,d.seal_content_arc,\n\t\t\n",
-																		"d.seal_content_arc_font,d.seal_content_bottom,d.seal_content_bottom_font,\n\t\t",
-																		"c.x AS seal_x,c.y AS seal_y,d.seal_w,d.seal_h,d.seal_font,d.seal_color\n",
-																		"FROM acc_enter_role AS d0\n",
-																		"INNER JOIN acc_enter_seal AS d ON d.roleID = d0.roleID\n",
-																		"LEFT JOIN acc_mission_seal AS c ON ",
-CONCAT_WS(' AND ', CONCAT('c.seal_no = ',j3(ajson,"seal_no")), CONCAT('c.pageId = ',j3(ajson,"pageId")),CONCAT('c.missionId = ',j3(ajson,"missionId")),"c.seal_id = d.sealID\n"),
-																		"LEFT JOIN acc_seal_1 AS a ON ",
-CONCAT_WS(' AND ', CONCAT('a.missionId = ',j3(ajson,"missionId")), CONCAT('a.expId = ',j3(ajson,"expId")),"c.seal_id = a.seal_Id AND c.pageId = a.pageId\n"),
-
-																		"WHERE ",
-CONCAT_WS(" AND ",CONCAT("d0.roleID = " ,j3(ajson,"roleID"), "\n"),
-																		"d.seal_name NOT LIKE '%none%' AND d.seal_name NOT LIKE '%操作%' AND d.seal_content NOT LIKE '%操作%'"));
-
-
-
-	PREPARE stmt_init4Seals FROM @init4Seals;
-	EXECUTE stmt_init4Seals;
-	DEALLOCATE PREPARE stmt_init4Seals;
 
 END
 ;;
@@ -13043,7 +20394,15 @@ DROP PROCEDURE IF EXISTS `v5_init4Seals_p`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `v5_init4Seals_p`(in _missionId VARCHAR(50),in _expId VARCHAR(50),in _pageId Integer, in sealNo varchar(5))
 init4Seals:BEGIN
- 
+/*
+用于初始化界面
+1、获取签章信息
+ sealStat 0 不能签的，1 可以签 2 已签章 3 其他人签章
+*//*
+START TRANSACTION;
+CALL Audit_1('v5_init4Seals_p',CONCAT_WS(',',QUOTE(`_missionId`),QUOTE(`_expId`),QUOTE(`_pageId`),QUOTE(`sealNo`)),'ok');
+COMMIT; 
+*/
   IF IFNULL(_pageId,0) = 0 THEN SET _pageId = 1 ;END IF ;
 	SET @init4Seals = CONCAT("SELECT 	IF(e.missionId IS NOT NULL,IF(c.missionId IS NULL,'1','3'),'0') AS sealStat,d.sealID,b.roleID,a.seal_no,",`sealNo`," as sealNo,\n",
 																		"d.seal_shape,d.seal_content,d.seal_content_arc,\n\t\t\n",
@@ -13060,7 +20419,7 @@ init4Seals:BEGIN
 																		"b.seal_name NOT LIKE '%操作%' AND b.seal_content NOT LIKE '%操作%'\n",
 																		"GROUP BY d.roleID,d.sealID");
 
- 
+ -- SELECT 	CAST(@init4Seals AS CHAR);
 
 	PREPARE stmt_init4Seals FROM @init4Seals;
 	EXECUTE stmt_init4Seals;
@@ -13095,11 +20454,13 @@ BEGIN
 
  declare continue handler for not found set done=1;
 
-
+/*
+CALL Audit_1('v5_init4Seals',CONCAT_WS(',',QUOTE(`coursesNo`),QUOTE(`fMng`),QUOTE(`gMng`)),'ok');
+*/
  
 delete from acc_mission_seal_assist where acc_mission_seal_assist.courseNo=coursesNo;
 
-
+-- 查询 猪脚 ？
 
 SELECT a.roleID 
 into  monId
@@ -13214,27 +20575,38 @@ CREATE DEFINER=`root`@`%` PROCEDURE `v5_query_mission`(IN `expid_` varchar(60) ,
     READS SQL DATA
 label:BEGIN
 
+/*
+ 1054 1064 SQLSTATE 1139 - Got error 'empty (sub)expression' from regexp
+ 锁定课程 
+*/
+
+	DECLARE  old_type VARCHAR(60) DEFAULT 'no';
+
+  DECLARE CONTINUE HANDLER FOR  SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22' , SQLSTATE	'HY000'-- ,SQLSTATE	'22007'
+	BEGIN GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;SET  @`sqlstate` = JSON_OBJECT('sqlstate',@`sqlstate`,'errno',@errno,'text',@text);
+				SET @`errsql` = @stmtbody3;
+				SET @funcid = CONCAT_WS(' ','Error: ', ' v5_query_mission' ),
+				@pp = CONCAT_WS(',',QUOTE(`expid_`),QUOTE(`type_`),QUOTE(`keyword`),`page` ,`num` );
+				CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp,'SQL',@`errsql`,'err',@`sqlstate`));
+	END;
+/*start TRANSACTION;
+				SET @`errsql` = @stmtbody3;
+				SET @funcid = CONCAT_WS(' ',' v5_query_mission' ),
+				@pp = CONCAT_WS(',',QUOTE(`expid_`),QUOTE(`type_`),QUOTE(`keyword`),`page` ,`num` );
+				CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp));
+COMMIT;
+
+*/
 
 
-	DECLARE  old_type VARCHAR(10) DEFAULT 'no';
-
-
-	SET  @a = NULL,
-				@a = DATABASE();
+	SET  @a = NULL,	@a = DATABASE();
 
 	IF @a = 'qianxue_sjzh' THEN
-
 		CALL  v5_query_mission_bk(`expid_` ,`type_`, `keyword`, `page` ,`num`);
 		LEAVE label;
 	END IF;
 
-	set 				
-				
-				@stmtbody = NULL ,
-				@totalnum = 0,
-				@stmtbody1 = NULL ,
-				@stmtbody2 = NULL ,
-				@stmtbody3 = '' ;
+	set @stmtbody = NULL ,				@totalnum = 0,				@stmtbody1 = NULL ,				@stmtbody2 = NULL ,				@stmtbody3 = '' ;
 
 	IF page <1 THEN 
 			set @offset1 = 1;
@@ -13297,7 +20669,7 @@ label:BEGIN
 	END IF;
 
 	SET @stmtbody3 = CONCAT(" AND ",type_, @stmtbody3,"\nGROUP BY a1.expid,a1.missionid",
-	    "\nORDER BY c3.billTypeSay,c2.billname,nabc(CONCAT(b4.node_no,',',b5.typesort))");
+	    "\nORDER BY c3.billTypeSay,c2.billname,nabc(CONCAT(b4.node_no,'.',b5.typesort))");
 
 
 	SET @allmis = '' ,
@@ -13305,9 +20677,13 @@ label:BEGIN
 			@stmtbody = concat(@stmtbody1,@stmtbody2,@stmtbody3);
 
 
+/*
+  SELECT @stmtbody;
+ LEAVE label;
 
-	PREPARE stmt from  @stmtbody ;
-	EXECUTE stmt ;
+*/
+	EXECUTE immediate  @stmtbody ;
+
 	
 	SET @stmtbody1 = NULL,
 			@stmtbody2 = NULL,
@@ -13325,7 +20701,7 @@ label:BEGIN
 												"WHERE b.expNO =", QUOTE(expid_)," AND c1.contentNo IS NOT NULL AND INSTR(@allmis,c2.missionid) ");
 
 	CASE old_type
-			WHEN 'kjpz' THEN  
+			WHEN 'kjpz' THEN  -- 凭证
 				label1:BEGIN
 						SET @stmtbody3 = CONCAT_WS('', @stmtbody3,"\n",
 											"\n\t\t\t UNION ALL \n",
@@ -13344,9 +20720,8 @@ label:BEGIN
 						SET @stmtbody3 = @stmtbody3;
 	END CASE ;
 
-	PREPARE stmt from  @stmtbody3 ;
-	EXECUTE stmt ;
-  DEALLOCATE PREPARE stmt;
+	EXECUTE immediate  @stmtbody3 ;
+
 
 END label
 ;;
@@ -13362,8 +20737,11 @@ CREATE DEFINER=`root`@`%` PROCEDURE `v5_query_mission_bk`(IN `expid_` varchar(60
 label:BEGIN
 
 	DECLARE  old_type VARCHAR(10) DEFAULT 'no';
-
-
+/*
+START TRANSACTION;
+CALL Audit_1('v5_query_mission_bk',CONCAT_WS(',',QUOTE(`expid_`),QUOTE(`type_`),QUOTE(`keyword`),`page` ,`num` ),'ok');	
+commit;LEAVE label;
+*/
 	set 				
 				
 				@qbkbody = NULL ,
@@ -13435,11 +20813,14 @@ LEFT JOIN qianxue_sjzh.acc_standard_1 AS c1 ON c1.missionId = c.missionId\n",
 
 			@qbkbody = CONCAT_WS('','SELECT a.*,@allmis := CONCAT_WS("",QUOTE(a.missionId),@allmis) AS missionids\nFROM(',
 										@qbkbody1,@qbkbody2,@qbkbody3,'\n) AS a' );
-
+/*
+ SELECT  @qbkbody;
+LEAVE label;
+ */
 
 	PREPARE stmt from  @qbkbody ;
 	EXECUTE stmt ;
-
+-- CONCAT(a1.billname,' - ',c1.node_No,'.',c2.typesort,' - ',a.missionLabel
 	SET @qbkbody1 = NULL,
 			@qbkbody2 = NULL,
 			@qbkbody3 = 
@@ -13456,7 +20837,7 @@ WHERE c1.contentNo IS NOT NULL AND INSTR(@allmis,c2.missionid)
 ");
 
 	CASE old_type
-			WHEN 'kjpz' THEN  
+			WHEN 'kjpz' THEN  -- 凭证
 				label1:BEGIN
 						SET @qbkbody3 = CONCAT_WS('', @qbkbody3,"\n",
 											"\n\t\t\t UNION ALL \n",
@@ -13475,13 +20856,27 @@ WHERE c1.contentNo IS NOT NULL AND INSTR(@allmis,c2.missionid)
 						SET @qbkbody3 = @qbkbody3;
 	END CASE ;
 
-
-
+-- 	SET @qbkbody3 = CONCAT_WS("\n","CREATE TABLE temp_query_mission_2 AS",@qbkbody3); 	
+/*			SELECT @qbkbody3 ; 
+	LEAVE label;
+*/
 
 	PREPARE stmt from  @qbkbody3 ;
 	EXECUTE stmt ;
   DEALLOCATE PREPARE stmt;
+/*SELECT
+a.missionid,
+a.quoteid,
+a.bd,
+a.title,
+a.pageNo,
+a.courseno
+FROM
+temp_query_mission_2 AS a;
 
+
+	SELECT  a.* FROM temp_query_mission_2 AS a ;
+*/
 END label
 ;;
 DELIMITER ;
@@ -13493,11 +20888,11 @@ DROP PROCEDURE IF EXISTS `v5_retreat_action`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `v5_retreat_action`(in n_expID VARCHAR(50),in n_missionId VARCHAR(50),in isSelf int)
 BEGIN
-
-
-
-
-
+-- 流程回退
+-- 0)已经及时的流程，直接返回
+-- 1)删除该角色的签章
+-- 2)获取回退的当前角色和下一角色
+-- 3)修改流程信息
  
  declare _PKid VARCHAR(50);
  declare _sealNo VARCHAR(3);
@@ -13510,20 +20905,20 @@ BEGIN
  declare xRoleId VARCHAR(50);
 
 
- 
-  
-  if isSelf=0 THEN 
+ -- 删除该角色的签章
+  -- 1) 获取当前角色No和角色ID    
+  if isSelf=0 THEN -- 半自动
     select case when exp_stu_mission.SealNo is null then -1 else exp_stu_mission.SealNo end,exp_stu_mission.nRoleId INTO xSealNo,xRoleId from exp_stu_mission where exp_stu_mission.expId=n_expID  and exp_stu_mission.missionId=n_missionId ;     
-  ELSE 
+  ELSE -- 手动
     select case when exp_stu_mission.SealNo is null then -1 else exp_stu_mission.SealNo end,exp_stu_mission.roleId INTO xSealNo,xRoleId from exp_stu_mission where exp_stu_mission.expId=n_expID  and exp_stu_mission.missionId=n_missionId ;
   end if; 
 
-  
+  -- 删除当前角色签章
   delete from acc_seal_1 where acc_seal_1.expID=n_expID and acc_seal_1.missionId=n_missionId and acc_seal_1.seal_Id in 
    (select acc_enter_seal.sealID from acc_enter_seal where acc_enter_seal.roleID=xRoleId);
-  
+  -- 2)如果当前角色No为-1，表明当前流程已经结束
   if xSealNo>1 THEN
-    if isSelf=0 THEN 
+    if isSelf=0 THEN -- 半自动
      select 
        case when seal05.roleID is null then seal1.PKid else seal05.PKid end as PKid,
        case when seal05.roleID is null then seal1.roleID else seal05.roleID end as roleID,
@@ -13562,10 +20957,10 @@ BEGIN
       select aesa.missionId,aesa.PKid,aesa.roleID,aesa.sealNo as sealNo,aesa.nodeSealId FROM acc_mission_seal_assist aesa where aesa.sealNo=(xSealNo-0.5) and aesa.missionId=n_missionId 
      ) seal05 on 1=1;
     end if;
-    
+    -- 修改数据
     update exp_stu_mission set exp_stu_mission.PKid=_PKid,exp_stu_mission.roleID=_roleID,exp_stu_mission.sealNo=_sealNo,exp_stu_mission.nodeSealId=_actionNo,exp_stu_mission.nRoleId=_nRoleId,exp_stu_mission.nSealNo=_nSealNo
      where exp_stu_mission.expId=n_expID and exp_stu_mission.missionId=n_missionId;
-    
+    -- 删除上一角色签章
     delete from acc_seal_1 where acc_seal_1.expID=n_expID and acc_seal_1.missionId=n_missionId and acc_seal_1.seal_Id in 
     (select acc_enter_seal.sealID from acc_enter_seal where acc_enter_seal.roleID=_roleID or acc_enter_seal.roleID=_nRoleId);
   end if;
@@ -13581,7 +20976,7 @@ DROP PROCEDURE IF EXISTS `v5_retreat_check`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `v5_retreat_check`(IN `expId_` varchar(60),IN `missionId_` varchar(60))
 BEGIN
-	
+	#Routine body goes here...
 		SELECT
 		CASE 
 			WHEN a.score IS NULL THEN '1'
@@ -13628,8 +21023,10 @@ DROP PROCEDURE IF EXISTS `ware_insert`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `ware_insert`(IN `s` varchar(30),IN `fp` tinytext,IN `sT` varchar(1))
 wil:BEGIN
-	
-
+	#Routine body goes here...
+/* 
+'qianxue_cn',"E:\\eclipseWorkspace\\qianxue_v3\\WebContent"
+*/
 
 	DECLARE i INT(5) DEFAULT 0;
 
@@ -13658,7 +21055,7 @@ IF IFNULL(st,0) = 0 OR st =1 THEN
 														"FROM `",s,"`.exp_courseware_cells AS a\n",
 														"LEFT JOIN `",s,"`.exp_courses_node_content AS b ON a.unique_id = b.missionid\n",
 														"WHERE a.edit0_file1_url2 = 1\n");
-
+-- SELECT CAST(@stmt1 AS CHAR) ; LEAVE wil;
 	PREPARE stmt1 FROM @stmt1;
 	EXECUTE stmt1 ;
 END IF;
@@ -13687,6 +21084,936 @@ IF IFNULL(st,0) = 0 OR st =2 THEN
 END if;
   DEALLOCATE PREPARE stmt1 ;
 
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `_f`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `_f`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `_f`(`p` LONGBLOB,`r` text) RETURNS longblob
+    DETERMINISTIC
+BEGIN
+	DECLARE `rs`,`ts`,		`jrs`,	`抓拍`,`trs`, env  LONGBLOB DEFAULT NULL;
+
+	DECLARE `arr`,调试 TEXT DEFAULT NULL;
+	DECLARE 次数 int(3) DEFAULT 0;
+
+	DECLARE callf  CONDITION FOR 666;
+
+	DECLARE CONTINUE HANDLER FOR callf
+	BEGIN
+	DECLARE fn TINYTEXT DEFAULT NULL;
+	GET DIAGNOSTICS CONDITION 1 fn = MESSAGE_TEXT;
+
+								set trs  = IF(fn = 'f_else',f_else(JSON_ARRAY(p,rs)),f_react(JSON_ARRAY(p,rs)));
+
+								CASE WHEN  json_valid(trs) && JSON_EXTRACT(trs,'$.RETURNED_SQLSTATE') is NOT NULL || JSON_EXISTS(trs,'$.tiaoShi') THEN 
+										SET 调试 = JSON_value(trs,'$.tiaoShi');
+
+													SET @RETURNED_SQLSTATE = CONCAT('f_else',json_value(trs,'$.RETURNED_SQLSTATE')),
+															@MYSQL_ERRNO =  json_value(trs,'$.MYSQL_ERRNO'),
+															@MESSAGE_TEXT = json_value(trs,'$.MESSAGE_TEXT');
+
+													RETURN _s(json_array(@MYSQL_ERRNO,@MESSAGE_TEXT));
+											WHEN   json_valid(trs) && JSON_EXISTS(trs, '$.p') THEN
+
+												 SET p = IF(JSON_EXISTS(trs, '$.p'),json_value(trs,'$.p'),trs),
+														 rs = CAST(IF(JSON_EXISTS(trs, '$.rs'),json_value(trs,'$.rs'),rs) AS CHAR);
+
+									ELSE  
+
+												SET p = trs, rs ='["f_else","未处理"]';
+												
+								END  case;	
+
+							
+
+	END;
+	DECLARE CONTINUE HANDLER FOR SQLSTATE '22001',SQLSTATE '23000',		SQLSTATE '42000',		SQLSTATE '42S22',		SQLSTATE 'HY000',SQLSTATE	'22007'
+
+		bl : BEGIN
+			GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE,
+			@errno = MYSQL_ERRNO,
+			@TEXT = MESSAGE_TEXT;
+	
+		SET @`sqlstate` = JSON_OBJECT( 'sqlstate', @`sqlstate`, 'errno', @errno, 'text', @TEXT );
+		RETURN CONCAT_WS( '\n'
+		,CASE WHEN 调试 IS NULL THEN CONCAT(@errno,',',@TEXT)
+		      else 调试 END
+		,CONCAT(@RETURNED_SQLSTATE, @TEXT)
+		,CONCAT(@`sqlstate`)
+);
+END;
+
+	多个动作:WHILE  次数=0  DO
+	SET 次数 = 1;
+	CASE 
+	WHEN IFNULL(p,'')='' || p = 'null' THEN
+			SET p = NULL; 
+	WHEN IFNULL(r,'')='' THEN 
+		SET p = null;	
+	WHEN  (not json_valid(r)) && IFNULL(R,'')!=''  THEN 
+		SET p = REGEXP_substr(p,r);	
+	WHEN json_valid(p) && JSON_DEPTH(p)>1 && JSON_EXISTS(p, '$.p')THEN
+	
+
+			  SET     env =   CAST(JSON_value(p,'$.env') AS CHAR); 
+				SET p  = json_value(p,'$.p'),
+						次数=0;
+
+		ITERATE 多个动作;
+	WHEN not json_valid(r) THEN
+
+		 SET p = CONCAT('[',p,']'),次数=0;
+		ITERATE 多个动作;
+	WHEN json_length(r)>0 && p IS NOT NULL THEN
+
+       IF  JSON_DEPTH(r)<3 || r REGEXP '^\\s*\\[\\s*[^\\[]'THEN SET r = CONCAT('[',r,']') ; END IF;
+
+
+			BEGIN  
+			DECLARE 次数1 int(3) DEFAULT 0;
+
+			label: LOOP
+
+				IF json_length(`r`)<1 || p IS NULL || JSON_DEPTH(r)<3 THEN 				LEAVE label; 			END IF; 
+
+				SET  @数组_自用 = JSON_QUERY(`r`,'$[0]'),r = JSON_REMOVE(`r`,'$[0]');
+
+				label2: LOOP    
+				
+			
+				SET 次数1 = 次数1+1;
+
+							IF JSON_VALID(@数组_自用) && json_length(@数组_自用)<1 || p IS NULL THEN	LEAVE label2; 			END IF; 
+
+							SET		@自用表达式_rp = json_value(@数组_自用,'$[0]');
+
+
+							CASE 
+								WHEN  p = 'null' THEN RETURN null;
+								WHEN @自用表达式_rp REGEXP '^R3$' THEN
+
+											SET @数组_自用 =  JSON_REMOVE(@数组_自用,'$[0]');
+
+								WHEN @自用表达式_rp REGEXP '^\\s*CALL变量\\s*$' &&  JSON_LENGTH(@数组_自用)>1  THEN
+
+											SET @自用表替换_rp = json_value(@数组_自用,'$[1]');
+											SET @自用表达式_rp  := JSON_VALUE(ENV, CONCAT('$.',@自用表替换_rp)),
+													@自用表达式_rp = e(@自用表达式_rp);
+											
+											SET	 @数组_自用 =  JSON_REMOVE(@数组_自用,'$[0]','$[0]');
+
+
+								WHEN @自用表达式_rp REGEXP '^\\s*f_react' &&  JSON_LENGTH(@数组_自用)>1  THEN
+											SET @自用表替换_rp = json_value(@数组_自用,'$[1]');
+
+											SET rs =  JSON_MERGE(JSON_ARRAY('来自','react'),JSON_REMOVE(@数组_自用,'$[0]')) ;
+
+
+
+											SET		p= f(p,rs) ,@数组_自用 = '[]'; 
+
+											ITERATE label;
+											
+								WHEN @自用表达式_rp REGEXP '^\\s*(?:UPPER|LOWER)' &&  JSON_LENGTH(@数组_自用)>1  THEN
+
+											SET @自用表替换_rp = json_value(@数组_自用,'$[1]');
+
+											SET rs = JSON_ARRAY('1','react',@自用表替换_rp,
+											CONCAT('(?#',TRIM(@自用表达式_rp),')'
+											, regEXP_substr(@自用表替换_rp,'\\\\K\\K.+$')),'\\1');
+
+											SET @auusd8dsuusd8ds := _s(json_array(666,'f_react'));
+
+											SET		@数组_自用 =  JSON_REMOVE(@数组_自用,'$[0]','$[0]');
+
+											
+								WHEN @自用表达式_rp = '抓取' &&  JSON_LENGTH(@数组_自用)>1  THEN
+
+											SET @自用表替换_rp = JSON_EXTRACT(@数组_自用,'$[1]');
+
+											SET @自用表替换_rp = IF(JSON_DEPTH(@自用表替换_rp) =1 ,CONCAT('[',@自用表替换_rp,']'),@自用表替换_rp);
+
+											SET rs = REGEXP_replace(@自用表替换_rp,'^\\s*\\[\\s*"','["","","(?#抓取)') ;
+
+											SET @auusd8dsuusd8ds := _s(json_array(666,'f_else'));
+-- return p;
+											SET		@数组_自用 =  JSON_REMOVE(@数组_自用,'$[0]','$[0]');
+
+
+								WHEN @自用表达式_rp REGEXP '^变数组$'    THEN
+
+											SET p = CONCAT_WS('\n','[', 
+															REGEXP_replace(
+																	REGEXP_replace(p,'^\\s+|\\s+$',''),
+																				'(?<!\\\\)""','",\n"')
+															,']');
+
+											
+											SET		@数组_自用 =  JSON_REMOVE(@数组_自用,'$[0]');
+
+
+								WHEN @自用表达式_rp REGEXP '^\\s*删除\\s*'  &&  JSON_LENGTH(@数组_自用)>1   THEN
+											SET @自用表替换_rp = json_value(@数组_自用,'$[1]');
+
+											SET @自用表达式_rp = e(CONCAT('del ' ,json_QUOTE(@自用表替换_rp)));
+											
+											SET		@数组_自用 =  JSON_REMOVE(@数组_自用,'$[0]','$[0]');
+
+
+								WHEN @自用表达式_rp REGEXP '^\\s*2?SELECT\\s*'  &&  JSON_LENGTH(@数组_自用)>1   THEN
+											SET @自用表替换_rp = json_value(@数组_自用,'$[1]');
+											
+											SET p = CONCAT('\n','SELECT' ,JSON_QUOTE(p),'INTO DUMPFILE' ,QUOTE(@自用表替换_rp));
+											
+											SET		@数组_自用 =  JSON_REMOVE(@数组_自用,'$[0]','$[0]');
+
+								ELSE 
+										CASE 
+												WHEN @自用表达式_rp REGEXP '\\Q(?#\\E(?:调试|debug)'   THEN
+												
+														RETURN CONCAT_WS('\n\n',REGEXP_substr(p,@自用表达式_rp),QUOTE(@自用表达式_rp));
+
+												WHEN @自用表达式_rp REGEXP '\\Q(?#\\E(?:抓取|substr|grep)' || mod(JSON_LENGTH(@数组_自用),2)>0   THEN
+														SET  @MOD_自用 =1;
+												ELSE
+														SET  @MOD_自用 =0;
+										END CASE;
+
+										SET 	@自用表替换_rp = IF( @MOD_自用 ,NULL,json_value(@数组_自用,'$[1]'));
+
+
+										SET		@数组_自用 = IF(@自用表替换_rp IS NULL ,JSON_REMOVE(@数组_自用,'$[0]'),JSON_REMOVE(@数组_自用,'$[0]','$[0]'));
+								 
+
+
+										SET p = CASE	WHEN @自用表替换_rp IS NULL  THEN 	
+																REGEXP_substr(p,@自用表达式_rp)
+													ELSE 
+															 REGEXP_replace(p,@自用表达式_rp,@自用表替换_rp) 
+													END ;
+												
+							END CASE;
+
+
+
+
+				END LOOP label2;
+
+
+			END LOOP label;END;
+	
+
+	ELSE
+		 SET p = p;
+	END CASE;
+	END while 多个动作;
+
+
+	RETURN IF(p = 'null' || p=''   ,null, p);
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `_j`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `_j`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `_j`(p LONGBLOB) RETURNS longblob
+    DETERMINISTIC
+BEGIN
+	DECLARE  k blob DEFAULT  REGEXP_substr(p,'^\\s*@?\\K[^\\.\\s,]+');
+	DECLARE  v longblob DEFAULT  REGEXP_substr(p,'[\\s\\.,]\\K[^\\.,\\s]+(?=\\s*$)');
+-- RETURN CONCAT_WS('____',k,v);
+	RETURN 
+					CASE	WHEN  IFNULL(p,'') = ''  THEN NULL
+								WHEN  IFNULL(k,'') = ''  THEN p
+								WHEN  k = 'env'  THEN JSON_EXTRACT(@env, CONCAT_ws('.','$',v))
+						ELSE p
+					END ;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `_r`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `_r`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` FUNCTION `_r`(`r` text) RETURNS text CHARSET utf8mb3
+    NO SQL
+BEGIN
+	DECLARE
+		次数 int(5) DEFAULT 1;
+
+	set @r3自用 =  NULL;
+	多个动作:WHILE  次数>0  DO
+
+			SET 次数 = 0;
+			CASE
+					WHEN r IS NULL THEN RETURN NULL;
+					
+					WHEN  json_valid(r) && JSON_DEPTH(r)=2 && r REGEXP'^\\s*\\[' || r REGEXP '^\\w+(?:,\\w+)*$' THEN
+						SET  r = _f(r,JSON_ARRAY(
+						'"\\s*,\\s*"','|',
+						'^\\s*(?:\\[")?|(?:"\\s*\\])?\\s*$',''
+						));
+					WHEN  r REGEXP @_r3自用:=o('(?&message) message') THEN 
+
+						SET r  = _f(r,JSON_ARRAY(
+												o('(?&替换的) message')
+												,'路径为“',':'
+												,'”',''
+												,'\\\\(.)','\\1'
+												,'，',',\n'	));
+					
+					WHEN r REGEXP '^\\s*npm\\b' THEN 
+						SET r  = _f(r,JSON_ARRAY( 
+											'(?i)\\s*npm\\s+I(?:NSTALL)?','yarn add'  
+											,'(?i)(?:\\-\\-?s(ave)?)\\b',''
+											,'(?i)\\-?\\-dev\\b','-D'))
+											;
+					
+					WHEN CHAR_LENGTH(r)>500 THEN return r;
+					WHEN @r3自用 IS NOT NULL && r REGEXP @r3自用 THEN
+					   SET r =  REGEXP_replace(REGEXP_replace(r ,  @r3自用,'import from "@site\\1" '),'\\.js(?=")','')
+									,次数 = 0
+									,@r3自用 = null
+									;
+
+					WHEN r REGEXP o('(?&path) path') THEN 
+						CASE  WHEN r REGEXP '\\\\' THEN
+										SET r = REGEXP_replace(r ,'\\\\','/');
+										IF r  REGEXP @r3自用:=  o('(?x)^(?&分割)?[w]((?:(?&分割)(?&path0))+) path') THEN
+										SET 次数=1; END IF;
+
+								ELSE 
+										SET r = REGEXP_replace(r ,'/','\\\\');
+						END CASE;
+					WHEN r REGEXP '^`\w+`$' THEN
+						SET r = R1(r);
+					WHEN r REGEXP '(?<=\\(\\?)((?:&)(\\w+))(?=\\))|(?<=\\\\)((?:g\\{)(\\w+)\\})' THEN 
+						SET r = REGEXP_replace(r,'(?<=\\(\\?)((?:&)(\\w+))(?=\\))','R<\\2>'),
+								r = REGEXP_replace(r,'(?<=\\\\)((?:g\\{)(\\w+)\\})','k<\\2>');
+					
+					WHEN r REGEXP '(?<=\\(\\?)((?:R<)(\\w+))(?:>)(?=\\))|(?<=\\\\)((?:k\\<)(\\w+)\\>)' THEN
+						SET r = REGEXP_replace(r,'(?<=\\(\\?)((?:R\\<)(\\w+))(?:\\>)(?=\\))','&\\2'),
+								r = REGEXP_replace(r,'(?<=\\\\)((?:k\\<)(\\w+)\\>)','g{\\2}');
+					WHEN r REGEXP "^([^$]*(\\$)\\d{1,3}[^$]*)*$" THEN
+						SET r = REGEXP_replace(r, '(?<=[^$]|^)(\\$)(?=[^$]|$)',REPEAT('\\',2));
+					WHEN r REGEXP "^(?:[^\\\\]*\\\\\\d{1,9}[^\\\\]*)*$" THEN 
+						SET r = REGEXP_replace(r, '(?<=[^\\\\]|^)(\\\\)(\\d{1,9})','$\\2');
+
+				ELSE SET r = r;	
+			END CASE;
+
+	END while 多个动作;
+
+	RETURN r;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `_RESIGNAL`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `_RESIGNAL`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `_RESIGNAL`(`no` tinyblob,`MESSAGE` TINYTEXT) RETURNS longblob
+    DETERMINISTIC
+BEGIN
+	DECLARE exit HANDLER FOR SQLEXCEPTION
+
+	SET	no= IF(IFNULL(no,'')='','5555',no),
+			MESSAGE= IF(IFNULL(MESSAGE,'')='','no message',MESSAGE);
+			
+	RESIGNAL 
+   SET MYSQL_ERRNO = no, MESSAGE_TEXT = `MESSAGE`;
+	RETURN '{返回}';
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `_S`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `_S`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `_S`(P LONGBLOB ) RETURNS longblob
+    DETERMINISTIC
+BEGIN
+  DECLARE `no` tinyblob DEFAULT json_value(p,'$[0]');
+	DECLARE `MESSAGE` TEXT DEFAULT json_value(p,'$[1]'); 
+
+	SET	no= IF(IFNULL(no,'')='','5555',no),
+			MESSAGE= IF(IFNULL(MESSAGE,'')='','no message',MESSAGE);
+			
+	SIGNAL SQLSTATE 'HY000' 
+   SET MYSQL_ERRNO = no, MESSAGE_TEXT = `MESSAGE`;
+	RETURN  P;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `_SIGNAL`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `_SIGNAL`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `_SIGNAL`(`no` tinyblob,`MESSAGE` TINYTEXT) RETURNS longblob
+    DETERMINISTIC
+BEGIN
+	DECLARE exit HANDLER FOR SQLEXCEPTION
+
+	SET	no= IF(IFNULL(no,'')='','5555',no),
+			MESSAGE= IF(IFNULL(MESSAGE,'')='','no message',MESSAGE);
+			
+	RESIGNAL 
+   SET MYSQL_ERRNO = no, MESSAGE_TEXT = `MESSAGE`;
+	RETURN '{返回}';
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `分类`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `分类`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `分类`(`p` text) RETURNS longtext CHARSET utf8mb3
+    NO SQL
+    DETERMINISTIC
+BEGIN
+	
+	CASE 
+			WHEN `p`  REGEXP '记账凭证' THEN 
+				SET `p` = 'kjpz';
+				
+			WHEN p REGEXP '成本' THEN 
+				SET `p` = 'kjgz';
+			WHEN p REGEXP '税务' THEN 
+				SET `p` = 'kjns';
+		ELSE 
+			SET `p` = NULL;
+	END CASE;
+  
+
+	RETURN `p`;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `取整`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `取整`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `取整`(`d` int(5),`a` longtext) RETURNS longtext CHARSET utf8mb3
+    NO SQL
+    DETERMINISTIC
+BEGIN
+	#Routine body goes here...
+	DECLARE  v TINYBLOB DEFAULT NULL ;
+SET 	v  = jk("税b",`d` ,`a` );
+
+IF v   REGEXP '\\-?\\d+\\.\\d{3,}' THEN 
+SET  a = REGEXP_replace(`a`,CONCAT('(?x)\\[
+(?+1)
+(?:,\\s*(?+1)){',`d`-1,'}
+,\\s*\\K("[^"]*"|null|\\-?[\\d\\.]+)'),CONCAT_WS('','"',ROUND(`v`,2),'"'));
+END IF ;
+	RETURN CAST(a as CHAR) ;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `执行`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `执行`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`::1` PROCEDURE `执行`(IN `p` longblob)
+p:BEGIN
+	#Routine body goes here...
+	DECLARE i INT(5) DEFAULT 0;DECLARE l INT(5) DEFAULT 0;
+	DECLARE `funcid` VARCHAR(100) DEFAULT 'funcid';DECLARE `b`,`n`MEDIUMBLOB DEFAULT NULL;
+	DECLARE `mod` VARCHAR(100) DEFAULT NULL; DECLARE 取参数 TINYTEXT DEFAULT "\\s*\\-{1,2}slint\\s*$";
+	DECLARE CONTINUE HANDLER FOR  SQLSTATE '21S01', SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22' ,SQLSTATE '21000', SQLSTATE	'HY000'-- ,SQLSTATE	'22007'
+	bl:BEGIN GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;SET  @`sqlstate` = JSON_OBJECT('sqlstate',@`sqlstate`,'errno',@errno,'text',CONCAT(i,@text));
+CASE WHEN ( @errno='1091' || @errno='1360' )&& 0 THEN SET @不记录 =0,@继续执行 = 1 ;
+		ELSE
+SELECT @`sqlstate` 出错;
+				IF(b REGEXP 'Done：' )  THEN SET @不记录 =0,@继续执行 = 0 ;ELSE SET @不记录 = null;END IF;
+				SET @`errsql` =b,@funcid =  NULL;
+				SET @funcid = CONCAT_WS(' ','Error: ',(SELECT CONCAT_WS(', ',a.note,CONCAT_WS('',UPPER(SUBSTR(a.`name`,1,1)),LOWER(substr(a.`name`,2))),a.id) FROM mysq1_schema.qs AS a WHERE a.`name` = `funcid`)
+									, ' 执行' ),
+				@pp = QUOTE(p);
+				CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp,'SQL',@`errsql`,'err',@`sqlstate`,'l',1,"继续执行",IFNULL(@继续执行,0),'记录',IFNULL(@不记录,1)));END CASE ;END;
+
+/*
+START TRANSACTION;
+SET @funcid = CONCAT_WS(' ',(SELECT CONCAT_WS(', ',a.note,CONCAT_WS('',UPPER(SUBSTR(a.`name`,1,1)),LOWER(substr(a.`name`,2))),a.id) FROM mysq1_schema.qs AS a WHERE a.`name` = `funcid`)
+							, ' 执行' ),
+		@pp = QUOTE(`p`);
+
+CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp));COMMIT;*/
+
+SET `mod` = REGEXP_substr(p,取参数),p=REGEXP_replace(p,取参数,'');
+
+SET @开始时间 = SYSDATE(6);
+IF p IS NULL THEN LEAVE p;end if;
+IF  !json_valid(p) THEN 
+
+IF  p NOT REGEXP '^\\s*+"' THEN  SET p = json_quote(CAST(p AS CHAR) );END IF;
+
+SET p = CONCAT('[',p ,']');
+END IF; 
+
+-- SELECT CAST(json_extract(p,'$[0]') AS CHAR);
+
+SET @FOREIGN_key_checks = 0 ;
+
+
+IF  p is NOT null AND json_valid(p) THEN 
+ 
+		l:LOOP
+
+			SET `B` = CAST(json_value(p,'$[0]') AS CHAR),p= json_remove(p,'$[0]');
+			
+			IF( b IS NULL  ) THEN  SELECT p ;LEAVE l;END IF;
+			
+			SET n = REGEXP_substr(CAST(b AS CHAR), '(?i)\\s*^\\s*CALL\\s+`?执行`?\\(\\K.+?(?=\\)[\\s;]*(?-m)$)'
+);
+
+			IF  IFNULL(n,'') != ''  THEN 
+					SET @`执行专用n` = NULL;
+
+					EXECUTE  immediate  CAST(CONCAT(' ','set @`执行专用n` =',n) AS CHAR);
+					SET n = @`执行专用n` ;
+
+					IF IFNULL(n,'') != '' && JSON_valid(n)&&JSON_DEPTH(n)>1  && JSON_LENGTH(n)>0 THEN
+	-- SELECT json_length(p),p,JSON_MERGE(n,p);
+						SET p = JSON_MERGE(n,p),n=NULL ;
+
+						ELSE 
+						SIGNAL SQLSTATE 'HY000' SET  MYSQL_ERRNO =1003,MESSAGE_TEXT = '不可递归调用，n不是有效数组';
+						LEAVE p;
+					END IF ;
+	-- SELECT p ,'JSON_LENGTH(p)'; LEAVE p;
+				ITERATE l;
+
+				
+				
+			END IF;  
+			
+			CASE  
+					WHEN @p0调试 is NOT NULL && @p0调试  THEN 
+
+							EXECUTE  immediate  CAST(CONCAT('SELECT CAST(b AS char) ',i,' - 语句')AS CHAR); 
+
+					WHEN    b != '' THEN  
+			
+						EXECUTE immediate  b;
+			  
+			END CASE;
+					
+
+
+
+			SET l = l+FOUND_ROWS();
+			SET i = i +1;
+		END LOOP;
+	
+	ELSE 	SET b = CONCAT('执行结果:',i,'/','不是json ','NULL');	LEAVE p;
+END IF;
+ IF @执行安静 is NOT null  AND   @执行安静 REGEXP 取参数 ||`mod` IS NOT NULL  THEN 
+ SET@执行安静 =  NULL;  SET  @p0调试 =  NULL;
+ LEAVE p; 
+ END IF;
+ 
+	SELECT CONCAT('Done：',IFNULL(JSON_LENGTH(p),'NULL'),'/',i,'/',l,'/',FORMAT(exetime(@开始时间),3));
+	-- SIGNAL SQLSTATE 'HY000' SET  MYSQL_ERRNO =1003,MESSAGE_TEXT = b;
+
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `插入json`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `插入json`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `插入json`(`p` longblob)
+p:BEGIN
+	DECLARE onep LONGBLOB DEFAULT NULL; -- (?<![\w`"'])([a-z])(?![\w`"'])
+	DECLARE `i` INT(5) DEFAULT 0;
+	DECLARE `l` INT(5) DEFAULT 0;
+
+  DECLARE CONTINUE HANDLER FOR  SQLSTATE '21S01', SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22' , SQLSTATE	'HY000'-- ,SQLSTATE	'22007'
+	bl:BEGIN GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;SET  @`sqlstate` = JSON_OBJECT('sqlstate',@`sqlstate`,'errno',@errno,'text',@text);
+				SET @`errsql` = @sql_body,@funcid =  NULL,@`errsql` := @`sql`;
+				SET @funcid = CONCAT_WS(' ','插入json','Error: ' ),
+				@pp = QUOTE(`p`);
+				CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp,'SQL',@`errsql`,'err',@`sqlstate`,"继续执行",1));END;/**/
+
+/*
+START TRANSACTION;
+				SET @funcid = CONCAT_WS(' ','插入json','记录参数' ),
+				@pp = QUOTE(`p`);
+				CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp,'SQL',@`errsql`,'err',@`sqlstate`,'`l`',1));
+
+*/
+
+	IF IFNULL(`p`,'') ='' THEN LEAVE p;END IF;
+
+	IF !json_valid(`p`) OR json_depth(`p`) <4 THEN SET `p` = CONCAT_WS('','[',`p`,']');END IF;
+
+	IF !json_valid(`p`) OR json_depth(`p`) <4  THEN SET @funcid = CONCAT_WS(' ','插入json',' 问题参数 ' ),@pp = QUOTE(`p`);			CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp,'SQL',@`errsql`,'err',@`sqlstate`,'`l`',1)); LEAVE `p`;END IF;
+
+	SET `l` = json_length(`p`);
+
+	l0:LOOP
+
+		IF `i`>=`l` THEN LEAVE l0;END IF;
+		SET onep = json_query(CAST(`p` AS CHAR) ,'$[0]');
+
+		BEGIN DECLARE `y` int(5) DEFAULT 0 ;DECLARE `x` int(5) DEFAULT 0 ;DECLARE `vs` LONGTEXT DEFAULT json_query(onep,'$.v');DECLARE `v` LONGTEXT DEFAULT NULL;DECLARE `k` LONGTEXT DEFAULT NULL;DECLARE `j` LONGTEXT DEFAULT NULL; 
+				
+
+				l1:LOOP
+
+						IF json_length(vs) =0 THEN LEAVE l1;END IF;
+
+
+						SET `k` = json_keys(`vs`),
+
+								`v` = REGEXP_replace(REGEXP_replace(json_extract(json_extract(CAST(`onep` AS CHAR),'$.关键字'),'$.*'),'^\\[|\\]$',''),'"(?:行|@\\w\\s*:=.*?)"',`x`+1),
+								`y` = 0;
+
+						
+				
+						l2:LOOP
+
+									IF `y` >= json_length(`k`) OR ISNULL(json_length(`k`)) THEN LEAVE l2;END IF;
+									-- IF `y` >= 2 THEN LEAVE l1;END IF;
+
+									SET @v := REGEXP_replace(REGEXP_substr(CAST(vs AS CHAR ),
+													CONCAT_WS(''
+													,json_quote(json_value(`k`,CONCAT_WS('','$[',`y`,']')))
+															,':\\s*(?:"(?:(?=\\\\).{2}|[^\\\\"]++)*?"|null|[\\d\\-\\.\\,]+)'
+													)),'"[^"]+":\\s*','')
+										;
+
+									SET `v` = CONCAT_WS(', ',`v`,IF(IFNULL(@v,'')!='',@v,'null')); 
+
+
+									 SET `y` = `y`+1;
+						END loop;
+
+
+						IF CAST(onep as CHAR) REGEXP "(?i)UPDATE" THEN 
+
+								SET @sql = CONCAT_WS(IF(IFNULL(@优化,'')!='',@优化,'	')
+																		,json_value(CAST(onep AS CHAR),'$.表')
+																		,CONCAT_WS(IF(IFNULL(@优化,'')!='',@优化,'	')
+																			,'set'
+																			,REGEXP_replace(REGEXP_replace(REGEXP_replace(json_merge(vs,json_extract(CAST(onep AS CHAR),'$.关键字'))
+																			,'"([^"]+)":','\\1 = '),'^\\{|\\}$','')
+																			,CONCAT_WS('',',(\\s*',json_value(json_keys(CAST(onep AS CHAR),'$.关键字'),'$[0]'),')(?=\\s*=\\s*)')
+																			,' where \\1'))
+																		
+													);
+
+						ELSE 	
+								SET @sql = CAST(CONCAT_WS(IF(IFNULL(@优化,'')!='',@优化,'	')
+																			,CONCAT_WS('',json_value(CAST(onep AS CHAR),'$.表'),'(',REGEXP_replace(json_merge(json_keys(json_extract(CAST(onep AS CHAR),'$.关键字')),json_keys(vs)),'^\\[|\\]$|"',''),')')
+																			,CONCAT_WS('','VALUES(',`v`,')')
+																			)as char);
+
+						END IF;
+
+						EXECUTE immediate @`sql`;
+
+						SET  @sql = CONCAT_WS('','set @`sql` := json_remove(',QUOTE(vs),',',REGEXP_replace(REGEXP_replace(`k`,'(?<=\\[|,\\s|,)"','"$.'),'^\\[|\\]$',''),')');
+
+						EXECUTE immediate @`sql`;
+
+						SET vs = @sql,`x`=`x`+1;
+
+
+			END LOOP;
+
+			END ;
+
+
+		SET `i` = `i`+1,`p` =json_REMOVE(`p`,'$[0]');
+
+
+	END LOOP;
+
+
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `插入字段名`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `插入字段名`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`::1` FUNCTION `插入字段名`(`b` longblob,`s` blob) RETURNS longblob
+    NO SQL
+    DETERMINISTIC
+BEGIN
+
+	DECLARE i INT(5) DEFAULT 0;DECLARE f BLOB  DEFAULT NULL;
+	DECLARE s1 VARCHAR(200) ;DECLARE r0 VARCHAR(200) DEFAULT '((?<q>["\'])(?:(?=\\\\).{2}|(?!\\k<q>).)*?\\k<q>(?!\\s*as))';
+	DECLARE r VARCHAR(400) DEFAULT '(?s)^(?:(?=(["\']))\\g-1(?:(?=\\\\).{2}|(?!\\g-1).)*?\\1|[^\\r\\n"\']+)+[\\r\\n]';
+  DECLARE 第一行 MEDIUMBLOB DEFAULT NULL;DECLARE rs MEDIUMBLOB DEFAULT NULL;
+	SET r0 = '(?ism)(?<=select|,)\\s*(?:(?:(["\'])(?:(?=\\\\).{2}|(?!\\g-1).)*?\\g-1)|[^\\s,]+)(?=\\s*,|\\s*union)';
+
+	CASE
+		WHEN IFNULL(b,'') ='' THEN 
+			RETURN NULL; 
+		WHEN NOT json_valid(s) THEN
+		  SET s = IF( S REGEXP '^([\\w_]+)(,(?1))*+$',CONCAT('["',REGEXP_replace(s,',','","'),'"]'),NULL);
+	END CASE;
+
+SET 第一行 = REGEXP_substr(b,r),b = REGEXP_replace(b,CONCAT('\\Q',第一行,'\\E'),'');
+-- RETURN b;
+
+	Loop1:LOOP
+
+		IF 第一行 NOT REGEXP r0 OR  i > 10  THEN LEAVE Loop1; END IF;
+		SET f = REGEXP_substr(第一行,r0),rs = CONCAT_WS('',rs,REGEXP_substr(第一行,CONCAT('^.*?(?=\\Q',f,'\\E|$)')))
+				,第一行 = REGEXP_replace(第一行,CONCAT('^.*?(?:\\Q',f,'\\E|$)'),'');
+		SET  s1 = json_value(s,CONCAT('$[',i,']'));
+
+		SET  rs = CONCAT_WS('',rs, CONCAT(f,' AS ',IF(IFNULL(s1,'')!='' ,s1,CONCAT('`c',i+1,'`'))));
+
+		SET i=i+1;
+
+		END LOOP ;#Loop1:
+
+		SET b = CONCAT_WS('',rs,第一行,b);
+
+	RETURN b;-- CAST(b AS CHAR);
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `数组2sql`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `数组2sql`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`::1` FUNCTION `数组2sql`(`b` longblob) RETURNS longblob
+    NO SQL
+    DETERMINISTIC
+BEGIN
+	#Routine body goes here...
+	DECLARE r varchar(100) DEFAULT '(?s)((?:(")(?:(?=\\\\).{2}|(?!\\g-1).)*?\\g-1|[^,\\[\\]]+|,)*?)(?:\\](?:,\\[))';
+	DECLARE type VARCHAR(1) DEFAULT NULL; DECLARE s TINYTEXT DEFAULT NULL;
+	
+
+	
+  
+  SET b = REGEXP_replace(b,'[\\n\\r]+','\\\\n');
+
+	CASE 
+		WHEN json_valid(b) THEN SET type = '1';
+		WHEN json_valid(CONCAT('[',b,']')) THEN SET type ='2';
+   ELSE RETURN NULL;
+	END CASE;
+
+
+	IF b REGEXP '"keys"' THEN 
+	
+
+	 SET s =  JSON_value(b,'$[0].keys') ,
+	      b = JSON_COMPACT(json_remove(b,'$[0]'));	
+		  SET type=2;
+	 ELSE SET type =1;
+	END IF;
+	
+
+	SET b = CONCAT("SELECT ",REGEXP_replace(
+REGEXP_replace(b,r,'\\1 UNION ALL\nSELECT ')
+ ,"^\\[{1,2}|\\]{1,2}$",''))
+;
+
+
+
+	RETURN IF( type =1,b, 插入字段名(b,S));
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `正则抓取`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `正则抓取`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `正则抓取`(b longblob,r text) RETURNS longblob
+    NO SQL
+    DETERMINISTIC
+BEGIN
+	DECLARE rs text DEFAULT NULL;
+
+ 
+
+	RETURN 0;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `生成`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `生成`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `生成`(`p` text) RETURNS text CHARSET utf8mb3
+    DETERMINISTIC
+BEGIN
+	#Routine body goes here...
+	DECLARE  r TINYTEXT DEFAULT  '^\\s*\\w{1,2}[\\.\\s]+||[,\\s]+\\w{1,2}\\s*$';
+	DECLARE  profix VARCHAR(10) DEFAULT REGEXP_substr(p,r);
+	
+	SET  profix = IF(profix <=> '',NULL, REGEXP_substr(profix,'\\w+')),
+			`p`  = REGEXP_replace(p,CONCAT('\\s+|',r),'');
+	
+	SET  p  = (SELECT  
+CONCAT('JSON_OBJECT(',GROUP_CONCAT(QUOTE(s.COLUMN_NAME),',',CONCAT_WS('.',profix,s.COLUMN_NAME)  ORDER BY  s.ORDINAL_POSITION),')') 
+FROM
+	information_schema.`COLUMNS` AS s
+	INNER JOIN
+	information_schema.`TABLES` AS s1
+	ON 
+-- 		s1.TABLE_COMMENT != 'view' AND 
+		s.TABLE_SCHEMA = s1.TABLE_SCHEMA AND
+		s.TABLE_NAME = s1.TABLE_NAME
+
+	LEFT JOIN
+	information_schema.`COLUMNS` AS p
+	ON 
+		s.TABLE_SCHEMA = p.TABLE_SCHEMA AND
+		s.TABLE_NAME = p.TABLE_NAME AND
+		if(`s`.ordinal_position=1 ,0,`s`.ORDINAL_POSITION = p.ORDINAL_POSITION+1)
+WHERE
+	s.TABLE_SCHEMA = DATABASE() 	
+AND 	s.TABLE_NAME = p 
+);
+	RETURN p;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `生成reg`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `生成reg`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`::1` PROCEDURE `生成reg`(IN `p` longblob)
+BEGIN
+	#Routine body goes here...
+SELECT count(*)  ,@语句 = JSON_ARRAYagg(语句) 语句 FROM(
+SELECT
+Id ,json
+
+,@语句 :=CONCAT_WS('\n'
+,'UPDATE	mysq1_schema.regc AS a '
+,CONCAT('SET  a.Reg =  ',json)
+,CONCAT(' ,stat  = NULL' )
+,CONCAT( 'WHERE a.id =', QUOTE(Id),';' )
+)语句
+
+FROM
+	mysq1_schema.regc AS a
+WHERE
+	a.json IS NOT NULL
+	&& a.stat is not null
+-- 
+) AS a ;
+
+call 执行(@语句);
+
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `视图优化`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `视图优化`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `视图优化`()
+BEGIN
+	#Routine body goes here...
+call v2t('acc_mission_seal_detalv0,1',null);
+
+
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `语句变数组`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `语句变数组`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `语句变数组`(p longblob) RETURNS longblob
+    DETERMINISTIC
+p:BEGIN
+
+		IF json_valid(p)&& JSON_DEPTH(p)>1 THEN RETURN p;END IF; 
+
+		SET p = REGEXP_replace(p,O('(?x)(?:"(?:(?=\\\\).{2}|[^"])*?")(*SKIP)(*FAIL)|(?&zs3)|(?&zs4) es6'),'');
+
+		SET p := f(p ,
+		json_array('来自','react',o('(?x)((?:(?&v)|[^;])+?); es6')
+		,'(?#quote)(?s)(^.+?);$','\\1')
+		);
+
+
+		SET p = _f(p,'["变数组"]');
+		RETURN `p` ;
+
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `调试`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `调试`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `调试`(`p` longblob) RETURNS longblob
+    DETERMINISTIC
+BEGIN
+	#Routine body goes here...
+
+	RETURN JSON_OBJECT('tiaoShi' , `p` );
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `键长`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `键长`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`::1` FUNCTION `键长`(`k` longblob) RETURNS int(5)
+    NO SQL
+    DETERMINISTIC
+BEGIN
+	#Routine body goes here...
+
+	RETURN LENGTH(REGEXP_REPLACE(k,'[^,]+',''))+1;
 END
 ;;
 DELIMITER ;
