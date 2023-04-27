@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BackupProfile Ver="1.3">
+  <General ConnectionProjectName="" ConnectionProjectOwnerNavicatID="" ConnectionName="wang" DatabaseName="race" SchemaName="" Compressed="true" LockAllTables="false" UseSingleTransaction="false" UseSpecifyFileName="true" FileName="wang 综合 实训数据230423" Comments="wang 综合 实训数据 "/>
+  <Tables SelectAll="false">
+    <Table Name="acc_1"/>
+    <Table Name="acc_n"/>
+    <Table Name="acc_n_1"/>
+    <Table Name="acc_n_2"/>
+    <Table Name="acc_n_3"/>
+    <Table Name="acc_n_4"/>
+    <Table Name="acc_n_5"/>
+    <Table Name="acc_n_6"/>
+    <Table Name="acc_n_7"/>
+    <Table Name="acc_n_8"/>
+    <Table Name="acc_n_9"/>
+    <Table Name="acc_seal_1"/>
+    <Table Name="exp_experimentclass"/>
+    <Table Name="exp_experimentclass_course"/>
+    <Table Name="exp_experimentclassstudent"/>
+  </Tables>
+  <Views SelectAll="false"/>
+  <Functions SelectAll="false"/>
+  <Events SelectAll="false"/>
+  <Sequences SelectAll="false"/>
+  <Indexes SelectAll="false"/>
+  <Triggers SelectAll="false"/>
+</BackupProfile>

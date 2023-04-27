@@ -9,5 +9,12 @@
 # Documentation here: https://yarnpkg.com/features/zero-installs
 !.yarn/cache
 #.pnp.*
-src/sql/*
-!src/sql/*.sql
+*.bAk
+# src/sql/*
+
+*.psc
+!psc/*.psc
+
+src/sql/*/*.sql
+
+id_cacher.db*.*
