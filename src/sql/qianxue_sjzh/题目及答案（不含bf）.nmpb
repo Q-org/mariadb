@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BackupProfile Ver="1.3">
+  <General ConnectionProjectName="" ConnectionProjectOwnerNavicatID="" ConnectionName="dev_copy" DatabaseName="qianxue_sjzh" SchemaName="" Compressed="true" LockAllTables="false" UseSingleTransaction="false" UseSpecifyFileName="true" FileName="题目答案备份 sjzh dev" Comments="题目答案备份 dev sjzh"/>
+  <Tables SelectAll="false">
+    <Table Name="acc_mission"/>
+    <Table Name="acc_mission_1"/>
+    <Table Name="acc_mission_back_information"/>
+    <Table Name="acc_mission_backbill_1"/>
+    <Table Name="acc_mission_backbill_n"/>
+    <Table Name="acc_mission_backbill_seal"/>
+    <Table Name="acc_mission_backtext"/>
+    <Table Name="acc_mission_seal"/>
+    <Table Name="acc_standard_1"/>
+    <Table Name="acc_standard_blur_1"/>
+    <Table Name="acc_standard_blur_n"/>
+    <Table Name="acc_standard_n"/>
+    <Table Name="exp_courses"/>
+    <Table Name="exp_courses_node"/>
+    <Table Name="exp_courses_node_content"/>
+    <Table Name="exp_courseware_cells"/>
+  </Tables>
+  <Views SelectAll="false"/>
+  <Functions SelectAll="true"/>
+  <Events SelectAll="false"/>
+  <Sequences SelectAll="false"/>
+  <Indexes SelectAll="false"/>
+  <Triggers SelectAll="false"/>
+</BackupProfile>
