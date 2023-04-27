@@ -1,8 +1,8 @@
 /*
 MARIADB Backup
-Source Server Version: 10.6.4
+Source Server Version: 10.6.5
 Source Database: qianxue_sjzh
-Date: 2023/4/19 09:49:16
+Date: 2023/4/27 13:12:58
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -38,41 +38,59 @@ DELIMITER ;
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `3in1`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `3in1`(IN `statu` varchar(100),IN `key_names` varchar(100),IN `key_values` varchar(200),IN `field_names` longtext,IN `field_values` longtext,in `rowids` varchar(300), dblob blob)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `3in1`(IN `funcid` varchar(100),IN `key_names` varchar(100),IN `key_values` varchar(200),IN `field_names` longtext,IN `field_values` longtext,in `rowids` varchar(300), dblob blob)
     DETERMINISTIC
-3in1_label:BEGIN
+`l`:BEGIN
+
+	DECLARE rownum varchar(300);	DECLARE IS5 VARCHAR(1) DEFAULT 0;	DECLARE i INT(3);  DECLARE ir INT(3);	DECLARE ia INT(3);	DECLARE mid1 varchar(60) DEFAULT NULL;
+	DECLARE len INT(5) DEFAULT 0 ; 
+	DECLARE 对比 text DEFAULT
+					CONCAT_WS(' ',
+						"CASE WHEN ??? IS NULL OR ??? REGEXP '^null$'",
+						"THEN NULL\nWHEN ???? REGEXP ??? THEN IF( ??? REGEXP ",
+						QUOTE('\\Q(?#\\E'),",NULL,'#00FF00')\n" ,
+						"ELSE '#FF9999' END AS colB??\n");
+
+	DECLARE b保存 text DEFAULT  REGEXP_replace(REGEXP_replace(REGEXP_replace(对比,
+																			'#FF9999','0'),
+																			'#00FF00','1'),
+																			'colB','ERR_B');
+	DECLARE b计算 text DEFAULT  REGEXP_replace(REGEXP_replace(b保存,
+																					"(?im)null$|'0'|,\\Knull(?=,)",0),
+																					'(?im)as\\s*[\\w_?]+\\s*$','');
+	DECLARE a计算 text DEFAULT  
+					CONCAT_WS(' ',
+						"ERR_A1 = CASE WHEN ??? IS NULL OR ??? REGEXP '^null$'",
+						"THEN NULL\nWHEN ???? REGEXP ??? THEN IF( ??? REGEXP ",
+						QUOTE('\\Q(?#\\E'),",NULL,'#00FF00')\n" ,
+						"ELSE '#FF9999' END\n");
+	
+  DECLARE CONTINUE HANDLER FOR  SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22' , SQLSTATE	'HY000'-- ,SQLSTATE	'22007'
+	BEGIN GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;SET  @`sqlstate` = JSON_OBJECT('sqlstate',@`sqlstate`,'errno',@errno,'text',@text);
+				SET @`errsql` = @3in1_body;
+				SET @funcid = CONCAT_WS(' ','Error: ', ' 3in1' ,`funcid`,ELT(`funcid`,'','对比','保存','提示' , '？5')),
+				@pp =CONCAT_WS(',',quote(`funcid`),quote( `key_names`),quote( `key_values`),quote( `field_names`),quote( `field_values`),quote( `rowids` ),quote( dblob));
+				CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp,'SQL',@`errsql`,'err',@`sqlstate`));
+	END;
+/*
+START TRANSACTION;
+				SET @funcid = CONCAT_WS(' ', ' 3in1' ,`funcid`,ELT(`funcid`,'','对比','保存','提示' , '？5')),
+				@pp =CONCAT_WS(',',quote(`funcid`),quote( `key_names`),quote( `key_values`),quote( `field_names`),quote( `field_values`),quote( `rowids` ),quote( dblob));
+INSERT INTO plogs (Function_Name,parameter) VALUES (@funcid,@pp);
+#CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp));COMMIT;
+
+/*,'l','1'*/
 
 
-	DECLARE rownum varchar(300);
-	DECLARE IS5 VARCHAR(1) DEFAULT 0;
-	DECLARE i INT(3);
-  DECLARE ir INT(3);
-	DECLARE ia INT(3);
-	DECLARE mid1 varchar(60) DEFAULT NULL;
+   SET @missionid = null,@a_t = null,@a_n= 0,@b_total =0,@b_r_total=0;     SET @missionid = Fetch_Set(key_values,2,'\''),				@EXPID = Fetch_Set(key_values,1,'\''),			  @a_fnz = NULL,@3in1_body = '',				rownum = NULL,				@db_b = NULL;
 
+	IF IFNULL(@missionid,'') = '' OR IFNULL(@expid,'')='' THEN 		CALL Audit('3in1',				CAST(CONCAT_WS('-','expid',IFNULL(@expid,'null'),'missionid',IFNULL(@missionid,'null')) AS CHAR),`funcid`,				key_names,key_values,field_names,field_values,rowids);		SELECT NULL AS `expidmissioniderror`; 		LEAVE `l`; 	END IF;
 
-   	SET @missionid = null,@a_t = null,@a_n= 0,@b_total =0,@b_r_total=0;
-    SET @missionid = Fetch_Set(key_values,2,'\''), 
-				@EXPID = Fetch_Set(key_values,1,'\''),
-			  @a_fnz = NULL,@3in1_body = '',
-				rownum = NULL,
-				@db_b = NULL;
+	CASE 	WHEN `funcid` = '6' THEN
 
-	IF IFNULL(@missionid,'') = '' OR IFNULL(@expid,'')='' THEN
-		CALL Audit('3in1',
-				CAST(CONCAT_WS('-','expid',IFNULL(@expid,'null'),'missionid',IFNULL(@missionid,'null')) AS CHAR),statu,
-				key_names,key_values,field_names,field_values,rowids);
-		SELECT NULL AS `expidmissioniderror`;
-		LEAVE 3in1_label;
-	END IF;
-
-	CASE
-
-			WHEN statu = '6' THEN
-
-				CALL Fetch_Set_values(field_names,'a',@field_names_1);
+				CALL Fetch_Set_values(field_names,'a',@field_names_1);-- 取得字r段名
 						 CALL Fetch_Set_values(field_values,'0',@field_values_1);
-
+-- SELECT @field_names_1,@field_values_1 ;   LEAVE `l`;
 						 CALL Temp_Func_2(CONCAT_WS('',
 "IF((@b :=",
 	"CASE	WHEN a1.init_?? = 1 THEN b1.?? ",
@@ -89,12 +107,12 @@ LEFT JOIN acc_standard_1 AS b0 ON a0.missionId = b0.missionId
 LEFT JOIN acc_standard_1 AS b1 ON a1.missionId = b1.missionId
 LEFT JOIN acc_1 AS c0 ON b0.missionId = c0.missionId AND c0.expID = ",QUOTE(@expID),
 "\nWHERE a1.missionId = ",QUOTE(@missionid));	
+-- SELECT CAST(@3in1_body as CHAR) ;   LEAVE `l`;
 
-		PREPARE stmt_bsb FROM @3in1_body;
-		EXECUTE stmt_bsb ;
+		EXECUTE immediate @3in1_body;
 
 
-			WHEN statu = '5' THEN
+			WHEN `funcid` = '5' THEN
 			label5:BEGIN
 
 				CASE 
@@ -103,23 +121,29 @@ LEFT JOIN acc_1 AS c0 ON b0.missionId = c0.missionId AND c0.expID = ",QUOTE(@exp
 						WHEN rowids REGEXP '^[1-9]{1}(,[1-9][0-9]{0,}){0,}$' THEN
 								SET rownum = rowids;
 					ELSE 
-	
-							CALL audit('3IN1',CONCAT_WS(':',IFNULL(STATU,'label5B1'),'ROWIDS ERROR:',QUOTE(rowids)),STATU,key_names,key_values,field_names,field_values,rowids);
-							LEAVE label5; 
+	-- 						SET @3in1_body ="SELECT NULL as `label5B1`";
+
+						SET rowids =CONCAT_WS(':','rowids',rowids);
+
+-- 	 					SIGNAL SQLSTATE 'HY000' SET MYSQL_ERRNO ='553' , MESSAGE_TEXT = rowids;
+--  						CALL audit('3IN1',CONCAT_WS(':',IFNULL(`funcid`,'label5B1'),'ROWIDS ERROR:',QUOTE(rowids)),`funcid`,key_names,key_values,field_names,field_values,rowids);
+						LEAVE label5; -- rowids 出错  
+
 				END CASE;	
 
 				label5A:BEGIN
 
-					CALL Fetch_Set_values(field_names,'a',@field_names_1);
+					CALL Fetch_Set_values(field_names,'a',@field_names_1);-- 取得字r段名
 					CALL Fetch_Set_values(field_values,'0',@field_values_1);
-          IF IFNULL(@field_names_1,'') NOT REGEXP 
-							'^\'(a[1-9][0-9]{0,1}[0]{0,1}){1,}\'(,\'(a[1-9][0-9]{0,1}[0]{0,1})*\')*$' THEN 
-							CALL audit(CONCAT_WS(':','3IN1',statu),CONCAT_WS(':','afieldWarning:',@FIELD_NAMES_1),statu,key_names,key_values,field_names,field_values,rowids);
 
+          IF IFNULL(@field_names_1,'') NOT REGEXP 
+							'^\'(a[1-9][0-9]{0,1}[0]{0,1}){1,}\'(,\'(a[1-9][0-9]{0,1}[0]{0,1})*\')*$' THEN -- 校验A字段 允许为空
+							CALL audit(CONCAT_WS(':','3IN1',`funcid`),CONCAT_WS(':','afieldWarning:',@FIELD_NAMES_1),`funcid`,key_names,key_values,field_names,field_values,rowids);
+-- 							LEAVE label4a;
 							SET @one = ''; 
 						ELSE 
 
-
+-- SELECT @field_names_1,@field_values_1 ;   LEAVE `l`;
 						 CALL Temp_Func_2(CONCAT_WS('',
 "IF((@b :=",
 	"CASE	WHEN a1.init_?? = 1 THEN b1.?? ",
@@ -136,13 +160,13 @@ LEFT JOIN acc_standard_1 AS b0 ON a0.missionId = b0.missionId
 LEFT JOIN acc_standard_1 AS b1 ON a1.missionId = b1.missionId
 LEFT JOIN acc_1 AS c0 ON b0.missionId = c0.missionId AND c0.expID = ",QUOTE(@expID),
 "\nWHERE a1.missionId = ",QUOTE(@missionid));	
+-- SELECT CAST(@3in1_body as CHAR) ;   LEAVE `l`;
 
-						PREPARE stmt_bsb FROM @3in1_body;
-						EXECUTE stmt_bsb ;
+						EXECUTE immediate @3in1_body;
 
  					END IF;	
 
-				END LABEL5A; 
+				END LABEL5A; -- 处理A字段
 
 				Label5B:BEGIN
 
@@ -151,9 +175,9 @@ LEFT JOIN acc_1 AS c0 ON b0.missionId = c0.missionId AND c0.expID = ",QUOTE(@exp
 
 					IF @FIELD_NAMES_1 NOT REGEXP '^\'(B[1-9][0-9]{0,1})\'(,\'B[1-9][0-9]{0,1}\'){0,}$'   THEN
 						  SET @3in1_body = "SELECT NULL as `label4B1FEILEDNAMESeeror`";
-							CALL audit('3IN1',CONCAT_WS(':','B1FEILEDNAMESeeror:',QUOTE(@FIELD_NAMES_1)),statu,key_names,key_values,field_names,field_values,rowids);
+							CALL audit('3IN1',CONCAT_WS(':','B1FEILEDNAMESeeror:',QUOTE(@FIELD_NAMES_1)),`funcid`,key_names,key_values,field_names,field_values,rowids);
 							LEAVE label5b;
-					END IF; 
+					END IF; -- 校验B字段建
 
 					SET i = 1;
 
@@ -161,12 +185,12 @@ LEFT JOIN acc_1 AS c0 ON b0.missionId = c0.missionId AND c0.expID = ",QUOTE(@exp
 
 					CALL Fetch_Set_P0(@a_b_row,1,ir);
 
-
+-- SELECT ir,@a_b_row,@field_names_1; LEAVE `l`;
 					fetch_recode_s:LOOP
 
 						SET @a = FIND_IN_SET(ir,@a_row); 
 
-
+-- SELECT CAST(CONCAT_WS(',',QUOTE(@a_value),QUOTE(ia),QUOTE(@a_value_1)) AS CHAR);
 						SET @a = FIND_IN_SET(ir,rownum);
 						IF @a != 0 THEN 
 								CALL Fetch_Set_values(field_values,ir,@field_values_1);
@@ -185,7 +209,7 @@ LEFT JOIN acc_1 AS c0 ON b0.missionId = c0.missionId AND c0.expID = ",QUOTE(@exp
 
 						SET i = i + 1;
 						CALL Fetch_Set_P0(@a_b_row,i,ir);
-						IF ir IS NULL THEN 	 LEAVE fetch_recode_s; END IF; 
+						IF ir IS NULL THEN 	 LEAVE fetch_recode_s; END IF; -- SELECT  @3in1_body,rownum,i,ir,ia;
 						SET @3in1_body = CONCAT_WS('\tunion\n',@3in1_body,'');
 
 					END LOOP;
@@ -208,46 +232,38 @@ LEFT JOIN ",expid2b(@expID)," AS c0 ON b0.missionId = c0.missionId AND b0.rowNo 
 LEFT JOIN (\n",@3in1_body,"\n) AS c1 ON b1.missionId = c1.missionId AND b1.rowNo = c1.rowId
 WHERE a1.missionId = ",QUOTE(@missionid));	
 
-
+-- SELECT @3in1_body,@field_names_1; LEAVE `l`;
 
 				END label5B;
 			END label5;
 
-			WHEN statu IS NULL THEN
+			WHEN `funcid` IS NULL THEN
 				 SET @3in1_body = "SELECT NULL as `1`";
-				 CALL audit('3IN1',IFNULL(statu,'STATU IS NULL'),STATU ,key_names,key_values,field_names,field_values,rowids);
+				 CALL audit('3IN1',IFNULL(`funcid`,'`funcid` IS NULL'),`funcid` ,key_names,key_values,field_names,field_values,rowids);
 
 
-			WHEN STATU = '2'  THEN 
+			WHEN `funcid` = '2'  THEN 
+
 			LABEL1:BEGIN
-				IF IFNULL(rowids,'') ='' THEN
-						SET rowids ='1'; 
-				END IF;
-
-				CASE 
-						WHEN rowids REGEXP '^[0]{1}(,[1-9][0-9]{0,}){1,}$' THEN
-								SET rownum= SUBSTR(rowids,3);
-						WHEN rowids REGEXP '^[1-9]{1}(,[1-9][0-9]{0,}){0,}$' THEN
-								SET rownum = rowids;
-					ELSE 
-							LEAVE 3in1_label; 
-				END CASE;	
+				IF IFNULL(rowids,'') ='' THEN	SET rowids ='1';	END IF;
+				CASE 		WHEN rowids REGEXP '^[0]{1}(,[1-9][0-9]{0,}){1,}$' THEN	SET rownum= SUBSTR(rowids,3);
+								WHEN rowids REGEXP '^[1-9]{1}(,[1-9][0-9]{0,}){0,}$' THEN SET rownum = rowids;
+					ELSE	LEAVE `l`; -- rowids 出错  
+				END CASE;	-- 取得B记录行 rownum
 
 					SET @a_fds = NULL,@a_row  = NULL;
+
 					CALL generate_one_en(@missionid,rownum,@a_fields,@a_row,@a_value); 
 
-					IF @a_row IS NULL OR @a_value IS NULL THEN 
-							SELECT NULL AS brecord;
-							LEAVE 3in1_label;
-					END IF;
-					CALL Fetch_Set_values(field_names,'rowId',@field_names_1);
-	
+					IF @a_row IS NULL OR @a_value IS NULL THEN  SELECT NULL AS brecord;		LEAVE `l`;	END IF;
+
+					CALL Fetch_Set_values(field_names,'rowId',@field_names_1);-- 取得字r段名
 
 					IF @FIELD_NAMES_1 NOT REGEXP '^\'(B[1-9][0-9]{0,1})\'(,\'B[1-9][0-9]{0,1}\'){0,}$'   THEN
 						  SET @3in1_body = "SELECT NULL as `label4B1FEILEDNAMESeeror`";
-							CALL audit('3IN1',CONCAT_WS(':','B1FEILEDNAMESeeror:',QUOTE(@FIELD_NAMES_1)),statu,key_names,key_values,field_names,field_values,rowids);
-							LEAVE 3in1_label;
-					END IF; 
+							CALL audit('3IN1',CONCAT_WS(':','B1FEILEDNAMESeeror:',QUOTE(@FIELD_NAMES_1)),`funcid`,key_names,key_values,field_names,field_values,rowids);
+							LEAVE `l`;
+					END IF; -- 校验B字段建
 
 					SET  
 							i = 1;
@@ -256,8 +272,7 @@ WHERE a1.missionId = ",QUOTE(@missionid));
 							@a_b_row = Fielter_Set(@a_b_row);
 					CALL Fetch_Set_P0(@a_b_row,1,ir);
 
-
-
+SET len = CHAR_LENGTH(REGEXP_replace(@a_row,'\\w+',''))+1;
 					fetch_recode:LOOP
 						SET @a = FIND_IN_SET(ir,rownum);
 						IF @a != 0 THEN 
@@ -270,22 +285,24 @@ WHERE a1.missionId = ",QUOTE(@missionid));
 						SET ia := Fetch_elt(ir,@a_row), 
 								@a_value_1 := Fetch_y_1(ia,@a_value);
 
-
-	
-
 						SET	@3in1_body =CAST(CONCAT(@3in1_body
 									,"SELECT  ",ir," AS rowNo \n"
 																	)AS CHAR);
 						SET @one =NULL;
 
-						CALL Temp_Func_3(CONCAT_WS('',"CASE WHEN ??? IS NULL OR ??? REGEXP '^null$'  THEN NULL WHEN ???? REGEXP ??? THEN IF( ??? REGEXP ",QUOTE('\\Q(?#\\E'),",NULL,'#00FF00') ELSE '#FF9999' END AS colB??"),NULL,"",
-															"",'','b',@a_fields,@a_value_1,@field_names_1,@field_values_1,@one);
+						CALL Temp_Func_3(
+															对比
+															,NULL,
+															"",
+															"",
+															'','b',
+															@a_fields,@a_value_1,@field_names_1,@field_values_1,@one);
 
  						SET  @3in1_body = CONCAT_WS('',@3in1_body,',',IFNULL(@one,0),"'' AS rowinno");
 
 						SET i = i + 1;
 						CALL Fetch_Set_P0(@a_b_row,i,ir);
-						IF ir IS NULL THEN 	 LEAVE fetch_recode; END IF; 
+						IF ir IS NULL || i > len THEN 	 LEAVE fetch_recode; END IF;
 						SET @3in1_body = CONCAT_WS('\nunion\n',@3in1_body,'');
 
 
@@ -293,11 +310,11 @@ WHERE a1.missionId = ",QUOTE(@missionid));
 
 			END LABEL1;
 
-			WHEN STATU = '4' OR STATU ='3' OR STATU ='7' THEN
+			WHEN `funcid` = '4' OR `funcid` ='3' OR `funcid` ='7' THEN
 			label4:BEGIN
 
 				SET @a_fields = NULL;
-				IF STATU <> '7' THEN 
+				IF `funcid` <> '7' THEN 
 
 					SET @db_b = expid2b(@expid),
 							@db_a = "acc_1";
@@ -315,10 +332,10 @@ WHERE a1.missionId = ",QUOTE(@missionid));
 							"WHERE a.expid =",QUOTE(@expid)," AND a.missionid =", QUOTE(@missionid),
 								CONCAT(" AND a.missionid1 =", quote_d(mid1)));
 
-					PREPARE stmt_bsb FROM @sb;
-					EXECUTE stmt_bsb ;
+	
+					EXECUTE immediate @sb;
 
-				label4B:	BEGIN 
+				label4B:	BEGIN -- 处理 B字段		
 				CASE 
 						WHEN rowids REGEXP '^[0]{1}(,[1-9][0-9]{0,}){1,}$' THEN
 								SET rownum= SUBSTR(rowids,3);
@@ -326,22 +343,25 @@ WHERE a1.missionId = ",QUOTE(@missionid));
 								SET rownum = rowids;
 					ELSE 
 
-							LEAVE label4B; 
+							LEAVE label4B; -- rowids 出错 
 
-				END CASE;	
+				END CASE;	-- 取得B记录行 rownum
 
-				IF STATU <> '5' THEN
+				IF `funcid` <> '5' THEN
+-- SELECT @missionid,rownum,@a_fields,@a_row,@a_value;LEAVE l;
 					CALL generate_one_en(@missionid,rownum,@a_fields,@a_row,@a_value); 
+
 				END IF;
 
-					CALL Fetch_Set_values(field_names,'b',@field_names_1);
+
+					CALL Fetch_Set_values(field_names,'b',@field_names_1);-- 取得字r段名
 
 
 					IF @FIELD_NAMES_1 NOT REGEXP '^\'(B[1-9][0-9]{0,1})\'(,\'B[1-9][0-9]{0,1}\'){0,}$'   THEN
 						  SET @3in1_body = "SELECT NULL as `label4B1FEILEDNAMESeeror`";
-							CALL audit('3IN1',CONCAT_WS(':','B1FEILEDNAMESeeror:',QUOTE(@FIELD_NAMES_1)),statu,key_names,key_values,field_names,field_values,rowids);
+							CALL audit('3IN1',CONCAT_WS(':','B1FEILEDNAMESeeror:',QUOTE(@FIELD_NAMES_1)),`funcid`,key_names,key_values,field_names,field_values,rowids);
 							LEAVE label4b;
-					END IF; 
+					END IF; -- 校验B字段建
 
 
 					SET i = 1;
@@ -350,8 +370,7 @@ WHERE a1.missionId = ",QUOTE(@missionid));
 							@a_b_row = Fielter_Set(@a_b_row);
 					CALL Fetch_Set_P0(@a_b_row,1,ir);
 
-
-
+SET len = CHAR_LENGTH(REGEXP_replace(@a_row,'\\w+',''))+1;
 					fetch_recode:LOOP
 
 						SET ia := Fetch_elt(ir,@a_row), 
@@ -367,24 +386,32 @@ WHERE a1.missionId = ",QUOTE(@missionid));
 
 
 						CALL Temp_Func_2(" ??? AS ??",@field_names_1,@field_values_1,NULL,@one);
-
+-- SELECT @one;
 						SET	@3in1_body =CONCAT_WS('',@3in1_body
-									,"SELECT  ",QUOTE(@expid)," ,", 
-													QUOTE(@missionid)," ,",
+									,"SELECT  ",QUOTE(@expid)," ,", -- " AS expid,",
+													QUOTE(@missionid)," ,",-- " AS missionid ,",
 											IF(mid1,CONCAT(QUOTE(mid1)," ,"),NULL),
 															ir," AS rowId,",
 															@one,','," \n");
 						SET @one =NULL;
 
-						CALL Temp_Func_3(" ???? REGEXP ??? AS ERR_B??",NULL,"@b_r_total := ",
-															"IFNULL(???? REGEXP ??? ,0)",'+','b',@a_fields,@a_value_1,@field_names_1,@field_values_1,@one);
+						CALL Temp_Func_3(
+-- 															" ???? REGEXP ??? AS ERR_B??" --         1
+															b保存
+															,NULL,-- 2
+															"@b_r_total := ",-- 3
+-- 															"IFNULL(???? REGEXP ??? ,0)",-- 4
 
+															b计算,
+															'+','b',-- 5
+															@a_fields,@a_value_1,@field_names_1,@field_values_1,@one);-- 6
 
 						SET  @3in1_body = CONCAT_WS('',@3in1_body,IFNULL(@one,0),",@b_total := IFNULL(@b_total,0)+ IFNULL(@b_r_total,0)");
 
 						SET i = i + 1;
 						CALL Fetch_Set_P0(@a_b_row,i,ir);
-						IF ir IS NULL THEN 	 LEAVE fetch_recode; END IF; 
+						
+						IF ir IS NULL || i>len THEN 	 LEAVE fetch_recode; END IF; -- SELECT  @3in1_body,rownum,i,ir,ia;
 						SET @3in1_body = CONCAT_WS('\nunion\n',@3in1_body,'');
 					END LOOP;
 
@@ -399,585 +426,6 @@ WHERE a1.missionId = ",QUOTE(@missionid));
 
           IF @3in1_body IS NOT NULL THEN
 
-							PREPARE stmt_bsb FROM @3in1_body;
-							EXECUTE stmt_bsb ;
-					END IF;
-				END label4B;
-
-
-
-				SET @A_S = NULL;
-		
-				label4A:BEGIN
-
-					SET @3in1_body = NULL,
-							@statu_value = NULL,
-							@statu_name = NULL,
-							@3in1_body = CONCAT_WS('',"SELECT b.expID,a.classNo INTO @statu_value ,@statu_name\nFROM exp_experimentclassstudent AS a\nLEFT JOIN ",
-																@db_a," AS b ON a.expNo = b.expID AND b.missionId = ",QUOTE(@missionid),
-																CONCAT(" AND b.missionid1 =", quote_d(mid1)),				
-																"\nWHERE a.expNo = ", QUOTE(@expid)); 
-
-
-					PREPARE stmt_bsb FROM @3in1_body;
-					EXECUTE stmt_bsb ;
-
-		 			IF  @statu_value IS NULL THEN
-							SET @3in1_body = CONCAT_WS('',"INSERT ",@db_a,"(EXPID,MISSIONID",
-																	IF(mid1 IS NULL,NULL,",missionId1,billid"),")\n",
-																						"VALUES(",QUOTE(@expid),',',QUOTE(@missionid),
-																		CONCAT(',',IF(mid1 IS NULL,NULL,QUOTE(mid1)),',',QUOTE('jzpz_bjzyfl')),
-																")");
-
-
-
-							PREPARE stmt_bsb FROM @3in1_body;
-							EXECUTE stmt_bsb ;
-					END IF;
-
-					SET @3in1_body = "SET \n" ;
-					CALL Fetch_Set_values(field_names,'a',@field_names_1);
-
-
-          IF IFNULL(@field_names_1,'') NOT REGEXP 
-							'^\'(a[1-9][0-9]{0,1}[0]{0,1}){1,}\'(,\'(a[1-9][0-9]{0,1}[0]{0,1})*\')*$' THEN 
-							CALL audit(CONCAT_WS(':','3IN1',statu),CONCAT_WS(':','afieldWarning:',@FIELD_NAMES_1),statu,key_names,key_values,field_names,field_values,rowids);
-
-							SET @one = ''; 
-						ELSE 
-						 CALL Fetch_Set_values(field_values,'0',@field_values_1);
-
-						 CALL Temp_Func_2("?? := ??? \n",@field_names_1,@field_values_1,NULL,@one);
-
- 					END IF;	
-
-						SET @3in1_body = CONCAT(@3in1_body,@ONE,IF(IFNULL(@ONE,'')='' ,'',','));	
-
-					CALL generate_one_en(@missionid,'0',@a_fields,@a_row,@a_value);
-
-	
-					IF IFNULL(@a_fields,'') !='' THEN 
-								CALL Fetch_Set_values(@a_value,'0',@a_values_1);
-
-								CALL Temp_Func_3("ERR_A?? = ???? REGEXP ??? ",NULL,"a.right_count = @right_count := ",
-																	"IFNULL(???? REGEXP ??? ,0)",'+','a',@a_fields,@a_values_1,@field_names_1,@field_values_1,@one);
-
-								SET @one =CONCAT(@one,'+');
-							ELSE 
-								SET @one ='';
-					END IF;
-
-					IF @one ='' THEN
-						SET @one = CONCAT('a.line  = ',j(dblob,'line')),
-								@one = CONCAT_WS(',',@one, "a.right_count = @right_count := ");
-					END IF;
-
-					SET @3in1_body =CAST(
-											CONCAT("UPDATE ",@db_a," AS a, (\n",
-															"\t\t\t	SELECT \n",
-															"\t\t\t\t\t\t a1.classType, \n",
-															"\t\t\t\t\t\t IF(IFNULL(b.line_type,0) =0, 0, 1) AS is_line, \n",
-															"\t\t\t\t\t\t Count(b1.seal_id) AS shouldSeal, \n",
-															"\t\t\t\t\t\t Count(b3.expID) AS overSeal, \n",
-															"\t\t\t\t\t\t COUNT(b1.seal_id)-COUNT(b3.expid) AS unSealed, \n",
-															"\t\t\t\t\t\t @unS := \n",
-															"\t\t\t\t\t\t\t\t CAST(CONCAT_WS('\\n',\n",
-															"\t\t\t\t\t\t\t\t\t  CONCAT(IF(IFNULL(b0.max_page,1)=1 ,b0.billname,b0.page_title1),'缺少：（',\n",
-															"\t\t\t\t\t\t\t\t\t\t  GROUP_CONCAT(\n",
-															"\t\t\t\t\t\t\t\t\t\t\t 	IF((b.pageno = 0 AND b0.max_page >=1 or b.pageno =1) AND b1.pageid = 1 AND b3.expid IS NULL,CONCAT_WS('',b2.seal_name),NULL) \n",
-															"\t\t\t\t\t\t\t\t\t\t\t\t 	ORDER BY b1.seal_no) \n",
-															"\t\t\t\t\t\t\t\t ,'）'),",
-															Temp_Func(CONCAT("\n",
-															"\t\t\t\t\t\t\t\t\t CONCAT(b0.page_title??,'缺少：（',\n",
-															"\t\t\t\t\t\t\t\t\t\t  GROUP_CONCAT( \n",
-															"\t\t\t\t\t\t\t\t\t\t\t 	IF((b.pageno = 0 AND b0.max_page >=?? or b.pageno =??) AND b1.pageid = ?? AND b3.expid IS NULL,CONCAT_WS('',b2.seal_name),NULL) \n",
-															"\t\t\t\t\t\t\t\t\t\t\t\t 	ORDER BY b1.seal_no) \n",
-															"\t\t\t\t\t\t\t\t  ,'）')"),2,7,NULL),
-															"\t\t\t\t\t\t\t\t\t ,IF( Count(b1.seal_id)<>Count(b3.expID),'<p>注：请更换角色，在不同联次，完成签章！</p>',NULL) \n",
-															"\t\t\t\t\t\t\t\t  )AS CHAR ) AS uns,\n",
-															"\t\t\t\t\t\t IFNULL(a2.read_answer_size,0) as read_answer_size, \n",
-															"\t\t\t\t\t\t IFNULL(a2.answerScore,0) as answerScore, \n",
-															"\t\t\t\t\t\t IFNULL(a2.resultScore,0) AS resultScore, \n", 
-															"\t\t\t\t\t\t a2.pass_score_size, \n",
-															"\t\t\t\t\t\t a2.score_seal_size, \n",
-															"\t\t\t\t\t\t a2.score_line_size, \n",
-															"\t\t\t\t\t\t IFNULL(a2.resultcount,0) as resultcount, \n",
-															"\t\t\t\t\t\t @pt33 := IF(b.is_line,a2.score_line_size,0), \n",
-															"\t\t\t\t\t\t @pt44 :=a2.resultcount*a2.resultScore, \n",
-															"\t\t\t\t\t\t @pt55 :=a2.read_answer_size* a2.answerScore, \n",
-															"\t\t\t\t\t\t a2.max_score_size, \n",
-															"\t\t\t\t\t\t a2.redo_size \n",
-															"\t\t\t	FROM exp_experimentclass AS a1 \n",
-															"\t\t\t	INNER JOIN mysq1_schema.exp_difficulty AS a2 ON a1.difficulty_level = a2.difficulty_level \n",
-															"\t\t\t	JOIN acc_mission AS b ON b.missionId = ",QUOTE(@missionid)," \n",
-															"\t\t\t	INNER JOIN mysq1_schema.bill_list AS b0 ON b.billid = b0.billid \n",
-															"\t\t\t LEFT JOIN acc_mission_seal AS b1 ON b1.missionId = ",QUOTE(@missionid)," \n",
-															"\t\t\t INNER JOIN acc_enter_seal AS b2 ON b1.seal_id = b2.sealID AND b2.seal_content <> '操作' \n",
-															"\t\t\t INNER JOIN acc_enter_role AS b21 ON b21.roleid = b2.roleid \n",
-															"\t\t\t LEFT JOIN acc_seal_1 AS b3 ON b3.expID =",QUOTE(@expid)," \n",
-															"\t\t\t\t\t\t AND b3.missionId =",QUOTE(@missionid)," \n", 
-															"\t\t\t\t\t\t AND b1.pageId = b3.pageId AND b1.seal_id = b3.seal_Id \n",
-															"\t\t\t WHERE a1.ClassNo =",QUOTE(@statu_name)," \n",
-															"LOCK in SHARE mode",
-															"\t\t	) AS b  \n",
-														@3in1_body,
-														@one,@b_total," ,\n",
-														"a.log_count := IFNULL(a.log_count,0)+",IF(STATU=4,'1',0)," ,\n",
-														"a.already_no_seal = b.overSeal,\n",
-														"a.read_ans_size := IF(read_ans_size IS NULL ,0,a.read_ans_size) ,\n",
-														"a.error_count = @pt1 :=",REPLACE(@a_s,',','+'),",\n",
- 														"a.pt1 = @pt1 := (@pt11 :=(100- IF(IFNULL(b.shouldSeal,0)=0,0,b.score_seal_size) -  b.score_line_size * b.is_line))*IF(IFNULL(@pt1,0) != 0,@right_count/@pt1,1), \n",
-														"a.pt2 = @pt2 := (@pt22 :=IF(IFNULL(b.shouldSeal,0)=0,0,b.score_seal_size))*b.overSeal/IF(b.shouldSeal = 0,1,b.shouldSeal), \n",
-														"a.pt3 = @pt3 := IF(b.is_line,IF(IFNULL(a.is_line,0),b.score_line_size,0),0), \n",
-														"a.pt4 = @pt4 := IF(b.resultcount > IFNULL(a.mission_result,0),a.mission_result,b.resultcount)*b.resultScore  ,\n",
-														"a.pt5 = @pt5 := IF(b.read_answer_size>a.read_ans_size, a.read_ans_size ,b.read_answer_size)* b.answerScore ,\n",
-														"a.score :=IF(IFNULL(@pt1,0) + IFNULL(@pt2,0) + IFNULL(@pt3,0)  - IFNULL(@pt4,0)  -IFNULL(@pt5,0) <0 ,0, IFNULL(@pt1,0) + IFNULL(@pt2,0) + IFNULL(@pt3,0)  - IFNULL(@pt4,0)  -IFNULL(@pt5,0))\n",
-														"WHERE a.missionId =",QUOTE(@missionid)," AND a.expid=",QUOTE(@expid)
-												)
-											AS CHAR);
-
-					PREPARE stmt_bsb FROM @3in1_body;
-					EXECUTE stmt_bsb;
-
-					IF STATU <>4 THEN  SET @3in1_body="SELECT 'ok' AS teaa";LEAVE label4;END IF;
-
-			IF	DATABASE() REGEXP  '5$' THEN
- 
-					CALL v5_autoFlow(@expid,@missionid,1);
-					SET IS5=1;
-			END IF;
-
-
-					SET @3in1_body =CONCAT("
-
-SELECT \n",
-QUOTE(@expid)," AS expID,",
-QUOTE(@missionid)," AS missionId,",
-"IFNULL(d.redo_size,0) AS redoSize,
-IFNULL(d.max_score_size,0) AS missionMaxScore,
-IFNULL(a.score,0) AS missionScore,
-IFNULL(a.read_ans_size,0) AS readAnswer,
-IFNULL(a.read_ans_size,0) AS number,
-CAST(a.log_count AS char) AS logCount,
-IFNULL(a.error_count,0) AS error_count,
-IFNULL(a.right_count,0) AS RIGHT_COUNT,
-@b :=a.score AS tempscore,
-@pt44, @pt4,
-IF(IFNULL(c.CLASSTYPE,0) = 1,CONCAT_WS('',
-'<h5><',C.CLASSNAME,'>','<h5>将在：',
-TIMEDIFF(c.endtime,NOW()),'后结束！'),
-CAST(CONCAT_WS('','<h5><',e.node_No,'.',f.typesort,'>',TRIM(g.missionLabel),'（合格率:',
-IF(@b =0, 0,IF(ROUND(@b,2)=CEIL(@b),CEIL(@b),ROUND(@b,2))),
-'%）</h5>'",
-IF(@pt11<>0,CONCAT(",'<p>填空得分( ",@pt11," )：",CEIL(@pt1),"</p>'"),""),"\n",
-IF(@pt22<>0,CONCAT(",'<p>签章得分( ",FLOOR(@pt22)," )：",CEIL(@pt2),"</p>'"),""),"\n",
-IF(@pt33<>0,CONCAT(",'<p>画线得分( ",@pt33," )：",CEIL(@pt3),"</p>'"),""),"\n",
-IF(@pt44<>0 AND @pt4 <> 0,CONCAT(",'<p>对比扣分( -",@pt44," )：-",CEIL(@pt4),"</p>'"),""),"\n",
-IF(@pt55<>0 AND @pt5 <> 0,CONCAT(",'<p>查看答案扣分( -",@pt55," )：-",CEIL(@pt5),"</p>'"),""),"\n",
-IF(CHAR_LENGTH(@uns) <>0,CONCAT(",'<p>提示：</p>',",QUOTE(@uns)),''),"\n",
-") AS char))AS missionLabel
-FROM acc_1 AS a
-LEFT JOIN acc_mission AS g ON g.missionId = a.missionId 
-LEFT JOIN exp_experimentclassstudent AS b ON a.expID = b.expNo
-LEFT JOIN exp_experimentclass AS c ON b.classNo = c.classNo
-",IF(IS5,'',"LEFT JOIN exp_experimentclass_course AS c1 ON c1.classNo = c.classNo"),"
-LEFT JOIN mysq1_schema.exp_difficulty AS d ON c.difficulty_level = d.difficulty_level
-LEFT JOIN exp_courses_node_content AS f ON g.missionId = f.missionid
-INNER JOIN exp_courses_node AS e ON  f.contentNo = e.contentNo  AND ",IF(IS5 ,'c','c1'),".courseNo = e.node_courseNo
-",	"\nWHERE a.missionId =",QUOTE(@missionid)," AND a.expid=",QUOTE(@expid));
- 
-
-
-				END label4A;
-			END label4;
-
-
-	END CASE;
-
-	IF IFNULL(@3in1_body,'')= '' THEN
-		SET @3in1_body ="SELECT NULL as `Elabel400`";
-		CALL audit('3IN1',CONCAT_WS(':',IFNULL(STATU,'400'),'something ERROR:',QUOTE(rowids)),STATU,key_names,key_values,field_names,field_values,rowids);
-	END IF;
-
-		PREPARE stmt_bsb FROM @3in1_body;
-		EXECUTE stmt_bsb ;
-		DEALLOCATE PREPARE stmt_bsb;
-
-
-
-END
-;;
-DELIMITER ;
-
--- ----------------------------
---  Procedure definition for `3in1_copy`
--- ----------------------------
-DROP PROCEDURE IF EXISTS `3in1_copy`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `3in1_copy`(IN `statu` varchar(100),IN `key_names` varchar(100),IN `key_values` varchar(200),IN `field_names` longtext,IN `field_values` longtext,in `rowids` varchar(300), dblob blob)
-    DETERMINISTIC
-3in1_label:BEGIN
-
-
-	DECLARE rownum varchar(300);
-	DECLARE IS5 VARCHAR(1) DEFAULT 0;
-	DECLARE i INT(3);
-  DECLARE ir INT(3);
-	DECLARE ia INT(3);
-	DECLARE mid1 varchar(60) DEFAULT NULL;
-
-
-   	SET @missionid = null,@a_t = null,@a_n= 0,@b_total =0,@b_r_total=0;
-    SET @missionid = Fetch_Set(key_values,2,'\''), 
-				@EXPID = Fetch_Set(key_values,1,'\''),
-			  @a_fnz = NULL,@3in1_body = '',
-				rownum = NULL,
-				@db_b = NULL;
-
-	IF IFNULL(@missionid,'') = '' OR IFNULL(@expid,'')='' THEN
-		CALL Audit('3in1',
-				CAST(CONCAT_WS('-','expid',IFNULL(@expid,'null'),'missionid',IFNULL(@missionid,'null')) AS CHAR),statu,
-				key_names,key_values,field_names,field_values,rowids);
-		SELECT NULL AS `expidmissioniderror`;
-		LEAVE 3in1_label;
-	END IF;
-
-	CASE
-
-			WHEN statu = '6' THEN
-
-				CALL Fetch_Set_values(field_names,'a',@field_names_1);
-						 CALL Fetch_Set_values(field_values,'0',@field_values_1);
-
-						 CALL Temp_Func_2(CONCAT_WS('',
-"IF((@b :=",
-	"CASE	WHEN a1.init_?? = 1 THEN b1.?? ",
-				"WHEN a0.init_?? = 1 THEN b0.?? ",
-				"WHEN IFNULL(c0.??,'') <> '' THEN c0.?? ",
-			"ELSE  ???",
-	"END) =''",
-",NULL,@b) AS  ?? "),@field_names_1,@field_values_1,NULL,@one);
-
-						 SET @3in1_body = CONCAT("SELECT\n",@ONE,"\n",
-"FROM acc_mission AS a1
-LEFT JOIN acc_mission AS a0 ON a1.behind_missionId = a0.missionId
-LEFT JOIN acc_standard_1 AS b0 ON a0.missionId = b0.missionId
-LEFT JOIN acc_standard_1 AS b1 ON a1.missionId = b1.missionId
-LEFT JOIN acc_1 AS c0 ON b0.missionId = c0.missionId AND c0.expID = ",QUOTE(@expID),
-"\nWHERE a1.missionId = ",QUOTE(@missionid));	
-
-		PREPARE stmt_bsb FROM @3in1_body;
-		EXECUTE stmt_bsb ;
-
-
-			WHEN statu = '5' THEN
-			label5:BEGIN
-
-				CASE 
-						WHEN rowids REGEXP '^[0]{1}(,[1-9][0-9]{0,}){1,}$' THEN
-								SET rownum= SUBSTR(rowids,3);
-						WHEN rowids REGEXP '^[1-9]{1}(,[1-9][0-9]{0,}){0,}$' THEN
-								SET rownum = rowids;
-					ELSE 
-	
-							CALL audit('3IN1',CONCAT_WS(':',IFNULL(STATU,'label5B1'),'ROWIDS ERROR:',QUOTE(rowids)),STATU,key_names,key_values,field_names,field_values,rowids);
-							LEAVE label5; 
-				END CASE;	
-
-				label5A:BEGIN
-
-					CALL Fetch_Set_values(field_names,'a',@field_names_1);
-					CALL Fetch_Set_values(field_values,'0',@field_values_1);
-          IF IFNULL(@field_names_1,'') NOT REGEXP 
-							'^\'(a[1-9][0-9]{0,1}[0]{0,1}){1,}\'(,\'(a[1-9][0-9]{0,1}[0]{0,1})*\')*$' THEN 
-							CALL audit(CONCAT_WS(':','3IN1',statu),CONCAT_WS(':','afieldWarning:',@FIELD_NAMES_1),statu,key_names,key_values,field_names,field_values,rowids);
-
-							SET @one = ''; 
-						ELSE 
-
-
-						 CALL Temp_Func_2(CONCAT_WS('',
-"IF((@b :=",
-	"CASE	WHEN a1.init_?? = 1 THEN b1.?? ",
-				"WHEN a0.init_?? = 1 THEN b0.?? ",
-				"WHEN IFNULL(c0.??,'') <> '' THEN c0.?? ",
-			"ELSE  ???",
-	"END) =''",
-",NULL,@b) AS  ?? "),@field_names_1,@field_values_1,NULL,@one);
-
-						 SET @3in1_body = CONCAT("SELECT\n",@ONE,"\n",
-"FROM acc_mission AS a1
-LEFT JOIN acc_mission AS a0 ON a1.behind_missionId = a0.missionId
-LEFT JOIN acc_standard_1 AS b0 ON a0.missionId = b0.missionId
-LEFT JOIN acc_standard_1 AS b1 ON a1.missionId = b1.missionId
-LEFT JOIN acc_1 AS c0 ON b0.missionId = c0.missionId AND c0.expID = ",QUOTE(@expID),
-"\nWHERE a1.missionId = ",QUOTE(@missionid));	
-
-						PREPARE stmt_bsb FROM @3in1_body;
-						EXECUTE stmt_bsb ;
-
- 					END IF;	
-
-				END LABEL5A; 
-
-				Label5B:BEGIN
-
-					CALL Fetch_Set_values(field_names,'b',@field_names_1);
-
-
-					IF @FIELD_NAMES_1 NOT REGEXP '^\'(B[1-9][0-9]{0,1})\'(,\'B[1-9][0-9]{0,1}\'){0,}$'   THEN
-						  SET @3in1_body = "SELECT NULL as `label4B1FEILEDNAMESeeror`";
-							CALL audit('3IN1',CONCAT_WS(':','B1FEILEDNAMESeeror:',QUOTE(@FIELD_NAMES_1)),statu,key_names,key_values,field_names,field_values,rowids);
-							LEAVE label5b;
-					END IF; 
-
-					SET i = 1;
-
-          SET @a_b_row = rownum , @3in1_body = '';
-
-					CALL Fetch_Set_P0(@a_b_row,1,ir);
-
-
-					fetch_recode_s:LOOP
-
-						SET @a = FIND_IN_SET(ir,@a_row); 
-
-
-						SET @a = FIND_IN_SET(ir,rownum);
-						IF @a != 0 THEN 
-								CALL Fetch_Set_values(field_values,ir,@field_values_1);
-							ELSE
-								SET @field_values_1 = NULL;
-						END IF;
-
-
-						CALL Temp_Func_2(" ??? AS ??",@field_names_1,@field_values_1,NULL,@one);
-						SET	@3in1_body =CAST(CONCAT(@3in1_body
-									,"SELECT  ",QUOTE(@expid)," AS expid,",
-													QUOTE(@missionid)," AS missionid ,",
-															@one,',',ir," AS rowNo \n"
-																	)AS CHAR);
-
-
-						SET i = i + 1;
-						CALL Fetch_Set_P0(@a_b_row,i,ir);
-						IF ir IS NULL THEN 	 LEAVE fetch_recode_s; END IF; 
-						SET @3in1_body = CONCAT_WS('\tunion\n',@3in1_body,'');
-
-					END LOOP;
-
-				 CALL Temp_Func_2(CONCAT_WS('',
-"IF((@b :=",
-	"CASE	WHEN a1.init_?? = 1 THEN b1.?? ",
-				"WHEN a0.init_?? = 1 THEN b0.?? ",
-				"WHEN IFNULL(c0.??,'') <> IFNULL(c1.??,'') THEN c0.?? ",
-			"ELSE  c0.?? ",
-	"END) =''",
-",NULL,@b) AS  ?? "),@field_names_1,@field_values_1,NULL,@one);
-
-					 SET @3in1_body = CONCAT("SELECT\nb1.rowNo,",@ONE,"\n",
-"FROM acc_mission AS a1
-LEFT JOIN acc_mission AS a0 ON a1.behind_missionId = a0.missionId 
-LEFT JOIN acc_standard_n AS b1 ON a1.missionId = b1.missionId
-LEFT JOIN acc_standard_n AS b0 ON a0.missionId = b0.missionId AND b1.rowNo = b0.rowNo
-LEFT JOIN ",expid2b(@expID)," AS c0 ON b0.missionId = c0.missionId AND b0.rowNo = c0.rowNo
-LEFT JOIN (\n",@3in1_body,"\n) AS c1 ON b1.missionId = c1.missionId AND b1.rowNo = c1.rowNo
-WHERE a1.missionId = ",QUOTE(@missionid));	
-
-
-
-				END label5B;
-			END label5;
-
-			WHEN statu IS NULL THEN
-				 SET @3in1_body = "SELECT NULL as `1`";
-				 CALL audit('3IN1',IFNULL(statu,'STATU IS NULL'),STATU ,key_names,key_values,field_names,field_values,rowids);
-
-
-			WHEN STATU = '2'  THEN 
-			LABEL1:BEGIN
-				IF IFNULL(rowids,'') ='' THEN
-						SET rowids ='1'; 
-				END IF;
-
-				CASE 
-						WHEN rowids REGEXP '^[0]{1}(,[1-9][0-9]{0,}){1,}$' THEN
-								SET rownum= SUBSTR(rowids,3);
-						WHEN rowids REGEXP '^[1-9]{1}(,[1-9][0-9]{0,}){0,}$' THEN
-								SET rownum = rowids;
-					ELSE 
-							LEAVE 3in1_label; 
-				END CASE;	
-
-					SET @a_fds = NULL,@a_row  = NULL;
-					CALL generate_one_en(@missionid,rownum,@a_fields,@a_row,@a_value); 
-
-					IF @a_row IS NULL OR @a_value IS NULL THEN 
-							SELECT NULL AS brecord;
-							LEAVE 3in1_label;
-					END IF;
-					CALL Fetch_Set_values(field_names,'rowNo',@field_names_1);
-	
-
-					IF @FIELD_NAMES_1 NOT REGEXP '^\'(B[1-9][0-9]{0,1})\'(,\'B[1-9][0-9]{0,1}\'){0,}$'   THEN
-						  SET @3in1_body = "SELECT NULL as `label4B1FEILEDNAMESeeror`";
-							CALL audit('3IN1',CONCAT_WS(':','B1FEILEDNAMESeeror:',QUOTE(@FIELD_NAMES_1)),statu,key_names,key_values,field_names,field_values,rowids);
-							LEAVE 3in1_label;
-					END IF; 
-
-					SET  
-							i = 1;
-
-          SET @a_b_row = CONCAT_WS(',',rownum,@a_row),
-							@a_b_row = Fielter_Set(@a_b_row);
-					CALL Fetch_Set_P0(@a_b_row,1,ir);
-
-
-
-					fetch_recode:LOOP
-						SET @a = FIND_IN_SET(ir,rownum);
-						IF @a != 0 THEN 
-								CALL Fetch_Set_values(field_values,ir,@field_values_1);
-							ELSE
-								SET @field_values_1 = NULL;
-						END IF;
-
-
-						SET ia := Fetch_elt(ir,@a_row), 
-								@a_value_1 := Fetch_y_1(ia,@a_value);
-
-
-	
-
-						SET	@3in1_body =CAST(CONCAT(@3in1_body
-									,"SELECT  ",ir," AS rowNo \n"
-																	)AS CHAR);
-						SET @one =NULL;
-
-						CALL Temp_Func_3(CONCAT_WS('',"CASE WHEN ??? IS NULL OR ??? REGEXP '^null$'  THEN NULL WHEN ???? REGEXP ??? THEN IF( ??? REGEXP ",QUOTE('\\Q(?#\\E'),",NULL,'#00FF00') ELSE '#FF9999' END AS colB??"),NULL,"",
-															"",'','b',@a_fields,@a_value_1,@field_names_1,@field_values_1,@one);
-
- 						SET  @3in1_body = CONCAT_WS('',@3in1_body,',',IFNULL(@one,0),"'' AS rowinno");
-
-						SET i = i + 1;
-						CALL Fetch_Set_P0(@a_b_row,i,ir);
-						IF ir IS NULL THEN 	 LEAVE fetch_recode; END IF; 
-						SET @3in1_body = CONCAT_WS('\nunion\n',@3in1_body,'');
-
-
-					END LOOP;
-
-			END LABEL1;
-
-			WHEN STATU = '4' OR STATU ='3' OR STATU ='7' THEN
-			label4:BEGIN
-
-				SET @a_fields = NULL;
-				IF STATU <> '7' THEN 
-
-					SET @db_b = expid2b(@expid),
-							@db_a = "acc_1";
-
-				ELSE
-
-					 SET 	@db_b = 'acc_b',
-								@db_a = 'acc_a',
-								mid1 = preg_capture('/(?<=_).+$/',@missionId),
-								@missionId = preg_capture('/^.+?(?=_|$)/',@missionId);
-				END IF;
-
-				SET @3in1_body = "";
-					SET @sb = CONCAT_WS('',"DELETE a.* FROM ",@db_b," AS A \n",
-							"WHERE a.expid =",QUOTE(@expid)," AND a.missionid =", QUOTE(@missionid),
-								CONCAT(" AND a.missionid1 =", quote_d(mid1)));
-
-					PREPARE stmt_bsb FROM @sb;
-					EXECUTE stmt_bsb ;
-
-				label4B:	BEGIN 
-				CASE 
-						WHEN rowids REGEXP '^[0]{1}(,[1-9][0-9]{0,}){1,}$' THEN
-								SET rownum= SUBSTR(rowids,3);
-						WHEN rowids REGEXP '^[1-9]{1}(,[1-9][0-9]{0,}){0,}$' THEN
-								SET rownum = rowids;
-					ELSE 
-
-							LEAVE label4B; 
-
-				END CASE;	
-
-				IF STATU <> '5' THEN
-
-					CALL generate_one_en(@missionid,rownum,@a_fields,@a_row,@a_value); 
-
-				END IF;
-
-					CALL Fetch_Set_values(field_names,'b',@field_names_1);
-
-
-					IF @FIELD_NAMES_1 NOT REGEXP '^\'(B[1-9][0-9]{0,1})\'(,\'B[1-9][0-9]{0,1}\'){0,}$'   THEN
-						  SET @3in1_body = "SELECT NULL as `label4B1FEILEDNAMESeeror`";
-							CALL audit('3IN1',CONCAT_WS(':','B1FEILEDNAMESeeror:',QUOTE(@FIELD_NAMES_1)),statu,key_names,key_values,field_names,field_values,rowids);
-							LEAVE label4b;
-					END IF; 
-
-
-					SET i = 1;
-
-          SET @a_b_row = CONCAT_WS(',',rownum,@a_row),
-							@a_b_row = Fielter_Set(@a_b_row);
-					CALL Fetch_Set_P0(@a_b_row,1,ir);
-
-
-
-					fetch_recode:LOOP
-
-						SET ia := Fetch_elt(ir,@a_row), 
-								@a_value_1 := Fetch_y_1(ia,@a_value);
-
-						SET @a = FIND_IN_SET(ir,rownum);
-
-						IF @a != 0 THEN 
-								CALL Fetch_Set_values(field_values,ir,@field_values_1);
-							ELSE
-								SET @field_values_1 = NULL;
-						END IF;
-
-
-						CALL Temp_Func_2(" ??? AS ??",@field_names_1,@field_values_1,NULL,@one);
-
-						SET	@3in1_body =CONCAT_WS('',@3in1_body
-									,"SELECT  ",QUOTE(@expid)," ,", 
-													QUOTE(@missionid)," ,",
-											IF(mid1,CONCAT(QUOTE(mid1)," ,"),NULL),
-															ir," AS rowNo,",
-															@one,','," \n");
-						SET @one =NULL;
-
-						CALL Temp_Func_3(" ???? REGEXP ??? AS ERR_B??",NULL,"@b_r_total := ",
-															"IFNULL(???? REGEXP ??? ,0)",'+','b',@a_fields,@a_value_1,@field_names_1,@field_values_1,@one);
-
-
-						SET  @3in1_body = CONCAT_WS('',@3in1_body,IFNULL(@one,0),",@b_total := IFNULL(@b_total,0)+ IFNULL(@b_r_total,0)");
-
-						SET i = i + 1;
-						CALL Fetch_Set_P0(@a_b_row,i,ir);
-						IF ir IS NULL THEN 	 LEAVE fetch_recode; END IF; 
-						SET @3in1_body = CONCAT_WS('\nunion\n',@3in1_body,'');
-					END LOOP;
-
-					SET @3in1_body = CONCAT_ws('',"INSERT INTO ",@db_b,
-									"(expid,missionid,",
-								IF(mid1 IS NULL,NULL,'missionid1,'),"\n",
-									"rowNo," ,
-									REPLACE(@field_names_1,'\'',''),
-									CONCAT(',',REPLACE_set_0(@a_fields,'err_b')),",right_count,ERROR_count\n)\n",
-									@3in1_body,';');
-
-
-          IF @3in1_body IS NOT NULL THEN
-
-
 							EXECUTE IMMEDIATE  REGEXP_REPLACE(REGEXP_substr(@3in1_body,'(?i)select\\s+\\K\'(?:\\\\.|[^\'])+\'\\s*,\\s*\'(?:\\\\.|[^\'])+\'')
 							,"('[^']+')\\s*,\\s*('[^']+')",'SELECT 1 INTO @b FROM acc_1 AS a WHERE a.expID = \\1 AND  a.missionId = \\2');
 
@@ -985,18 +433,15 @@ WHERE a1.missionId = ",QUOTE(@missionid));
 							EXECUTE IMMEDIATE REGEXP_REPLACE(REGEXP_substr(@3in1_body,'(?i)select\\s+\\K\'(?:\\\\.|[^\'])+\'\\s*,\\s*\'(?:\\\\.|[^\'])+\'')
 							,"('[^']+')\\s*,\\s*('[^']+')",'INSERT INTO ACC_1(expID ,missionId)VALUES (\\1, \\2)');
 							END IF;
-
-
-
-							PREPARE stmt_bsb FROM @3in1_body;
-							EXECUTE stmt_bsb ;
+-- SELECT @3in1_body,'0Y';-- LEAVE l
+							EXECUTE immediate @3in1_body;
 
 					END IF;
-				END label4B;
+				END label4B;-- 处理 B字段
 
 
 				SET @A_S = NULL;
-		
+		-- 处理 A字段
 				label4A:BEGIN
 
 					SET @3in1_body = NULL,
@@ -1006,10 +451,10 @@ WHERE a1.missionId = ",QUOTE(@missionid));
 																@db_a," AS b ON a.expNo = b.expID AND b.missionId = ",QUOTE(@missionid),
 																CONCAT(" AND b.missionid1 =", quote_d(mid1)),				
 																"\nWHERE a.expNo = ", QUOTE(@expid)); 
+-- 
 
 
-					PREPARE stmt_bsb FROM @3in1_body;
-					EXECUTE stmt_bsb ;
+					EXECUTE immediate @3in1_body;
 
 		 			IF  @statu_value IS NULL THEN
 							SET @3in1_body = CONCAT_WS('',"INSERT ",@db_a,"(EXPID,MISSIONID",
@@ -1018,18 +463,16 @@ WHERE a1.missionId = ",QUOTE(@missionid));
 																		CONCAT(',',IF(mid1 IS NULL,NULL,QUOTE(mid1)),',',QUOTE('jzpz_bjzyfl')),
 																")");
 
-
-
-							PREPARE stmt_bsb FROM @3in1_body;
-							EXECUTE stmt_bsb ;
+							EXECUTE immediate  @3in1_body;
 					END IF;
 
 					SET @3in1_body = "SET \n" ;
-					CALL Fetch_Set_values(field_names,'a',@field_names_1);
+					CALL Fetch_Set_values(field_names,'a',@field_names_1);-- 取得r字段名
 
           IF IFNULL(@field_names_1,'') NOT REGEXP 
-							'^\'(a[1-9][0-9]{0,1}[0]{0,1}){1,}\'(,\'(a[1-9][0-9]{0,1}[0]{0,1})*\')*$' THEN 
-							CALL audit(CONCAT_WS(':','3IN1',statu),CONCAT_WS(':','afieldWarning:',@FIELD_NAMES_1),statu,key_names,key_values,field_names,field_values,rowids);
+							'^\'(a[1-9][0-9]{0,1}[0]{0,1}){1,}\'(,\'(a[1-9][0-9]{0,1}[0]{0,1})*\')*$' THEN -- 校验A字段 允许为空
+
+							CALL audit(CONCAT_WS(':','3IN1',`funcid`),CONCAT_WS(':','afieldWarning:',@FIELD_NAMES_1),`funcid`,key_names,key_values,field_names,field_values,rowids);
 
 							SET @one = ''; 
 						ELSE 
@@ -1043,20 +486,27 @@ WHERE a1.missionId = ",QUOTE(@missionid));
 
 
 					CALL generate_one_en(@missionid,'0',@a_fields,@a_row,@a_value);
-
-	
+-- SELECT b计算,B保存;
 					IF IFNULL(@a_fields,'') !='' THEN 
-								SELECT 'OK'; LEAVE 3in1_label;
+
 								CALL Fetch_Set_values(@a_value,'0',@a_values_1);
 
-								CALL Temp_Func_3("ERR_A?? = ???? REGEXP ??? ",NULL,"a.right_count = @right_count := ",
-																	"IFNULL(???? REGEXP ??? ,0)",'+','a',@a_fields,@a_values_1,@field_names_1,@field_values_1,@one);
+								CALL Temp_Func_3(
+ 													"ERR_A?? = ???? REGEXP ??? ", -- 1
+-- 													CONCAT_WS('',"ERR_A?? = \n",b计算),
+													NULL,-- 2
+													"a.right_count = @right_count := ", -- 3
+
+ 													"IFNULL(???? REGEXP ??? ,0)",-- 4
+-- 													b计算,
+													'+','a',-- 5
+													@a_fields,@a_values_1,@field_names_1,@field_values_1,@one);-- 6
 
 								SET @one =CONCAT(@one,'+');
 							ELSE 
 								SET @one ='';
 					END IF;
-
+-- SELECT @one;
 					IF @one ='' THEN
 						SET @one = CONCAT('a.line  = ',j(dblob,'line')),
 								@one = CONCAT_WS(',',@one, "a.right_count = @right_count := ");
@@ -1112,7 +562,7 @@ WHERE a1.missionId = ",QUOTE(@missionid));
 															"\t\t	) AS b  \n",
 														@3in1_body,
 														@one,@b_total," ,\n",
-														"a.log_count := IFNULL(a.log_count,0)+",IF(STATU=4,'1',0)," ,\n",
+														"a.log_count := IFNULL(a.log_count,0)+",IF(`funcid`=4,'1',0)," ,\n",
 														"a.already_no_seal = b.overSeal,\n",
 														"a.read_ans_size := IF(read_ans_size IS NULL ,0,a.read_ans_size) ,\n",
 														"a.error_count = @pt1 :=",REPLACE(@a_s,',','+'),",\n",
@@ -1125,16 +575,14 @@ WHERE a1.missionId = ",QUOTE(@missionid));
 														"WHERE a.missionId =",QUOTE(@missionid)," AND a.expid=",QUOTE(@expid)
 												)
 											AS CHAR);
-					
-					PREPARE stmt_bsb FROM @3in1_body;
-
-					EXECUTE stmt_bsb;
-					
+--  SELECT @3in1_body,'1';					
+					EXECUTE immediate @3in1_body;
+					-- 
 						
-					IF STATU <>4 THEN  SET @3in1_body="SELECT 'ok' AS teaa";LEAVE label4;END IF;
+					IF `funcid` <>4 THEN  SET @3in1_body="SELECT 'ok' AS teaa";LEAVE label4;END IF;
 					
 			IF	DATABASE() REGEXP  '5$' THEN
- 
+ -- SELECT CONCAT_WS(',',QUOTE(@expid),QUOTE(@missionid),1); LEAVE `l`;
 					CALL v5_autoFlow(@expid,@missionid,1);
 					SET IS5=1;
 			END IF;
@@ -1179,26 +627,642 @@ LEFT JOIN mysq1_schema.exp_difficulty AS d ON c.difficulty_level = d.difficulty_
 LEFT JOIN exp_courses_node_content AS f ON g.missionId = f.missionid
 INNER JOIN exp_courses_node AS e ON  f.contentNo = e.contentNo  AND ",IF(IS5 ,'c','c1'),".courseNo = e.node_courseNo
 ",	"\nWHERE a.missionId =",QUOTE(@missionid)," AND a.expid=",QUOTE(@expid));
- 
-
-
-				END label4A;
+ -- SELECT @3in1_body 		;			
+--  SELECT @EXPID,@3in1_body; LEAVE  `l`;
+--  LEAVE `l`;
+				END label4A;-- 处理 A字段,';'
 			END label4;
 
 
 	END CASE;
-
+/*
 	IF IFNULL(@3in1_body,'')= '' THEN
 		SET @3in1_body ="SELECT NULL as `Elabel400`";
-		CALL audit('3IN1',CONCAT_WS(':',IFNULL(STATU,'400'),'something ERROR:',QUOTE(rowids)),STATU,key_names,key_values,field_names,field_values,rowids);
+		CALL audit('3IN1',CONCAT_WS(':',IFNULL(`funcid`,'400'),'something ERROR:',QUOTE(rowids)),`funcid`,key_names,key_values,field_names,field_values,rowids);
 	END IF;
+*/-- SELECT CAST(@3in1_body as CHAR) ;-- LEAVE `l`;--  
 
-		PREPARE stmt_bsb FROM @3in1_body;
-		EXECUTE stmt_bsb ;
-		DEALLOCATE PREPARE stmt_bsb;
+		EXECUTE immediate  @3in1_body;
+-- select '1','2';
+--   SELECT @3in1_body; LEAVE `l`;
+-- SELECT null ;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `3in1_copy`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `3in1_copy`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `3in1_copy`(IN `funcid` varchar(100),IN `key_names` varchar(100),IN `key_values` varchar(200),IN `field_names` longtext,IN `field_values` longtext,in `rowids` varchar(300), dblob blob)
+    DETERMINISTIC
+`l`:BEGIN
+
+	DECLARE rownum varchar(300);	DECLARE IS5 VARCHAR(1) DEFAULT 0;	DECLARE i INT(3);  DECLARE ir INT(3);	DECLARE ia INT(3);	DECLARE mid1 varchar(60) DEFAULT NULL;
+	DECLARE len INT(5) DEFAULT 0 ; 
+	DECLARE 对比 text DEFAULT
+					CONCAT_WS(' ',
+						"CASE WHEN ??? IS NULL OR ??? REGEXP '^null$'",
+						"THEN NULL\nWHEN ???? REGEXP ??? THEN IF( ??? REGEXP ",
+						QUOTE('\\Q(?#\\E'),",NULL,'#00FF00')\n" ,
+						"ELSE '#FF9999' END AS colB??\n");
+
+	DECLARE b保存 text DEFAULT  REGEXP_replace(REGEXP_replace(REGEXP_replace(对比,
+																			'#FF9999','0'),
+																			'#00FF00','1'),
+																			'colB','ERR_B');
+	DECLARE b计算 text DEFAULT  REGEXP_replace(REGEXP_replace(b保存,
+																					"(?im)null$|'0'|,\\Knull(?=,)",0),
+																					'(?im)as\\s*[\\w_?]+\\s*$','');
+	DECLARE a计算 text DEFAULT  
+					CONCAT_WS(' ',
+						"ERR_A1 = CASE WHEN ??? IS NULL OR ??? REGEXP '^null$'",
+						"THEN NULL\nWHEN ???? REGEXP ??? THEN IF( ??? REGEXP ",
+						QUOTE('\\Q(?#\\E'),",NULL,'#00FF00')\n" ,
+						"ELSE '#FF9999' END\n");
+	
+  DECLARE CONTINUE HANDLER FOR  SQLSTATE '23000', SQLSTATE	'42000'	, SQLSTATE	'42S22' , SQLSTATE	'HY000'-- ,SQLSTATE	'22007'
+	BEGIN GET DIAGNOSTICS CONDITION 1 @`sqlstate` = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;SET  @`sqlstate` = JSON_OBJECT('sqlstate',@`sqlstate`,'errno',@errno,'text',@text);
+				SET @`errsql` = @3in1_body;
+				SET @funcid = CONCAT_WS(' ','Error: ', ' 3in1' ,`funcid`,ELT(`funcid`,'','对比','保存','提示' , '？5')),
+				@pp =CONCAT_WS(',',quote(`funcid`),quote( `key_names`),quote( `key_values`),quote( `field_names`),quote( `field_values`),quote( `rowids` ),quote( dblob));
+				CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp,'SQL',@`errsql`,'err',@`sqlstate`));
+	END;
+/*
+START TRANSACTION;
+				SET @funcid = CONCAT_WS(' ', ' 3in1' ,`funcid`,ELT(`funcid`,'','对比','保存','提示' , '？5')),
+				@pp =CONCAT_WS(',',quote(`funcid`),quote( `key_names`),quote( `key_values`),quote( `field_names`),quote( `field_values`),quote( `rowids` ),quote( dblob));
+INSERT INTO plogs (Function_Name,parameter) VALUES (@funcid,@pp);
+#CALL `Audit_3`(COLUMN_create('m',@funcid,'pp',@pp));COMMIT;
+
+/*,'l','1'*/
 
 
+   SET @missionid = null,@a_t = null,@a_n= 0,@b_total =0,@b_r_total=0;     SET @missionid = Fetch_Set(key_values,2,'\''),				@EXPID = Fetch_Set(key_values,1,'\''),			  @a_fnz = NULL,@3in1_body = '',				rownum = NULL,				@db_b = NULL;
 
+	IF IFNULL(@missionid,'') = '' OR IFNULL(@expid,'')='' THEN 		CALL Audit('3in1',				CAST(CONCAT_WS('-','expid',IFNULL(@expid,'null'),'missionid',IFNULL(@missionid,'null')) AS CHAR),`funcid`,				key_names,key_values,field_names,field_values,rowids);		SELECT NULL AS `expidmissioniderror`; 		LEAVE `l`; 	END IF;
+
+	CASE 	WHEN `funcid` = '6' THEN
+
+				CALL Fetch_Set_values(field_names,'a',@field_names_1);-- 取得字r段名
+						 CALL Fetch_Set_values(field_values,'0',@field_values_1);
+-- SELECT @field_names_1,@field_values_1 ;   LEAVE `l`;
+						 CALL Temp_Func_2(CONCAT_WS('',
+"IF((@b :=",
+	"CASE	WHEN a1.init_?? = 1 THEN b1.?? ",
+				"WHEN a0.init_?? = 1 THEN b0.?? ",
+				"WHEN IFNULL(c0.??,'') <> '' THEN c0.?? ",
+			"ELSE  ???",
+	"END) =''",
+",NULL,@b) AS  ?? "),@field_names_1,@field_values_1,NULL,@one);
+
+						 SET @3in1_body = CONCAT("SELECT\n",@ONE,"\n",
+"FROM acc_mission AS a1
+LEFT JOIN acc_mission AS a0 ON a1.behind_missionId = a0.missionId
+LEFT JOIN acc_standard_1 AS b0 ON a0.missionId = b0.missionId
+LEFT JOIN acc_standard_1 AS b1 ON a1.missionId = b1.missionId
+LEFT JOIN acc_1 AS c0 ON b0.missionId = c0.missionId AND c0.expID = ",QUOTE(@expID),
+"\nWHERE a1.missionId = ",QUOTE(@missionid));	
+-- SELECT CAST(@3in1_body as CHAR) ;   LEAVE `l`;
+
+		EXECUTE immediate @3in1_body;
+
+
+			WHEN `funcid` = '5' THEN
+			label5:BEGIN
+
+				CASE 
+						WHEN rowids REGEXP '^[0]{1}(,[1-9][0-9]{0,}){1,}$' THEN
+								SET rownum= SUBSTR(rowids,3);
+						WHEN rowids REGEXP '^[1-9]{1}(,[1-9][0-9]{0,}){0,}$' THEN
+								SET rownum = rowids;
+					ELSE 
+	-- 						SET @3in1_body ="SELECT NULL as `label5B1`";
+
+						SET rowids =CONCAT_WS(':','rowids',rowids);
+
+-- 	 					SIGNAL SQLSTATE 'HY000' SET MYSQL_ERRNO ='553' , MESSAGE_TEXT = rowids;
+--  						CALL audit('3IN1',CONCAT_WS(':',IFNULL(`funcid`,'label5B1'),'ROWIDS ERROR:',QUOTE(rowids)),`funcid`,key_names,key_values,field_names,field_values,rowids);
+						LEAVE label5; -- rowids 出错  
+
+				END CASE;	
+
+				label5A:BEGIN
+
+					CALL Fetch_Set_values(field_names,'a',@field_names_1);-- 取得字r段名
+					CALL Fetch_Set_values(field_values,'0',@field_values_1);
+
+          IF IFNULL(@field_names_1,'') NOT REGEXP 
+							'^\'(a[1-9][0-9]{0,1}[0]{0,1}){1,}\'(,\'(a[1-9][0-9]{0,1}[0]{0,1})*\')*$' THEN -- 校验A字段 允许为空
+							CALL audit(CONCAT_WS(':','3IN1',`funcid`),CONCAT_WS(':','afieldWarning:',@FIELD_NAMES_1),`funcid`,key_names,key_values,field_names,field_values,rowids);
+-- 							LEAVE label4a;
+							SET @one = ''; 
+						ELSE 
+
+-- SELECT @field_names_1,@field_values_1 ;   LEAVE `l`;
+						 CALL Temp_Func_2(CONCAT_WS('',
+"IF((@b :=",
+	"CASE	WHEN a1.init_?? = 1 THEN b1.?? ",
+				"WHEN a0.init_?? = 1 THEN b0.?? ",
+				"WHEN IFNULL(c0.??,'') <> '' THEN c0.?? ",
+			"ELSE  ???",
+	"END) =''",
+",NULL,@b) AS  ?? "),@field_names_1,@field_values_1,NULL,@one);
+
+						 SET @3in1_body = CONCAT("SELECT\n",@ONE,"\n",
+"FROM acc_mission AS a1
+LEFT JOIN acc_mission AS a0 ON a1.behind_missionId = a0.missionId
+LEFT JOIN acc_standard_1 AS b0 ON a0.missionId = b0.missionId
+LEFT JOIN acc_standard_1 AS b1 ON a1.missionId = b1.missionId
+LEFT JOIN acc_1 AS c0 ON b0.missionId = c0.missionId AND c0.expID = ",QUOTE(@expID),
+"\nWHERE a1.missionId = ",QUOTE(@missionid));	
+-- SELECT CAST(@3in1_body as CHAR) ;   LEAVE `l`;
+
+						EXECUTE immediate @3in1_body;
+
+ 					END IF;	
+
+				END LABEL5A; -- 处理A字段
+
+				Label5B:BEGIN
+
+					CALL Fetch_Set_values(field_names,'b',@field_names_1);
+
+
+					IF @FIELD_NAMES_1 NOT REGEXP '^\'(B[1-9][0-9]{0,1})\'(,\'B[1-9][0-9]{0,1}\'){0,}$'   THEN
+						  SET @3in1_body = "SELECT NULL as `label4B1FEILEDNAMESeeror`";
+							CALL audit('3IN1',CONCAT_WS(':','B1FEILEDNAMESeeror:',QUOTE(@FIELD_NAMES_1)),`funcid`,key_names,key_values,field_names,field_values,rowids);
+							LEAVE label5b;
+					END IF; -- 校验B字段建
+
+					SET i = 1;
+
+          SET @a_b_row = rownum , @3in1_body = '';
+
+					CALL Fetch_Set_P0(@a_b_row,1,ir);
+
+-- SELECT ir,@a_b_row,@field_names_1; LEAVE `l`;
+					fetch_recode_s:LOOP
+
+						SET @a = FIND_IN_SET(ir,@a_row); 
+
+-- SELECT CAST(CONCAT_WS(',',QUOTE(@a_value),QUOTE(ia),QUOTE(@a_value_1)) AS CHAR);
+						SET @a = FIND_IN_SET(ir,rownum);
+						IF @a != 0 THEN 
+								CALL Fetch_Set_values(field_values,ir,@field_values_1);
+							ELSE
+								SET @field_values_1 = NULL;
+						END IF;
+
+
+						CALL Temp_Func_2(" ??? AS ??",@field_names_1,@field_values_1,NULL,@one);
+						SET	@3in1_body =CAST(CONCAT(@3in1_body
+									,"SELECT  ",QUOTE(@expid)," AS expid,",
+													QUOTE(@missionid)," AS missionid ,",
+															@one,',',ir," AS rowId \n"
+																	)AS CHAR);
+
+
+						SET i = i + 1;
+						CALL Fetch_Set_P0(@a_b_row,i,ir);
+						IF ir IS NULL THEN 	 LEAVE fetch_recode_s; END IF; -- SELECT  @3in1_body,rownum,i,ir,ia;
+						SET @3in1_body = CONCAT_WS('\tunion\n',@3in1_body,'');
+
+					END LOOP;
+
+				 CALL Temp_Func_2(CONCAT_WS('',
+"IF((@b :=",
+	"CASE	WHEN a1.init_?? = 1 THEN b1.?? ",
+				"WHEN a0.init_?? = 1 THEN b0.?? ",
+				"WHEN IFNULL(c0.??,'') <> IFNULL(c1.??,'') THEN c0.?? ",
+			"ELSE  c0.?? ",
+	"END) =''",
+",NULL,@b) AS  ?? "),@field_names_1,@field_values_1,NULL,@one);
+
+					 SET @3in1_body = CONCAT("SELECT\nb1.rowNo,",@ONE,"\n",
+"FROM acc_mission AS a1
+LEFT JOIN acc_mission AS a0 ON a1.behind_missionId = a0.missionId 
+LEFT JOIN acc_standard_n AS b1 ON a1.missionId = b1.missionId
+LEFT JOIN acc_standard_n AS b0 ON a0.missionId = b0.missionId AND b1.rowNo = b0.rowNo
+LEFT JOIN ",expid2b(@expID)," AS c0 ON b0.missionId = c0.missionId AND b0.rowNo = c0.rowId
+LEFT JOIN (\n",@3in1_body,"\n) AS c1 ON b1.missionId = c1.missionId AND b1.rowNo = c1.rowId
+WHERE a1.missionId = ",QUOTE(@missionid));	
+
+-- SELECT @3in1_body,@field_names_1; LEAVE `l`;
+
+				END label5B;
+			END label5;
+
+			WHEN `funcid` IS NULL THEN
+				 SET @3in1_body = "SELECT NULL as `1`";
+				 CALL audit('3IN1',IFNULL(`funcid`,'`funcid` IS NULL'),`funcid` ,key_names,key_values,field_names,field_values,rowids);
+
+
+			WHEN `funcid` = '2'  THEN 
+
+			LABEL1:BEGIN
+				IF IFNULL(rowids,'') ='' THEN	SET rowids ='1';	END IF;
+				CASE 		WHEN rowids REGEXP '^[0]{1}(,[1-9][0-9]{0,}){1,}$' THEN	SET rownum= SUBSTR(rowids,3);
+								WHEN rowids REGEXP '^[1-9]{1}(,[1-9][0-9]{0,}){0,}$' THEN SET rownum = rowids;
+					ELSE	LEAVE `l`; -- rowids 出错  
+				END CASE;	-- 取得B记录行 rownum
+
+					SET @a_fds = NULL,@a_row  = NULL;
+
+					CALL generate_one_en(@missionid,rownum,@a_fields,@a_row,@a_value); 
+
+					IF @a_row IS NULL OR @a_value IS NULL THEN  SELECT NULL AS brecord;		LEAVE `l`;	END IF;
+
+					CALL Fetch_Set_values(field_names,'rowId',@field_names_1);-- 取得字r段名
+
+					IF @FIELD_NAMES_1 NOT REGEXP '^\'(B[1-9][0-9]{0,1})\'(,\'B[1-9][0-9]{0,1}\'){0,}$'   THEN
+						  SET @3in1_body = "SELECT NULL as `label4B1FEILEDNAMESeeror`";
+							CALL audit('3IN1',CONCAT_WS(':','B1FEILEDNAMESeeror:',QUOTE(@FIELD_NAMES_1)),`funcid`,key_names,key_values,field_names,field_values,rowids);
+							LEAVE `l`;
+					END IF; -- 校验B字段建
+
+					SET  
+							i = 1;
+
+          SET @a_b_row = CONCAT_WS(',',rownum,@a_row),
+							@a_b_row = Fielter_Set(@a_b_row);
+					CALL Fetch_Set_P0(@a_b_row,1,ir);
+
+SET len = CHAR_LENGTH(REGEXP_replace(@a_row,'\\w+',''))+1;
+					fetch_recode:LOOP
+						SET @a = FIND_IN_SET(ir,rownum);
+						IF @a != 0 THEN 
+								CALL Fetch_Set_values(field_values,ir,@field_values_1);
+							ELSE
+								SET @field_values_1 = NULL;
+						END IF;
+
+
+						SET ia := Fetch_elt(ir,@a_row), 
+								@a_value_1 := Fetch_y_1(ia,@a_value);
+
+						SET	@3in1_body =CAST(CONCAT(@3in1_body
+									,"SELECT  ",ir," AS rowNo \n"
+																	)AS CHAR);
+						SET @one =NULL;
+
+						CALL Temp_Func_3(
+															对比
+															,NULL,
+															"",
+															"",
+															'','b',
+															@a_fields,@a_value_1,@field_names_1,@field_values_1,@one);
+
+ 						SET  @3in1_body = CONCAT_WS('',@3in1_body,',',IFNULL(@one,0),"'' AS rowinno");
+
+						SET i = i + 1;
+						CALL Fetch_Set_P0(@a_b_row,i,ir);
+						IF ir IS NULL || i > len THEN 	 LEAVE fetch_recode; END IF;
+						SET @3in1_body = CONCAT_WS('\nunion\n',@3in1_body,'');
+
+
+					END LOOP;
+
+			END LABEL1;
+
+			WHEN `funcid` = '4' OR `funcid` ='3' OR `funcid` ='7' THEN
+			label4:BEGIN
+
+				SET @a_fields = NULL;
+				IF `funcid` <> '7' THEN 
+
+					SET @db_b = expid2b(@expid),
+							@db_a = "acc_1";
+
+				ELSE
+
+					 SET 	@db_b = 'acc_b',
+								@db_a = 'acc_a',
+								mid1 = preg_capture('/(?<=_).+$/',@missionId),
+								@missionId = preg_capture('/^.+?(?=_|$)/',@missionId);
+				END IF;
+
+				SET @3in1_body = "";
+					SET @sb = CONCAT_WS('',"DELETE a.* FROM ",@db_b," AS A \n",
+							"WHERE a.expid =",QUOTE(@expid)," AND a.missionid =", QUOTE(@missionid),
+								CONCAT(" AND a.missionid1 =", quote_d(mid1)));
+
+	
+					EXECUTE immediate @sb;
+
+				label4B:	BEGIN -- 处理 B字段		
+				CASE 
+						WHEN rowids REGEXP '^[0]{1}(,[1-9][0-9]{0,}){1,}$' THEN
+								SET rownum= SUBSTR(rowids,3);
+						WHEN rowids REGEXP '^[1-9]{1}(,[1-9][0-9]{0,}){0,}$' THEN
+								SET rownum = rowids;
+					ELSE 
+
+							LEAVE label4B; -- rowids 出错 
+
+				END CASE;	-- 取得B记录行 rownum
+
+				IF `funcid` <> '5' THEN
+-- SELECT @missionid,rownum,@a_fields,@a_row,@a_value;LEAVE l;
+					CALL generate_one_en(@missionid,rownum,@a_fields,@a_row,@a_value); 
+
+				END IF;
+
+
+					CALL Fetch_Set_values(field_names,'b',@field_names_1);-- 取得字r段名
+
+
+					IF @FIELD_NAMES_1 NOT REGEXP '^\'(B[1-9][0-9]{0,1})\'(,\'B[1-9][0-9]{0,1}\'){0,}$'   THEN
+						  SET @3in1_body = "SELECT NULL as `label4B1FEILEDNAMESeeror`";
+							CALL audit('3IN1',CONCAT_WS(':','B1FEILEDNAMESeeror:',QUOTE(@FIELD_NAMES_1)),`funcid`,key_names,key_values,field_names,field_values,rowids);
+							LEAVE label4b;
+					END IF; -- 校验B字段建
+
+
+					SET i = 1;
+
+          SET @a_b_row = CONCAT_WS(',',rownum,@a_row),
+							@a_b_row = Fielter_Set(@a_b_row);
+					CALL Fetch_Set_P0(@a_b_row,1,ir);
+
+SET len = CHAR_LENGTH(REGEXP_replace(@a_row,'\\w+',''))+1;
+					fetch_recode:LOOP
+
+						SET ia := Fetch_elt(ir,@a_row), 
+								@a_value_1 := Fetch_y_1(ia,@a_value);
+
+						SET @a = FIND_IN_SET(ir,rownum);
+
+						IF @a != 0 THEN 
+								CALL Fetch_Set_values(field_values,ir,@field_values_1);
+							ELSE
+								SET @field_values_1 = NULL;
+						END IF;
+
+
+						CALL Temp_Func_2(" ??? AS ??",@field_names_1,@field_values_1,NULL,@one);
+-- SELECT @one;
+						SET	@3in1_body =CONCAT_WS('',@3in1_body
+									,"SELECT  ",QUOTE(@expid)," ,", -- " AS expid,",
+													QUOTE(@missionid)," ,",-- " AS missionid ,",
+											IF(mid1,CONCAT(QUOTE(mid1)," ,"),NULL),
+															ir," AS rowId,",
+															@one,','," \n");
+						SET @one =NULL;
+
+						CALL Temp_Func_3(
+-- 															" ???? REGEXP ??? AS ERR_B??" --         1
+															b保存
+															,NULL,-- 2
+															"@b_r_total := ",-- 3
+-- 															"IFNULL(???? REGEXP ??? ,0)",-- 4
+
+															b计算,
+															'+','b',-- 5
+															@a_fields,@a_value_1,@field_names_1,@field_values_1,@one);-- 6
+
+						SET  @3in1_body = CONCAT_WS('',@3in1_body,IFNULL(@one,0),",@b_total := IFNULL(@b_total,0)+ IFNULL(@b_r_total,0)");
+
+						SET i = i + 1;
+						CALL Fetch_Set_P0(@a_b_row,i,ir);
+						
+						IF ir IS NULL || i>len THEN 	 LEAVE fetch_recode; END IF; -- SELECT  @3in1_body,rownum,i,ir,ia;
+						SET @3in1_body = CONCAT_WS('\nunion\n',@3in1_body,'');
+					END LOOP;
+
+					SET @3in1_body = CONCAT_ws('',"INSERT INTO ",@db_b,
+									"(expid,missionid,",
+								IF(mid1 IS NULL,NULL,'missionid1,'),"\n",
+									"rowid," ,
+									REPLACE(@field_names_1,'\'',''),
+									CONCAT(',',REPLACE_set_0(@a_fields,'err_b')),",right_count,ERROR_count\n)\n",
+									@3in1_body,';');
+
+
+          IF @3in1_body IS NOT NULL THEN
+
+							EXECUTE IMMEDIATE  REGEXP_REPLACE(REGEXP_substr(@3in1_body,'(?i)select\\s+\\K\'(?:\\\\.|[^\'])+\'\\s*,\\s*\'(?:\\\\.|[^\'])+\'')
+							,"('[^']+')\\s*,\\s*('[^']+')",'SELECT 1 INTO @b FROM acc_1 AS a WHERE a.expID = \\1 AND  a.missionId = \\2');
+
+							IF FOUND_ROWS()=0 THEN
+							EXECUTE IMMEDIATE REGEXP_REPLACE(REGEXP_substr(@3in1_body,'(?i)select\\s+\\K\'(?:\\\\.|[^\'])+\'\\s*,\\s*\'(?:\\\\.|[^\'])+\'')
+							,"('[^']+')\\s*,\\s*('[^']+')",'INSERT INTO ACC_1(expID ,missionId)VALUES (\\1, \\2)');
+							END IF;
+-- SELECT @3in1_body,'0Y';-- LEAVE l
+							EXECUTE immediate @3in1_body;
+
+					END IF;
+				END label4B;-- 处理 B字段
+
+
+				SET @A_S = NULL;
+		-- 处理 A字段
+				label4A:BEGIN
+
+					SET @3in1_body = NULL,
+							@statu_value = NULL,
+							@statu_name = NULL,
+							@3in1_body = CONCAT_WS('',"SELECT b.expID,a.classNo INTO @statu_value ,@statu_name\nFROM exp_experimentclassstudent AS a\nLEFT JOIN ",
+																@db_a," AS b ON a.expNo = b.expID AND b.missionId = ",QUOTE(@missionid),
+																CONCAT(" AND b.missionid1 =", quote_d(mid1)),				
+																"\nWHERE a.expNo = ", QUOTE(@expid)); 
+-- 
+
+
+					EXECUTE immediate @3in1_body;
+
+		 			IF  @statu_value IS NULL THEN
+							SET @3in1_body = CONCAT_WS('',"INSERT ",@db_a,"(EXPID,MISSIONID",
+																	IF(mid1 IS NULL,NULL,",missionId1,billid"),")\n",
+																						"VALUES(",QUOTE(@expid),',',QUOTE(@missionid),
+																		CONCAT(',',IF(mid1 IS NULL,NULL,QUOTE(mid1)),',',QUOTE('jzpz_bjzyfl')),
+																")");
+
+							EXECUTE immediate  @3in1_body;
+					END IF;
+
+					SET @3in1_body = "SET \n" ;
+					CALL Fetch_Set_values(field_names,'a',@field_names_1);-- 取得r字段名
+
+          IF IFNULL(@field_names_1,'') NOT REGEXP 
+							'^\'(a[1-9][0-9]{0,1}[0]{0,1}){1,}\'(,\'(a[1-9][0-9]{0,1}[0]{0,1})*\')*$' THEN -- 校验A字段 允许为空
+
+							CALL audit(CONCAT_WS(':','3IN1',`funcid`),CONCAT_WS(':','afieldWarning:',@FIELD_NAMES_1),`funcid`,key_names,key_values,field_names,field_values,rowids);
+
+							SET @one = ''; 
+						ELSE 
+						 CALL Fetch_Set_values(field_values,'0',@field_values_1);
+
+						 CALL Temp_Func_2("?? := ??? \n",@field_names_1,@field_values_1,NULL,@one);
+
+ 					END IF;	
+
+						SET @3in1_body = CONCAT(@3in1_body,@ONE,IF(IFNULL(@ONE,'')='' ,'',','));	
+
+
+					CALL generate_one_en(@missionid,'0',@a_fields,@a_row,@a_value);
+-- SELECT b计算,B保存;
+					IF IFNULL(@a_fields,'') !='' THEN 
+
+								CALL Fetch_Set_values(@a_value,'0',@a_values_1);
+
+								CALL Temp_Func_3(
+ 													"ERR_A?? = ???? REGEXP ??? ", -- 1
+-- 													CONCAT_WS('',"ERR_A?? = \n",b计算),
+													NULL,-- 2
+													"a.right_count = @right_count := ", -- 3
+
+ 													"IFNULL(???? REGEXP ??? ,0)",-- 4
+-- 													b计算,
+													'+','a',-- 5
+													@a_fields,@a_values_1,@field_names_1,@field_values_1,@one);-- 6
+
+								SET @one =CONCAT(@one,'+');
+							ELSE 
+								SET @one ='';
+					END IF;
+-- SELECT @one;
+					IF @one ='' THEN
+						SET @one = CONCAT('a.line  = ',j(dblob,'line')),
+								@one = CONCAT_WS(',',@one, "a.right_count = @right_count := ");
+					END IF;
+
+					SET @3in1_body =CAST(
+											CONCAT("UPDATE ",@db_a," AS a, (\n",
+															"\t\t\t	SELECT \n",
+															"\t\t\t\t\t\t a1.classType, \n",
+															"\t\t\t\t\t\t IF(IFNULL(b.line_type,0) =0, 0, 1) AS is_line, \n",
+															"\t\t\t\t\t\t Count(b1.seal_id) AS shouldSeal, \n",
+															"\t\t\t\t\t\t Count(b3.expID) AS overSeal, \n",
+															"\t\t\t\t\t\t COUNT(b1.seal_id)-COUNT(b3.expid) AS unSealed, \n",
+															"\t\t\t\t\t\t @unS := \n",
+															"\t\t\t\t\t\t\t\t CAST(CONCAT_WS('\\n',\n",
+															"\t\t\t\t\t\t\t\t\t  CONCAT(IF(IFNULL(b0.max_page,1)=1 ,b0.billname,b0.page_title1),'缺少：（',\n",
+															"\t\t\t\t\t\t\t\t\t\t  GROUP_CONCAT(\n",
+															"\t\t\t\t\t\t\t\t\t\t\t 	IF((b.pageno = 0 AND b0.max_page >=1 or b.pageno =1) AND b1.pageid = 1 AND b3.expid IS NULL,CONCAT_WS('',b2.seal_name),NULL) \n",
+															"\t\t\t\t\t\t\t\t\t\t\t\t 	ORDER BY b1.seal_no) \n",
+															"\t\t\t\t\t\t\t\t ,'）'),",
+															Temp_Func(CONCAT("\n",
+															"\t\t\t\t\t\t\t\t\t CONCAT(b0.page_title??,'缺少：（',\n",
+															"\t\t\t\t\t\t\t\t\t\t  GROUP_CONCAT( \n",
+															"\t\t\t\t\t\t\t\t\t\t\t 	IF((b.pageno = 0 AND b0.max_page >=?? or b.pageno =??) AND b1.pageid = ?? AND b3.expid IS NULL,CONCAT_WS('',b2.seal_name),NULL) \n",
+															"\t\t\t\t\t\t\t\t\t\t\t\t 	ORDER BY b1.seal_no) \n",
+															"\t\t\t\t\t\t\t\t  ,'）')"),2,7,NULL),
+															"\t\t\t\t\t\t\t\t\t ,IF( Count(b1.seal_id)<>Count(b3.expID),'<p>注：请更换角色，在不同联次，完成签章！</p>',NULL) \n",
+															"\t\t\t\t\t\t\t\t  )AS CHAR ) AS uns,\n",
+															"\t\t\t\t\t\t IFNULL(a2.read_answer_size,0) as read_answer_size, \n",
+															"\t\t\t\t\t\t IFNULL(a2.answerScore,0) as answerScore, \n",
+															"\t\t\t\t\t\t IFNULL(a2.resultScore,0) AS resultScore, \n", 
+															"\t\t\t\t\t\t a2.pass_score_size, \n",
+															"\t\t\t\t\t\t a2.score_seal_size, \n",
+															"\t\t\t\t\t\t a2.score_line_size, \n",
+															"\t\t\t\t\t\t IFNULL(a2.resultcount,0) as resultcount, \n",
+															"\t\t\t\t\t\t @pt33 := IF(b.is_line,a2.score_line_size,0), \n",
+															"\t\t\t\t\t\t @pt44 :=a2.resultcount*a2.resultScore, \n",
+															"\t\t\t\t\t\t @pt55 :=a2.read_answer_size* a2.answerScore, \n",
+															"\t\t\t\t\t\t a2.max_score_size, \n",
+															"\t\t\t\t\t\t a2.redo_size \n",
+															"\t\t\t	FROM exp_experimentclass AS a1 \n",
+															"\t\t\t	INNER JOIN mysq1_schema.exp_difficulty AS a2 ON a1.difficulty_level = a2.difficulty_level \n",
+															"\t\t\t	JOIN acc_mission AS b ON b.missionId = ",QUOTE(@missionid)," \n",
+															"\t\t\t	INNER JOIN mysq1_schema.bill_list AS b0 ON b.billid = b0.billid \n",
+															"\t\t\t LEFT JOIN acc_mission_seal AS b1 ON b1.missionId = ",QUOTE(@missionid)," \n",
+															"\t\t\t INNER JOIN acc_enter_seal AS b2 ON b1.seal_id = b2.sealID AND b2.seal_content <> '操作' \n",
+															"\t\t\t INNER JOIN acc_enter_role AS b21 ON b21.roleid = b2.roleid \n",
+															"\t\t\t LEFT JOIN acc_seal_1 AS b3 ON b3.expID =",QUOTE(@expid)," \n",
+															"\t\t\t\t\t\t AND b3.missionId =",QUOTE(@missionid)," \n", 
+															"\t\t\t\t\t\t AND b1.pageId = b3.pageId AND b1.seal_id = b3.seal_Id \n",
+															"\t\t\t WHERE a1.ClassNo =",QUOTE(@statu_name)," \n",
+															"LOCK in SHARE mode",
+															"\t\t	) AS b  \n",
+														@3in1_body,
+														@one,@b_total," ,\n",
+														"a.log_count := IFNULL(a.log_count,0)+",IF(`funcid`=4,'1',0)," ,\n",
+														"a.already_no_seal = b.overSeal,\n",
+														"a.read_ans_size := IF(read_ans_size IS NULL ,0,a.read_ans_size) ,\n",
+														"a.error_count = @pt1 :=",REPLACE(@a_s,',','+'),",\n",
+ 														"a.pt1 = @pt1 := (@pt11 :=(100- IF(IFNULL(b.shouldSeal,0)=0,0,b.score_seal_size) -  b.score_line_size * b.is_line))*IF(IFNULL(@pt1,0) != 0,@right_count/@pt1,1), \n",
+														"a.pt2 = @pt2 := (@pt22 :=IF(IFNULL(b.shouldSeal,0)=0,0,b.score_seal_size))*b.overSeal/IF(b.shouldSeal = 0,1,b.shouldSeal), \n",
+														"a.pt3 = @pt3 := IF(b.is_line,IF(IFNULL(a.is_line,0),b.score_line_size,0),0), \n",
+														"a.pt4 = @pt4 := IF(b.resultcount > IFNULL(a.mission_result,0),a.mission_result,b.resultcount)*b.resultScore  ,\n",
+														"a.pt5 = @pt5 := IF(b.read_answer_size>a.read_ans_size, a.read_ans_size ,b.read_answer_size)* b.answerScore ,\n",
+														"a.score :=IF(IFNULL(@pt1,0) + IFNULL(@pt2,0) + IFNULL(@pt3,0)  - IFNULL(@pt4,0)  -IFNULL(@pt5,0) <0 ,0, IFNULL(@pt1,0) + IFNULL(@pt2,0) + IFNULL(@pt3,0)  - IFNULL(@pt4,0)  -IFNULL(@pt5,0))\n",
+														"WHERE a.missionId =",QUOTE(@missionid)," AND a.expid=",QUOTE(@expid)
+												)
+											AS CHAR);
+--  SELECT @3in1_body,'1';					
+					EXECUTE immediate @3in1_body;
+					-- 
+						
+					IF `funcid` <>4 THEN  SET @3in1_body="SELECT 'ok' AS teaa";LEAVE label4;END IF;
+					
+			IF	DATABASE() REGEXP  '5$' THEN
+ -- SELECT CONCAT_WS(',',QUOTE(@expid),QUOTE(@missionid),1); LEAVE `l`;
+					CALL v5_autoFlow(@expid,@missionid,1);
+					SET IS5=1;
+			END IF;
+
+
+					SET @3in1_body =CONCAT("
+
+SELECT \n",
+QUOTE(@expid)," AS expID,",
+QUOTE(@missionid)," AS missionId,",
+"IFNULL(d.redo_size,0) AS redoSize,
+IFNULL(d.max_score_size,0) AS missionMaxScore,
+IFNULL(a.score,0) AS missionScore,
+IFNULL(a.read_ans_size,0) AS readAnswer,
+IFNULL(a.read_ans_size,0) AS number,
+CAST(a.log_count AS char) AS logCount,
+IFNULL(a.error_count,0) AS error_count,
+IFNULL(a.right_count,0) AS RIGHT_COUNT,
+@b :=a.score AS tempscore,
+@pt44, @pt4,
+CAST(CASE WHEN IFNULL(c.CLASSTYPE,0) = 1   THEN CONCAT_WS('',
+'<h5><',C.CLASSNAME,'>','<h5>将在：',
+TIMEDIFF(c.endtime,NOW()),'后结束！')
+WHEN  d.difficulty_level =9 THEN '考试模式，无提示。' 
+WHEN a.log_count > d.resultcount THEN '提示次数用完'
+ELSE CONCAT_WS('','<h5><',e.node_No,'.',f.typesort,'>',TRIM(g.missionLabel),'（合格率:',
+IF(@b =0, 0,IF(ROUND(@b,2)=CEIL(@b),CEIL(@b),ROUND(@b,2))),
+'%）</h5>'",
+IF(@pt11<>0,CONCAT(",'<p>填空得分( ",@pt11," )：",CEIL(@pt1),"</p>'"),""),"\n",
+IF(@pt22<>0,CONCAT(",'<p>签章得分( ",FLOOR(@pt22)," )：",CEIL(@pt2),"</p>'"),""),"\n",
+IF(@pt33<>0,CONCAT(",'<p>画线得分( ",@pt33," )：",CEIL(@pt3),"</p>'"),""),"\n",
+IF(@pt44<>0 AND @pt4 <> 0,CONCAT(",'<p>对比扣分( -",@pt44," )：-",CEIL(@pt4),"</p>'"),""),"\n",
+IF(@pt55<>0 AND @pt5 <> 0,CONCAT(",'<p>查看答案扣分( -",@pt55," )：-",CEIL(@pt5),"</p>'"),""),"\n",
+IF(CHAR_LENGTH(@uns) <>0,CONCAT(",'<p>提示：</p>',",QUOTE(@uns)),''),"\n",
+")END AS char)AS missionLabel
+FROM acc_1 AS a
+LEFT JOIN acc_mission AS g ON g.missionId = a.missionId 
+LEFT JOIN exp_experimentclassstudent AS b ON a.expID = b.expNo
+LEFT JOIN exp_experimentclass AS c ON b.classNo = c.classNo
+",IF(IS5,'',"LEFT JOIN exp_experimentclass_course AS c1 ON c1.classNo = c.classNo"),"
+LEFT JOIN mysq1_schema.exp_difficulty AS d ON c.difficulty_level = d.difficulty_level
+LEFT JOIN exp_courses_node_content AS f ON g.missionId = f.missionid
+INNER JOIN exp_courses_node AS e ON  f.contentNo = e.contentNo  AND ",IF(IS5 ,'c','c1'),".courseNo = e.node_courseNo
+",	"\nWHERE a.missionId =",QUOTE(@missionid)," AND a.expid=",QUOTE(@expid));
+ -- SELECT @3in1_body 		;			
+--  SELECT @EXPID,@3in1_body; LEAVE  `l`;
+--  LEAVE `l`;
+				END label4A;-- 处理 A字段,';'
+			END label4;
+
+
+	END CASE;
+/*
+	IF IFNULL(@3in1_body,'')= '' THEN
+		SET @3in1_body ="SELECT NULL as `Elabel400`";
+		CALL audit('3IN1',CONCAT_WS(':',IFNULL(`funcid`,'400'),'something ERROR:',QUOTE(rowids)),`funcid`,key_names,key_values,field_names,field_values,rowids);
+	END IF;
+*/-- SELECT CAST(@3in1_body as CHAR) ;-- LEAVE `l`;--  
+
+		EXECUTE immediate  @3in1_body;
+-- select '1','2';
+--   SELECT @3in1_body; LEAVE `l`;
+-- SELECT null ;
 END
 ;;
 DELIMITER ;
@@ -6104,14 +6168,14 @@ DELIMITER ;
 -- ----------------------------
 DROP FUNCTION IF EXISTS `isnu`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `isnu`(`m0` blob) RETURNS double
+CREATE DEFINER=`root`@`localhost` FUNCTION `isnu`(`m0` blob) RETURNS blob
     NO SQL
     DETERMINISTIC
 BEGIN
 	#Routine body goes here...
   
-	RETURN CASE WHEN m0 IS NULL || m0 ='0' || m0='' THEN 0
-	ELSE m0 END;
+	RETURN  REGEXP_replace(CASE WHEN m0 IS NULL || m0 ='0' || m0='' THEN 0
+	ELSE m0 END,',','');
 END
 ;;
 DELIMITER ;
@@ -7603,13 +7667,14 @@ funid
 	DECLARE `0` BLOB DEFAULT NULL;
 	DECLARE `1` BLOB DEFAULT NULL;
 	DECLARE `2` BLOB DEFAULT NULL;
+	DECLARE `r` text DEFAULT NULL;
 
 
-/*
+
 CALL Audit_1('m_j',CONCAT_WS(',',QUOTE(`FunId`),QUOTE(`dblob`)),'ok');
 
-COMMIT;LEAVE m_j;
-*/
+COMMIT;
+/*LEAVE m_j;*/
 
   SET @stmt_json = NULL,
 	 		`0` = j0(dblob,'0'),
@@ -7617,11 +7682,11 @@ COMMIT;LEAVE m_j;
 			`1` = j0(dblob,'1');
 
 
-	CASE SUBSTR(`FunId`,1,1)
+	CASE 
 
-			WHEN '1' THEN
-			CASE `FunId`
-					WHEN '11' THEN 
+			WHEN `FunId` REGEXP '^1' THEN
+			CASE 
+					WHEN `FunId`= '11' THEN 
 						SET @`1C` = '1,2,3,4',
 								@`1C` = preg_replace(r('`2c`'),"CONCAT(quotn('$1'),':{\"v\":',quotn(a.$1),'}')$2",@`1C`),
 								@stmt_json = CONCAT_WS('',"SELECT a.bdId,a.line,CONCAT_WS('',quotn(a.rowNo),':{',CONCAT_WS(''",",",@`1C`,"),'}') AS b ",'FROM bigdata_ab AS a WHERE a.bdId = "bdId-160604233010318113"'),
@@ -7630,19 +7695,20 @@ COMMIT;LEAVE m_j;
 
 				ELSE SET	@stmt_json = CONCAT_WS('','SELECT "Wrong or no `FunId` ',QUOTE(`FunId`),'" AS mes');
 			END CASE;
-			WHEN '0' THEN 
-				CASE `FunId`
-						WHEN	'01' THEN 
+
+			WHEN `FunId` REGEXP '^0' THEN 
+				CASE 
+						WHEN	`FunId` = '01' THEN 
 									SET	@stmt_json = CONCAT_WS("","INSERT ","acc_enter_backfile",	"(enterId,EnterBFid,enterback_title,file_name,enterback_file,billid)", 	"\nVALUE(",CONCAT_WS(",",
 																			j1(`0`,"enterId"),
 																			IF(j1(`0`,"EnterBFid") = "NULL" OR j1(`0`,"EnterBFid") = ""  ,QUOTE(gkey("ENTbf")),j1(dblob,"EnterBFid")),
 																			j1(`0`,"enterback_title"),j1(`0`,"file_name"), QUOTE(`1`),j1(`0`,"billid")),")");
-						WHEN '02' THEN 
+						WHEN `FunId` = '02' THEN 
 											SET @stmt_json = CONCAT_WS("","SELECT c(quotj(CONCAT_WS(',' ,a.`0`,a.`1`))) as file \nFROM(\n", 
 													"SELECT ",t_ckv('0',1,'a.enterId,a.EnterBFid,a.enterback_title,a.file_name,a.billid'), 'AS `0`,\n','CONCAT("\\\"a\\\"",":",','a.enterback_file) AS `1`',"\nFROM acc_enter_backfile AS a\nWHERE 1" ,
 													preg_replace(REG('R1'),' AND $2 = $4',`0`),'\n) AS a');
 
-						WHEN '03' THEN 
+						WHEN `FunId`='03' THEN 
 											SET @stmt_json = CONCAT_WS("","UPDATE acc_enter_backfile AS a \n SET a.enterback_file =", QUOTE(`1`),
 																				IF(IFNULL(`2`,'') = '', NULL,CONCAT(',',preg_replace(REG('R1'),'\n$2 = $3',`2`))),
 																								"WHERE 1 \n", preg_replace(REG('R1'),' AND $2 = $4',`0`));
@@ -7650,12 +7716,14 @@ COMMIT;LEAVE m_j;
 				ELSE	SET	@stmt_json = CONCAT_WS('','SELECT "Wrong or no `FunId` ',QUOTE(`FunId`),'" AS mes');
 			END CASE; 
 
-		ELSE 	BEGIN
-			CASE `FunId`				
-			WHEN '4' THEN 
-					SET @stmt_json = CONCAT_WS("","DELETE a.*,b.* FROM acc_a AS a LEFT JOIN acc_b AS b ON a.expID = b.expID AND a.missionId = b.missionId\nWHERE 1 ",
+		ELSE 	BEGIN 	DECLARE `acc_b` VARCHAR(10) DEFAULT NULL;
+		-- 	
+				SET `acc_b` =expid2b(CAST(json_value(dblob,'$.0.expID') AS CHAR));
+			CASE			
+			WHEN  `FunId`	= '4' THEN 
+					SET @stmt_json = CONCAT_WS("","DELETE a.*,b.* FROM acc_a AS a LEFT JOIN ",`acc_b`,"  AS b ON a.expID = b.expID AND a.missionId = b.missionId\nWHERE 1 ",
 																		 preg_replace(REG('R1'),' AND  a.$2 = $4 ',`0`));
-			WHEN '5' THEN 
+			WHEN `FunId` = '5' THEN 
 			 BEGIN 
 				DECLARE `1C` VARCHAR(2000) DEFAULT NULL;
 				DECLARE `2C` VARCHAR(2000) DEFAULT NULL;
@@ -7663,7 +7731,7 @@ COMMIT;LEAVE m_j;
 -- b
 					SET `1C` = '1,2,3,4,5',
 							`2C` = '1,2,3,4',
-
+	
 							@`1C` = preg_replace(REG('2col'),' null AS b$1',`1C`),
 							@`2C` = preg_replace(REG('2col'),'a.b$1',`2C`),
 
@@ -7671,7 +7739,7 @@ COMMIT;LEAVE m_j;
 															" FROM acc_mission AS a WHERE a.missionId IS NULL",
 															"\nUNION ALL\n",
 															"SELECT  @rowId := @rowId +1,preg_capture(",QUOTE(REG('index')),",b.missionLabel),",@`2C`,
-															"\nFROM acc_b AS a\n",
+															"\nFROM ",`acc_b`,"  AS a\n",
 															'INNER JOIN acc_mission AS b ON a.missionId = b.missionId\n',
 															"WHERE a.expID = ",json_extract(`0`,'$.expID'),
 															' AND\n\tCONCAT_WS("",',@`2C`,')!=""'
@@ -7692,7 +7760,7 @@ COMMIT;LEAVE m_j;
 
 			END;
 
-			WHEN '6' THEN 
+			WHEN `FunId` = '6' THEN 
 			 BEGIN 
 
 				DECLARE `1C` VARCHAR(2000) DEFAULT NULL;
@@ -7700,21 +7768,240 @@ COMMIT;LEAVE m_j;
 
 -- b
 				SET		`1C` = '1,3,4,5,6',
-							@stmt_json = CONCAT_WS('',"SELECT b.rowNo,b.b1,","/*@t, 3  b.b3,*/money(CASE @t WHEN 0 THEN b.b3 WHEN 1  THEN @b3  WHEN 2 THEN @z3 END) AS b3,","/*4 c.b3*/money(CASE @t WHEN 0 THEN c.b3 WHEN 1  THEN @b4  WHEN 2 THEN @z4 END)  AS b4,","/*b.b5 c.b4*/money(CASE @t WHEN 0 THEN c.b4 WHEN 1  THEN @b5  WHEN 2 THEN @z5 END)  AS b5,","/*6*/money(CASE @t WHEN 0 THEN isnu(b.b3) + isnu(c.b3) - isnu(c.b4) WHEN 1 THEN @b3 + @b4 -@b5 WHEN 2 THEN @z3 + @z4 -@z5 END) AS b6,\n","/*clear*/CASE @t WHEN 0 THEN if1(@b3 := @b3 + isnu(b.b3)) AND if1(@b4 := @b4 + isnu(c.b3)) AND if1(@b5 := @b5 + isnu(c.b4)) WHEN 1  THEN if1(@z3 := @z3 + @b3) AND if1(@b3:=0) AND if1(@z4 := @z4 + @b4) AND if1(@b4:=0) AND if1(@z5 := @z5 + @b5) AND if1(@b5:=0) WHEN 2 THEN IF(b.b1 LIKE '负债合计%',1,if1(@z3:=0) AND if1(@z4:=0) AND if1(@z5:=0)) END \n",																			"FROM acc_standard_n AS b LEFT JOIN acc_b AS c ON c.expID = ",json_extract(`0`,'$.expID'), " AND b.b1 = c.b2\n",																			"WHERE b.missionId = ",json_extract(`0`,'$.missionId')," AND if1(@t := CASE WHEN b.b1 LIKE '%合计%' AND NOT b.b1 LIKE '负债合计%'  THEN 1 WHEN b.b1 LIKE '%总计%' OR b.b1 LIKE '负债合计%' THEN 2 ELSE 0 END)" ),
+							`r` = '(?ms)"[45]":{"v":\\s*(?:"(?:(?=\\\\).{2}|(?!["\\\\]).)*?"|null|\\-?[\\d,]+(?:\\.\\d+))\\K,\\s*"c":\\s*"1"';
+
+				SET		@stmt_json = CONCAT_WS('',"SELECT b.rowNo,b.b1,","/*@t, 3  b.b3,*/money(CASE @t WHEN 0 THEN b.b3 WHEN 1  THEN @b3  WHEN 2 THEN @z3 END) AS b3,","/*4 c.b3*/money(CASE @t WHEN 0 THEN c.b3 WHEN 1  THEN @b4  WHEN 2 THEN @z4 END)  AS b4,","/*b.b5 c.b4*/money(CASE @t WHEN 0 THEN c.b4 WHEN 1  THEN @b5  WHEN 2 THEN @z5 END)  AS b5,","/*6*/money(CASE @t WHEN 0 THEN isnu(b.b3) + isnu(c.b3) - isnu(c.b4) WHEN 1 THEN @b3 + @b4 -@b5 WHEN 2 THEN @z3 + @z4 -@z5 END) AS b6,\n","/*clear*/CASE @t WHEN 0 THEN if1(@b3 := @b3 + isnu(b.b3)) AND if1(@b4 := @b4 + isnu(c.b3)) AND if1(@b5 := @b5 + isnu(c.b4)) WHEN 1  THEN if1(@z3 := @z3 + @b3) AND if1(@b3:=0) AND if1(@z4 := @z4 + @b4) AND if1(@b4:=0) AND if1(@z5 := @z5 + @b5) AND if1(@b5:=0) WHEN 2 THEN IF(b.b1 LIKE '负债合计%',1,if1(@z3:=0) AND if1(@z4:=0) AND if1(@z5:=0)) END \n",																			"FROM acc_standard_n AS b LEFT JOIN ",`acc_b`,"  AS c ON c.expID = ",json_extract(`0`,'$.expID'), " AND b.b1 = c.b2\n",																			"WHERE b.missionId = ",json_extract(`0`,'$.missionId')," AND if1(@t := CASE WHEN b.b1 LIKE '%合计%' AND NOT b.b1 LIKE '负债合计%'  THEN 1 WHEN b.b1 LIKE '%总计%' OR b.b1 LIKE '负债合计%' THEN 2 ELSE 0 END)" ),
 							@stmt_json = CONCAT_WS('',"SELECT  quotd(a.rowNo) AS rowno,quotj(CONCAT_WS(',',",CONCAT_WS(',',preg_replace(REG('2c'),"CONCAT(quotn('$1'),':{\"v\":',quotn(b$1),',\"c\":\"1\"}')$2",`1C`)),')) AS b\n',														"FROM(\n",@stmt_json,"\n) AS a "),
 							@stmt_json = CONCAT_WS('',"SELECT c(CONCAT_WS('',CONCAT('{\"line\":',quotd(COUNT(*))),',',GROUP_CONCAT(CONCAT_WS('',a.rowno,':',a.b,'\n')),'}')) AS b\nFROM(\n",													@stmt_json,"\n) AS a ")/**/ ;
 
- -- SELECT  c(@stmt_json );  LEAVE m_j;
+				SET		@stmt_json = CONCAT_WS('',"SELECT REGEXP_replace(b,",QUOTE(`r`),",'') b\nFROM(\n",@stmt_json,"\n) AS a ");
+
 
 				SET @rowId = 0,@t = 0, @b3 = 0.00,@b4 = 0.00,@b5 = 0.00,@b6 = 0.00,@z3 = 0.00,@z4 = 0.00,@z5 = 0.00,@z6 = 0.00;
+-- SELECT  c(@stmt_json );  LEAVE m_j;
+				EXECUTE  immediate @stmt_json;
 
+				LEAVE m_j;
+
+			END;
+
+			WHEN `FunId`= '7' || `FunId`= '8' THEN 
+			 BEGIN 
+
+				DECLARE `1C` VARCHAR(2000) DEFAULT NULL;
+				DECLARE `2C` VARCHAR(2000) DEFAULT NULL;
+-- b
+				SET		`1C` = REPLACE('`1`,`3`,`4`,`5`,`6`','`',''),
+							`2C` = REPLACE('`1`,`2`,`3`,`4`','`',''),
+							`r` = '(?ms)"[45]":{"v":\\s*(?:"(?:(?=\\\\).{2}|(?!["\\\\]).)*?"|null|\\-?[\\d,]+(?:\\.\\d+))\\K,\\s*"c":\\s*"1"';
+
+				SET		@stmt_json = CONCAT_WS('',"SELECT c.expID,c.missionId,c.rowId,c.b1,c.b2,Sum(c.b3) AS b3,c(GROUP_CONCAT(IF(IFNULL(c.b3,'')!='',REGEXP_substr(a.missionLabel,",QUOTE(R('index')),"),NULL))) AS t3,SUM(c.b4) AS b4 ,c(GROUP_CONCAT(IF(IFNULL(c.b4,'')!='',REGEXP_substr(a.missionLabel,",QUOTE(R('index')),"),NULL))) AS t4 FROM ",`acc_b`,"  AS c INNER JOIN acc_mission AS a ON c.missionId = a.missionId  WHERE c.expID = ",json_extract(`0`,'$.expID'), " GROUP BY TRIM(c.b2)"),
+							@stmt_json = CONCAT_WS('',"SELECT b.rowNo,b.b1,NULL AS t1,NULL AS t2, NULL AS t3,NULL AS t6,","/* @t,@b3,b.b3,*/money(@`1`:= if(if1(@b3 := @b3 + @t*isnu(b.b3)) AND @t = '0.0',@b3,b.b3)) AS b3,","/*c.b3 AS b3,@b4,b.b4,*/money(@`2`:= IF(if1(@b4 := @b4 + isnu(c.b3)) AND @t = '0.0',@b4,c.b3)) AS b4,c.t4,","/*c.b3 AS cb3,@b4,*/money(@`3`:= if(if1(@b5 := @b5 + isnu(c.b4)) AND @t = '0.0',@b5,c.b4)) AS b5,c.t4 AS t5,","/*b6,*/money(CASE WHEN @t =1 OR @t ='0.0' THEN isnu(@`1`)-isnu(@`2`)+ isnu(@`3`) ELSE isnu(@`1`)+isnu(@`2`)-isnu(@`3`) END) AS b6\n","FROM acc_standard_n AS b LEFT JOIN(",@stmt_json,")AS c ON INSTR(b.b1,c.b2)\n",	"WHERE b.missionId = ",json_extract(`0`,'$.missionId')," AND if1(@t := CASE WHEN b.b1 REGEXP '^(减)' THEN '-1' WHEN b.b1 REGEXP '^(加)' THEN '1' WHEN b.b1 REGEXP '^其中' THEN '0'WHEN b.b1 REGEXP '^(一|五)' THEN '1' WHEN b.b1 REGEXP CONCAT('^(',R1('〇-九'),')') THEN '0.0' ELSE @t END)" ),
+							@stmt_json = CONCAT_WS('',"SELECT  quotd(a.rowNo) AS rowno,quotj(CONCAT_WS(',',",CONCAT_WS(',',preg_replace(REG('2c'),"CONCAT(quotn('$1'),':{\"v\":',quotn(b$1),',\"c\":\"1\"',IF((@tt:=CONCAT(',\"t\":',quotd(t$1)))IS NULL,'',@tt),'}')$2",`1C`)),')) AS b\n',"FROM(\n",@stmt_json,"\n) AS a "),
+							@stmt_json = CONCAT_WS('',"SELECT c(CONCAT_WS('',CONCAT('{\"line\":',quotd(COUNT(*))),',',GROUP_CONCAT(CONCAT_WS('',a.rowno,':',a.b,'\n')),'}')) AS b\nFROM(\n",@stmt_json,"\n) AS a ");
+
+				SET		@stmt_json = CONCAT_WS('',"SELECT REGEXP_replace(b,",QUOTE(`r`),",'') b\nFROM(\n",@stmt_json,"\n) AS a ");
+
+
+
+
+					SET @t = '',@b3 = -0.00,@b4 = -0.00,@b5 = -0.00,@`1`=null,@`2`=0,@`3`=0;
+-- SELECT  c(@stmt_json );--  LEAVE m_j;
+					EXECUTE immediate  @stmt_json;
+
+					LEAVE m_j;
+
+				END;
+
+			WHEN `FunId` ='888' THEN 
+			 BEGIN 
+
+				DECLARE `1C` VARCHAR(2000) DEFAULT NULL;
+				DECLARE `2C` VARCHAR(2000) DEFAULT NULL;
+
+-- b
+				SET		`1C` = REPLACE('`1`,`3`,`4`,`5`,`6`','`',''),
+							`2C` = REPLACE('`1`,`2`,`3`,`4`','`',''),
+							`r` = '(?ms)"[45]":{"v":\\s*(?:"(?:(?=\\\\).{2}|(?!["\\\\]).)*?"|null|\\-?[\\d,]+(?:\\.\\d+))\\K,\\s*"c":\\s*"1"';
+
+				SET		@stmt_json = CONCAT_WS('',"SELECT c.expID,c.missionId,c.rowId,c.b1,c.b2,Sum(c.b3) AS b3,c(GROUP_CONCAT(IF(IFNULL(c.b3,'')!='',REGEXP_substr(a.missionLabel,",QUOTE(R('index')),"),NULL))) AS t3,SUM(c.b4) AS b4 ,c(GROUP_CONCAT(IF(IFNULL(c.b4,'')!='',REGEXP_substr(a.missionLabel,",QUOTE(R('index')),"),NULL))) AS t4 FROM ",`acc_b`,"  AS c INNER JOIN acc_mission AS a ON c.missionId = a.missionId  WHERE c.expID = ",json_extract(`0`,'$.expID'), " GROUP BY TRIM(c.b2)"),
+							@stmt_json = CONCAT_WS('',"SELECT b.rowNo,b.b1,NULL AS t1,NULL AS t2, NULL AS t3,NULL AS t6,","/* @t,@b3,b.b3,*/money(@`1`:= if(if1(@b3 := @b3 + @t*isnu(b.b3)) AND @t = '0.0',@b3,b.b3)) AS b3,","/*c.b3 AS b3,@b4,b.b4,*/money(@`2`:= IF(if1(@b4 := @b4 + isnu(c.b3)) AND @t = '0.0',@b4,c.b3)) AS b4,c.t4,","/*c.b3 AS cb3,@b4,*/money(@`3`:= if(if1(@b5 := @b5 + isnu(c.b4)) AND @t = '0.0',@b5,c.b4)) AS b5,c.t4 AS t5,","/*b6,*/money(CASE WHEN @t =1 OR @t ='0.0' THEN isnu(@`1`)-isnu(@`2`)+ isnu(@`3`) ELSE isnu(@`1`)+isnu(@`2`)-isnu(@`3`) END) AS b6\n","FROM acc_standard_n AS b LEFT JOIN(",@stmt_json,")AS c ON INSTR(b.b1,c.b2)\n",	"WHERE b.missionId = ",json_extract(`0`,'$.missionId')," AND if1(@t := CASE WHEN b.b1 REGEXP '^(减)' THEN '-1' WHEN b.b1 REGEXP '^(加)' THEN '1' WHEN b.b1 REGEXP '^其中' THEN '0'WHEN b.b1 REGEXP '^(一|五)' THEN '1' WHEN b.b1 REGEXP CONCAT('^(',R1('〇-九'),')') THEN '0.0' ELSE @t END)" ),
+							@stmt_json = CONCAT_WS('',"SELECT  quotd(a.rowNo) AS rowno,quotj(CONCAT_WS(',',",CONCAT_WS(',',preg_replace(REG('2c'),"CONCAT(quotn('$1'),':{\"v\":',quotn(b$1),',\"c\":\"1\"',IF((@tt:=CONCAT(',\"t\":',quotd(t$1)))IS NULL,'',@tt),'}')$2",`1C`)),')) AS b\n',"FROM(\n",@stmt_json,"\n) AS a "),
+							@stmt_json = CONCAT_WS('',"SELECT c(CONCAT_WS('',CONCAT('{\"line\":',quotd(COUNT(*))),',',GROUP_CONCAT(CONCAT_WS('',a.rowno,':',a.b,'\n')),'}')) AS b\nFROM(\n",@stmt_json,"\n) AS a ");
+
+				SET		@stmt_json = CONCAT_WS('',"SELECT REGEXP_replace(b,",QUOTE(`r`),",'') b\nFROM(\n",@stmt_json,"\n) AS a ");
+
+
+
+
+					SET @t = '',@b3 = -0.00,@b4 = -0.00,@b5 = -0.00,@`1`=0,@`2`=0,@`3`=0;
+-- SELECT  c(@stmt_json ); LEAVE m_j;
+					EXECUTE immediate @stmt_json;
+
+					LEAVE m_j;
+
+				END;
+			ELSE 
+					SET	@stmt_json = CONCAT_WS('','SELECT "Wrong or no `FunId` ',QUOTE(`FunId`),'" AS mes') ;
+
+			END CASE;	END;
+
+	END CASE;
+
+-- SELECT CAST(@stmt_json AS CHAR); LEAVE m_j;
+	PREPARE stmt_json FROM @stmt_json;
+	EXECUTE stmt_json ;
+
+
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `m_j_copy`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `m_j_copy`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `m_j_copy`(IN `FunId` varchar(2),in `dblob` LONGBLOB)
+m_j:BEGIN
+/*
+
+'01','{"0":{"enterId":"ENT15110213191300479","billid":""},"1":{"a1":"中泰纸业股份有限公司", "a2":"中泰纸业股份有限公司", "a3":"交通银行武汉汉阳支行","a4": "62222000639018171286","a5":"check:on", "a6": "账户：中国工商银行武汉汉阳支行（一般账户）； 账号：4200603100988125629；性质：股份有限公司，在深圳中小板上市，股票代码：002996 ；经营范围：商务信息用纸的研发、生产、销售； 增值税一般纳税人（税率17%），企业所得税税率为25%； 本公司产品分为热敏纸、无碳打印纸两大系列，其中热敏纸系列包括传真纸、POS用纸、ATM打印单、彩票纸、电影票五个品种；无碳打印纸系列包括密码信封、多联发票、压感打印纸三个品种","a7": "2011年1月1日", "a8": "医院会计","a9": "赵伟峰", "a10": "王珂玲", "a11": "方丽芳", "a12": "李有为", "a13": "白建勇"}}'
+'02','{"0":{"enter":"ENT15110213191300479","billid":""},"1":{"a1":"中泰纸业股份有限公司","a2":"中泰纸业股份有限公司","a3":"交通银行武汉汉阳支行","a4":"62222000639018171286","a5":"check:on","a6":"账户：中国工商银行武汉汉阳支行（一般账户）； 账号：4200603100988125629；性质：股份有限公司，在深圳中小板上市，股票代码：002996 ；经营范围：商务信息用纸的研发、生产、销售； 增值税一般纳税人（税率17%），企业所得税税率为25%； 本公司产品分为热敏纸、无碳打印纸两大系列，其中热敏纸系列包括传真纸、POS用纸、ATM打印单、彩票纸、电影票五个品种；无碳打印纸系列包括密码信封、多联发票、压感打印纸三个品种","a7":"2011年1月1日","a8":"医院会计","a9":"赵伟峰","a10":"王珂玲","a11":"方丽芳","a12":"李有为","a13":"白建勇"}}'
+funid
+企业资料
+01 02 03 04 增 读 改 删
+1 经济业务列表 
+11 12 13 14 读 写 改 删
+
+4 删除 acc_b 
+
+5 ab - billid  汇总 加载
+6 ab - billid  试算 加载 
+
+*/
+	DECLARE `0` BLOB DEFAULT NULL;
+	DECLARE `1` BLOB DEFAULT NULL;
+	DECLARE `2` BLOB DEFAULT NULL;
+	DECLARE `r` text DEFAULT NULL;
+
+
+/*
+CALL Audit_1('m_j',CONCAT_WS(',',QUOTE(`FunId`),QUOTE(`dblob`)),'ok');
+
+COMMIT;
+/*LEAVE m_j;*/
+
+  SET @stmt_json = NULL,
+	 		`0` = j0(dblob,'0'),
+			`2` = j0(dblob,'2'),
+			`1` = j0(dblob,'1');
+
+
+	CASE 
+
+			WHEN `FunId` REGEXP '^1' THEN
+			CASE 
+					WHEN `FunId`= '11' THEN 
+						SET @`1C` = '1,2,3,4',
+								@`1C` = preg_replace(r('`2c`'),"CONCAT(quotn('$1'),':{\"v\":',quotn(a.$1),'}')$2",@`1C`),
+								@stmt_json = CONCAT_WS('',"SELECT a.bdId,a.line,CONCAT_WS('',quotn(a.rowNo),':{',CONCAT_WS(''",",",@`1C`,"),'}') AS b ",'FROM bigdata_ab AS a WHERE a.bdId = "bdId-160604233010318113"'),
+								@stmt_json = CONCAT_WS('',"SELECT CONCAT_WS('','{',kv0('bdId',a.bdId,0),kv0('line',COUNT(*),0),GROUP_CONCAT(a.b SEPARATOR ',') ,'}') AS b\n",
+'FROM(\n',@stmt_json,'\n)AS a');
+
+				ELSE SET	@stmt_json = CONCAT_WS('','SELECT "Wrong or no `FunId` ',QUOTE(`FunId`),'" AS mes');
+			END CASE;
+
+			WHEN `FunId` REGEXP '^0' THEN 
+				CASE 
+						WHEN	`FunId` = '01' THEN 
+									SET	@stmt_json = CONCAT_WS("","INSERT ","acc_enter_backfile",	"(enterId,EnterBFid,enterback_title,file_name,enterback_file,billid)", 	"\nVALUE(",CONCAT_WS(",",
+																			j1(`0`,"enterId"),
+																			IF(j1(`0`,"EnterBFid") = "NULL" OR j1(`0`,"EnterBFid") = ""  ,QUOTE(gkey("ENTbf")),j1(dblob,"EnterBFid")),
+																			j1(`0`,"enterback_title"),j1(`0`,"file_name"), QUOTE(`1`),j1(`0`,"billid")),")");
+						WHEN `FunId` = '02' THEN 
+											SET @stmt_json = CONCAT_WS("","SELECT c(quotj(CONCAT_WS(',' ,a.`0`,a.`1`))) as file \nFROM(\n", 
+													"SELECT ",t_ckv('0',1,'a.enterId,a.EnterBFid,a.enterback_title,a.file_name,a.billid'), 'AS `0`,\n','CONCAT("\\\"a\\\"",":",','a.enterback_file) AS `1`',"\nFROM acc_enter_backfile AS a\nWHERE 1" ,
+													preg_replace(REG('R1'),' AND $2 = $4',`0`),'\n) AS a');
+
+						WHEN `FunId`='03' THEN 
+											SET @stmt_json = CONCAT_WS("","UPDATE acc_enter_backfile AS a \n SET a.enterback_file =", QUOTE(`1`),
+																				IF(IFNULL(`2`,'') = '', NULL,CONCAT(',',preg_replace(REG('R1'),'\n$2 = $3',`2`))),
+																								"WHERE 1 \n", preg_replace(REG('R1'),' AND $2 = $4',`0`));
+
+				ELSE	SET	@stmt_json = CONCAT_WS('','SELECT "Wrong or no `FunId` ',QUOTE(`FunId`),'" AS mes');
+			END CASE; 
+
+		ELSE 	BEGIN 	DECLARE `acc_b` VARCHAR(10) DEFAULT NULL;
+		-- 	
+				SET `acc_b` =expid2b(CAST(json_value(dblob,'$.0.expID') AS CHAR));
+			CASE			
+			WHEN  `FunId`	= '4' THEN 
+					SET @stmt_json = CONCAT_WS("","DELETE a.*,b.* FROM acc_a AS a LEFT JOIN ",`acc_b`,"  AS b ON a.expID = b.expID AND a.missionId = b.missionId\nWHERE 1 ",
+																		 preg_replace(REG('R1'),' AND  a.$2 = $4 ',`0`));
+			WHEN `FunId` = '5' THEN 
+			 BEGIN 
+				DECLARE `1C` VARCHAR(2000) DEFAULT NULL;
+				DECLARE `2C` VARCHAR(2000) DEFAULT NULL;
+
+-- b
+					SET `1C` = '1,2,3,4,5',
+							`2C` = '1,2,3,4',
+	
+							@`1C` = preg_replace(REG('2col'),' null AS b$1',`1C`),
+							@`2C` = preg_replace(REG('2col'),'a.b$1',`2C`),
+
+							@stmt_json = CONCAT_WS('',"SELECT NULL AS rowNo,", @`1C`,
+															" FROM acc_mission AS a WHERE a.missionId IS NULL",
+															"\nUNION ALL\n",
+															"SELECT  @rowId := @rowId +1,preg_capture(",QUOTE(REG('index')),",b.missionLabel),",@`2C`,
+															"\nFROM ",`acc_b`,"  AS a\n",
+															'INNER JOIN acc_mission AS b ON a.missionId = b.missionId\n',
+															"WHERE a.expID = ",json_extract(`0`,'$.expID'),
+															' AND\n\tCONCAT_WS("",',@`2C`,')!=""'
+															),
+							@stmt_json = CONCAT_WS('',"SELECT  quotd(a.rowNo) AS rowno,quotj(CONCAT_WS(',',",CONCAT_WS(',',
+														preg_replace(REG('2c'),"CONCAT(quotn('$1'),':{\"v\":',quotn(b$1),',\"c\":\"1\"}')$2",`1C`)),')) AS b\n',
+														"FROM(\n",@stmt_json,"\n) AS a "),
+
+							@stmt_json = CONCAT_WS('',"SELECT c(CONCAT_WS('',CONCAT('{\"line\":',quotd(COUNT(*))),',',GROUP_CONCAT(CONCAT_WS('',a.rowno,':',a.b,'\n')),'}')) AS b\nFROM(\n",
+													@stmt_json,"\n) AS a ");
+
+	
+-- SELECT  c(@stmt_json ); LEAVE m_j;
+				SET @rowId = 0;
 				PREPARE stmt_json FROM @stmt_json;
 				EXECUTE stmt_json ;
 				LEAVE m_j;
 
 			END;
 
-			WHEN '7' THEN 
+			WHEN `FunId` = '6' THEN 
+			 BEGIN 
+
+				DECLARE `1C` VARCHAR(2000) DEFAULT NULL;
+				DECLARE `2C` VARCHAR(2000) DEFAULT NULL;
+
+-- b
+				SET		`1C` = '1,3,4,5,6',
+							`r` = '(?ms)"[45]":{"v":\\s*(?:"(?:(?=\\\\).{2}|(?!["\\\\]).)*?"|null|\\-?[\\d,]+(?:\\.\\d+))\\K,\\s*"c":\\s*"1"';
+
+				SET		@stmt_json = CONCAT_WS('',"SELECT b.rowNo,b.b1,","/*@t, 3  b.b3,*/money(CASE @t WHEN 0 THEN b.b3 WHEN 1  THEN @b3  WHEN 2 THEN @z3 END) AS b3,","/*4 c.b3*/money(CASE @t WHEN 0 THEN c.b3 WHEN 1  THEN @b4  WHEN 2 THEN @z4 END)  AS b4,","/*b.b5 c.b4*/money(CASE @t WHEN 0 THEN c.b4 WHEN 1  THEN @b5  WHEN 2 THEN @z5 END)  AS b5,","/*6*/money(CASE @t WHEN 0 THEN isnu(b.b3) + isnu(c.b3) - isnu(c.b4) WHEN 1 THEN @b3 + @b4 -@b5 WHEN 2 THEN @z3 + @z4 -@z5 END) AS b6,\n","/*clear*/CASE @t WHEN 0 THEN if1(@b3 := @b3 + isnu(b.b3)) AND if1(@b4 := @b4 + isnu(c.b3)) AND if1(@b5 := @b5 + isnu(c.b4)) WHEN 1  THEN if1(@z3 := @z3 + @b3) AND if1(@b3:=0) AND if1(@z4 := @z4 + @b4) AND if1(@b4:=0) AND if1(@z5 := @z5 + @b5) AND if1(@b5:=0) WHEN 2 THEN IF(b.b1 LIKE '负债合计%',1,if1(@z3:=0) AND if1(@z4:=0) AND if1(@z5:=0)) END \n",																			"FROM acc_standard_n AS b LEFT JOIN ",`acc_b`,"  AS c ON c.expID = ",json_extract(`0`,'$.expID'), " AND b.b1 = c.b2\n",																			"WHERE b.missionId = ",json_extract(`0`,'$.missionId')," AND if1(@t := CASE WHEN b.b1 LIKE '%合计%' AND NOT b.b1 LIKE '负债合计%'  THEN 1 WHEN b.b1 LIKE '%总计%' OR b.b1 LIKE '负债合计%' THEN 2 ELSE 0 END)" ),
+							@stmt_json = CONCAT_WS('',"SELECT  quotd(a.rowNo) AS rowno,quotj(CONCAT_WS(',',",CONCAT_WS(',',preg_replace(REG('2c'),"CONCAT(quotn('$1'),':{\"v\":',quotn(b$1),',\"c\":\"1\"}')$2",`1C`)),')) AS b\n',														"FROM(\n",@stmt_json,"\n) AS a "),
+							@stmt_json = CONCAT_WS('',"SELECT c(CONCAT_WS('',CONCAT('{\"line\":',quotd(COUNT(*))),',',GROUP_CONCAT(CONCAT_WS('',a.rowno,':',a.b,'\n')),'}')) AS b\nFROM(\n",													@stmt_json,"\n) AS a ")/**/ ;
+
+				SET		@stmt_json = CONCAT_WS('',"SELECT REGEXP_replace(b,",QUOTE(`r`),",'') b\nFROM(\n",@stmt_json,"\n) AS a ");
+
+
+				SET @rowId = 0,@t = 0, @b3 = 0.00,@b4 = 0.00,@b5 = 0.00,@b6 = 0.00,@z3 = 0.00,@z4 = 0.00,@z5 = 0.00,@z6 = 0.00;
+-- SELECT  c(@stmt_json );  LEAVE m_j;
+				EXECUTE  immediate @stmt_json;
+
+				LEAVE m_j;
+
+			END;
+
+			WHEN `FunId`= '7' || `FunId`= '8' THEN 
 			 BEGIN 
 
 				DECLARE `1C` VARCHAR(2000) DEFAULT NULL;
@@ -7722,62 +8009,55 @@ COMMIT;LEAVE m_j;
 -- b
 				SET		`1C` = REPLACE('`1`,`3`,`4`,`5`,`6`','`',''),
 							`2C` = REPLACE('`1`,`2`,`3`,`4`','`',''),
-							@stmt_json = CONCAT_WS('',"SELECT c.expID,c.missionId,c.missionId1,c.rowNo,c.b1,c.b2,Sum(c.b3) AS b3,c(GROUP_CONCAT(IF(IFNULL(c.b3,'')!='',REGEXP_substr(a.missionLabel,",QUOTE(R('index')),"),NULL))) AS t3,SUM(c.b4) AS b4 ,c(GROUP_CONCAT(IF(IFNULL(c.b4,'')!='',REGEXP_substr(a.missionLabel,",QUOTE(R('index')),"),NULL))) AS t4 FROM acc_b AS c INNER JOIN acc_mission AS a ON c.missionId = a.missionId  WHERE c.expID = ",json_extract(`0`,'$.expID'), " GROUP BY TRIM(c.b2)"),
-							@stmt_json = CONCAT_WS('',"SELECT b.rowNo,b.b1,NULL AS t1,NULL AS t2, NULL AS t3,NULL AS t6,","/* @t,@b3,b.b3,*/money(@`1`:= if(if1(@b3 := @b3 + @t*isnu(b.b3)) AND @t = '0.0',@b3,b.b3)) AS b3,","/*c.b3 AS b3,@b4,b.b4,*/money(@`2`:= IF(if1(@b4 := @b4 + isnu(c.b3)) AND @t = '0.0',@b4,c.b3)) AS b4,c.t4,","/*c.b3 AS cb3,@b4,*/money(@`3`:= if(if1(@b5 := @b5 + isnu(c.b4)) AND @t = '0.0',@b5,c.b4)) AS b5,c.t4 AS t5,","/*b6,*/money(CASE WHEN @t =1 OR @t ='0.0' THEN isnu(@`1`)-isnu(@`2`)+ isnu(@`3`) ELSE isnu(@`1`)+isnu(@`2`)-isnu(@`3`) END) AS b6\n","FROM acc_standard_n AS b LEFT JOIN(",@stmt_json,")AS c ON INSTR(b.b1,c.b2)\n",	"WHERE b.missionId = ",json_extract(`0`,'$.missionId')," AND if1(@t := CASE WHEN b.b1 REGEXP '^(减)' THEN '-1' WHEN b.b1 REGEXP '^(加)' THEN '1' WHEN b.b1 REGEXP '^其中' THEN '0'WHEN b.b1 REGEXP '^(一|五)' THEN '1' WHEN b.b1 REGEXP CONCAT('^(',R1('〇-九'),')') THEN '0.0' ELSE @t END)" ),
-							@stmt_json = CONCAT_WS('',"SELECT  quotd(a.rowNo) AS rowno,quotj(CONCAT_WS(',',",CONCAT_WS(',',preg_replace(REG('2c'),"CONCAT(quotn('$1'),':{\"v\":',quotn(b$1),',\"c\":\"1\"',IF((@tt:=CONCAT(',\"t\":',quotd(t$1)))IS NULL,'',@tt),'}')$2",`1C`)),')) AS b\n',"FROM(\n",@stmt_json,"\n) AS a "),
-							@stmt_json = CONCAT_WS('',"SELECT c(CONCAT_WS('',CONCAT('{\"line\":',quotd(COUNT(*))),',',GROUP_CONCAT(CONCAT_WS('',a.rowno,':',a.b,'\n')),'}')) AS b\nFROM(\n",@stmt_json,"\n) AS a ");
+							`r` = '(?ms)"[45]":{"v":\\s*(?:"(?:(?=\\\\).{2}|(?!["\\\\]).)*?"|null|\\-?[\\d,]+(?:\\.\\d+))\\K,\\s*"c":\\s*"1"';
 
--- SELECT  c(@stmt_json ); LEAVE m_j;
+				SET		@stmt_json = CONCAT_WS('\n', "SELECT c.expID,c.missionId,c.rowId,c.b1,c.b2,c.b3,c(IF(IFNULL(c.b3,'')!='',REGEXP_substr(a.missionLabel,",QUOTE(R('index')),"),NULL)) AS t3,c.b4 AS b4 ,c(GROUP_CONCAT(IF(IFNULL(c.b4,'')!='',REGEXP_substr(a.missionLabel,",QUOTE(R('index')),"),NULL))) AS t4"
+,CONCAT_ws('',"FROM ",`acc_b`,"  AS c")
+,CONCAT_ws('',"INNER JOIN acc_mission AS a ON c.missionId = a.missionId")
+,CONCAT_ws('',"WHERE c.expID = ",json_extract(`0`,'$.expID'), " GROUP BY TRIM(c.b2)"))
+-- 							,@stmt_json = CONCAT_WS('',"SELECT b.rowNo,b.b1,NULL AS t1,NULL AS t2, NULL AS t3,NULL AS t6,","/* @t,@b3,b.b3,*/money(@`1`:= if(if1(@b3 := @b3 + @t*isnu(b.b3)) AND @t = '0.0',@b3,b.b3)) AS b3,","/*c.b3 AS b3,@b4,b.b4,*/money(@`2`:= IF(if1(@b4 := @b4 + isnu(c.b3)) AND @t = '0.0',@b4,c.b3)) AS b4,c.t4,","/*c.b3 AS cb3,@b4,*/money(@`3`:= if(if1(@b5 := @b5 + isnu(c.b4)) AND @t = '0.0',@b5,c.b4)) AS b5,c.t4 AS t5,","/*b6,*/money(CASE WHEN @t =1 OR @t ='0.0' THEN isnu(@`1`)-isnu(@`2`)+ isnu(@`3`) ELSE isnu(@`1`)+isnu(@`2`)-isnu(@`3`) END) AS b6\n","FROM acc_standard_n AS b LEFT JOIN(",@stmt_json,")AS c ON INSTR(b.b1,c.b2)\n",	"WHERE b.missionId = ",json_extract(`0`,'$.missionId')," AND if1(@t := CASE WHEN b.b1 REGEXP '^(减)' THEN '-1' WHEN b.b1 REGEXP '^(加)' THEN '1' WHEN b.b1 REGEXP '^其中' THEN '0'WHEN b.b1 REGEXP '^(一|五)' THEN '1' WHEN b.b1 REGEXP CONCAT('^(',R1('〇-九'),')') THEN '0.0' ELSE @t END)" )
+--							,@stmt_json = CONCAT_WS('',"SELECT  quotd(a.rowNo) AS rowno,quotj(CONCAT_WS(',',",CONCAT_WS(',',preg_replace(REG('2c'),"CONCAT(quotn('$1'),':{\"v\":',quotn(b$1),',\"c\":\"1\"',IF((@tt:=CONCAT(',\"t\":',quotd(t$1)))IS NULL,'',@tt),'}')$2",`1C`)),')) AS b\n',"FROM(\n",@stmt_json,"\n) AS a ")
+--							,@stmt_json = CONCAT_WS('',"SELECT c(CONCAT_WS('',CONCAT('{\"line\":',quotd(COUNT(*))),',',GROUP_CONCAT(CONCAT_WS('',a.rowno,':',a.b,'\n')),'}')) AS b\nFROM(\n",@stmt_json,"\n) AS a ")
+;
 
-					SET @t = '',@b3 = -0.00,@b4 = -0.00,@b5 = -0.00,@`1`=0,@`2`=0,@`3`=0;
+-- 				SET		@stmt_json = CONCAT_WS('',"SELECT REGEXP_replace(b,",QUOTE(`r`),",'') b\nFROM(\n",@stmt_json,"\n) AS a ");
 
-					PREPARE stmt_json FROM @stmt_json;
-					EXECUTE stmt_json ;
+
+
+
+					SET @t = '',@b3 = -0.00,@b4 = -0.00,@b5 = -0.00,@`1`=null,@`2`=0,@`3`=0;
+-- 
+SELECT  c(@stmt_json );--  LEAVE m_j;
+					EXECUTE immediate  @stmt_json;
+
 					LEAVE m_j;
 
 				END;
 
-			WHEN '8' THEN 
+			WHEN `FunId` ='888' THEN 
 			 BEGIN 
 
 				DECLARE `1C` VARCHAR(2000) DEFAULT NULL;
 				DECLARE `2C` VARCHAR(2000) DEFAULT NULL;
 
-					SET `1C` = '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15',
-
-
-
-							@stmt_json = CONCAT_WS('',"SELECT kv('','t1',a.t1) AS t,c(quotj(CONCAT_WS(',',",CONCAT_WS(',',
-preg_replace(REG('2c'),"CONCAT(quotn('$1'),':{\"v\":',quotn(a$1),',\"c\":\"1\"}')$2",`1C`)),'))) AS a\n',
-
-															" FROM acc_mission AS a 
-INNER JOIN acc_standard_1 AS b ON b.missionId = a.missionId
-WHERE a.missionId = ",json_extract(`0`,'$.missionId'));
-
- -- SELECT  c(@stmt_json ); LEAVE m_j;
-		PREPARE stmt_json FROM @stmt_json;
-		EXECUTE stmt_json ;
-
 -- b
 				SET		`1C` = REPLACE('`1`,`3`,`4`,`5`,`6`','`',''),
 							`2C` = REPLACE('`1`,`2`,`3`,`4`','`',''),
-							@stmt_json = CONCAT_WS('',"SELECT c.expID,c.missionId,c.missionId1,c.rowNo,c.b1,c.b2,Sum(c.b3) AS b3,c(GROUP_CONCAT(IF(IFNULL(c.b3,'')!='',preg_capture(",QUOTE(R('index')),",a.missionLabel),NULL))) AS t3,SUM(c.b4) AS b4 ,c(GROUP_CONCAT(IF(IFNULL(c.b4,'')!='',preg_capture(",QUOTE(R('index')),",a.missionLabel),NULL))) AS t4 FROM acc_b AS c INNER JOIN acc_mission AS a ON c.missionId = a.missionId  WHERE c.expID = ",json_extract(`0`,'$.expID'), " GROUP BY TRIM(c.b2)"),
+							`r` = '(?ms)"[45]":{"v":\\s*(?:"(?:(?=\\\\).{2}|(?!["\\\\]).)*?"|null|\\-?[\\d,]+(?:\\.\\d+))\\K,\\s*"c":\\s*"1"';
 
-							@stmt_json = CONCAT_WS('',"SELECT b.rowNo,b.b1,NULL AS t1,NULL AS t2, NULL AS t3,NULL AS t6,","/* @t,@b3,b.b3,*/money(@`1`:= if(if1(@b3 := @b3 + @t*isnu(b.b3)) AND @t = '0.0',@b3,b.b3)) AS b3,","/*c.b3 AS b3,@b4,b.b4,*/money(@`2`:= IF(if1(@b4 := @b4 + isnu(c.b3)) AND @t = '0.0',@b4,c.b3)) AS b4,c.t4,","/*c.b3 AS cb3,@b4,*/money(@`3`:= if(if1(@b5 := @b5 + isnu(c.b4)) AND @t = '0.0',@b5,c.b4)) AS b5,c.t4 AS t5,","/*b6,*/money(CASE WHEN @t =1 OR @t ='0.0' THEN isnu(@`1`)-isnu(@`2`)+ isnu(@`3`) ELSE isnu(@`1`)+isnu(@`2`)-isnu(@`3`) END) AS b6\n",
-"FROM acc_standard_n AS b LEFT JOIN(",@stmt_json,")AS c ON INSTR(b.b1,c.b2)\n",	"WHERE b.missionId = ",json_extract(`0`,'$.missionId')," AND if1(@t := CASE WHEN b.b1 REGEXP '^(减)' THEN '-1' WHEN b.b1 REGEXP '^(加)' THEN '1' WHEN b.b1 REGEXP '^其中' THEN '0'WHEN b.b1 REGEXP '^(一|五)' THEN '1' WHEN b.b1 REGEXP CONCAT('^(',R1('〇-九'),')') THEN '0.0' ELSE @t END)"
-															),
+				SET		@stmt_json = CONCAT_WS('',"SELECT c.expID,c.missionId,c.rowId,c.b1,c.b2,Sum(c.b3) AS b3,c(GROUP_CONCAT(IF(IFNULL(c.b3,'')!='',REGEXP_substr(a.missionLabel,",QUOTE(R('index')),"),NULL))) AS t3,SUM(c.b4) AS b4 ,c(GROUP_CONCAT(IF(IFNULL(c.b4,'')!='',REGEXP_substr(a.missionLabel,",QUOTE(R('index')),"),NULL))) AS t4 FROM ",`acc_b`,"  AS c INNER JOIN acc_mission AS a ON c.missionId = a.missionId  WHERE c.expID = ",json_extract(`0`,'$.expID'), " GROUP BY TRIM(c.b2)"),
+							@stmt_json = CONCAT_WS('',"SELECT b.rowNo,b.b1,NULL AS t1,NULL AS t2, NULL AS t3,NULL AS t6,","/* @t,@b3,b.b3,*/money(@`1`:= if(if1(@b3 := @b3 + @t*isnu(b.b3)) AND @t = '0.0',@b3,b.b3)) AS b3,","/*c.b3 AS b3,@b4,b.b4,*/money(@`2`:= IF(if1(@b4 := @b4 + isnu(c.b3)) AND @t = '0.0',@b4,c.b3)) AS b4,c.t4,","/*c.b3 AS cb3,@b4,*/money(@`3`:= if(if1(@b5 := @b5 + isnu(c.b4)) AND @t = '0.0',@b5,c.b4)) AS b5,c.t4 AS t5,","/*b6,*/money(CASE WHEN @t =1 OR @t ='0.0' THEN isnu(@`1`)-isnu(@`2`)+ isnu(@`3`) ELSE isnu(@`1`)+isnu(@`2`)-isnu(@`3`) END) AS b6\n","FROM acc_standard_n AS b LEFT JOIN(",@stmt_json,")AS c ON INSTR(b.b1,c.b2)\n",	"WHERE b.missionId = ",json_extract(`0`,'$.missionId')," AND if1(@t := CASE WHEN b.b1 REGEXP '^(减)' THEN '-1' WHEN b.b1 REGEXP '^(加)' THEN '1' WHEN b.b1 REGEXP '^其中' THEN '0'WHEN b.b1 REGEXP '^(一|五)' THEN '1' WHEN b.b1 REGEXP CONCAT('^(',R1('〇-九'),')') THEN '0.0' ELSE @t END)" ),
 							@stmt_json = CONCAT_WS('',"SELECT  quotd(a.rowNo) AS rowno,quotj(CONCAT_WS(',',",CONCAT_WS(',',preg_replace(REG('2c'),"CONCAT(quotn('$1'),':{\"v\":',quotn(b$1),',\"c\":\"1\"',IF((@tt:=CONCAT(',\"t\":',quotd(t$1)))IS NULL,'',@tt),'}')$2",`1C`)),')) AS b\n',"FROM(\n",@stmt_json,"\n) AS a "),
+							@stmt_json = CONCAT_WS('',"SELECT c(CONCAT_WS('',CONCAT('{\"line\":',quotd(COUNT(*))),',',GROUP_CONCAT(CONCAT_WS('',a.rowno,':',a.b,'\n')),'}')) AS b\nFROM(\n",@stmt_json,"\n) AS a ");
 
-							@stmt_json = CONCAT_WS('',"SELECT c(CONCAT_WS('',CONCAT('{\"line\":',quotd(COUNT(*))),',',GROUP_CONCAT(CONCAT_WS('',a.rowno,':',a.b,'\n')),'}')) AS b\nFROM(\n",													@stmt_json,"\n) AS a ")
-/**/ ;
+				SET		@stmt_json = CONCAT_WS('',"SELECT REGEXP_replace(b,",QUOTE(`r`),",'') b\nFROM(\n",@stmt_json,"\n) AS a ");
 
 
--- SELECT  c(@stmt_json ); -- LEAVE m_j;
+
 
 					SET @t = '',@b3 = -0.00,@b4 = -0.00,@b5 = -0.00,@`1`=0,@`2`=0,@`3`=0;
-
-					PREPARE stmt_json FROM @stmt_json;
-					EXECUTE stmt_json ;
+-- SELECT  c(@stmt_json ); LEAVE m_j;
+					EXECUTE immediate @stmt_json;
 
 					LEAVE m_j;
 
@@ -7806,28 +8086,25 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` FUNCTION `nabc`(`nodechar` varchar(20)) RETURNS decimal(26,20)
     NO SQL
     DETERMINISTIC
-BEGIN
-	declare  bit int default 3;
-	declare i int default 0 ;
-	declare nc varchar(20) default nodechar;
-
-	declare num decimal(36,20) default 0 ;
-	if nodechar  is  null  then 
-		return 0 ;
-	end if ;
-	lab: loop
-
-		set 	num =num + substring_index(nc ,'.' , 1) * power( 10, -1*i*bit) ;
-
-		if   instr( nc , '.' ) =  0 then
-			leave lab;
-		end if;
-
-		set	nc =  substring( nc ,instr(nc ,'.' )+1),
-			i = i+1;
-	end loop   ;
-	RETURN num;
-END
+BEGIN 
+declare  bit int default 3;
+declare i int default 0 ;
+declare nc varchar(20) default nodechar; 
+declare num decimal(36,20) default 0 ;
+if IFNULL(nodechar,'')=''  then 
+	return NULL ;
+end if ; 
+lab: loop 
+	set 
+num =num + substring_index(nc ,'.' , 1) * power( 10, -1*i*bit) ;
+	if   instr( nc , '.' ) =  0 then
+		leave lab;
+	end if;
+	set
+nc =  substring( nc ,instr(nc ,'.' )+1),
+		i = i+1; 
+end loop   ;
+RETURN num; END
 ;;
 DELIMITER ;
 
@@ -12189,8 +12466,8 @@ DROP PROCEDURE IF EXISTS `v3_initial_mission`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `v3_initial_mission`(IN `expid_` varchar(20000),IN `missionid_` varchar(60),in sealNo_ Integer(3),in pageId_ varchar(30))
     READS SQL DATA
-initial_label:BEGIN
-	
+`l`:BEGIN
+	#Routine body goes here...
 
 	DECLARE db_a VARCHAR(100) DEFAULT NULL;
 	DECLARE db_b VARCHAR(100) DEFAULT NULL;
@@ -12200,14 +12477,18 @@ initial_label:BEGIN
 
 
 
+START TRANSACTION;
+INSERT INTO plogs (Function_Name,parameter) VALUES ('v3_initial_mission',CONCAT_WS(',',QUOTE(`expid_`),QUOTE(`missionid_`),QUOTE(`sealNo_`),QUOTE(`pageId_`)));
+COMMIT;/*
+/**/
 
 
 
 	CASE
 			WHEN expid_ IS NULL THEN
-					SELECT NULL;LEAVE initial_label;
+					SELECT NULL;LEAVE `l`;
 			WHEN missionid_ IS NULL THEN
-					SELECT NULL;LEAVE initial_label;
+					SELECT NULL;LEAVE `l`;
 
 			ELSE 
          SET @initial_body =NULL;
@@ -12225,7 +12506,7 @@ initial_label:BEGIN
 			@initial_body =
 					CONCAT_WS('',"SELECT \n",
 												"b.mission_ask,c.line,\n",
-IF(`mId1` IS NULL,
+IF(`mId1` IS NULL ,
 CONCAT_WS('',
 "@ai := CONCAT('{',CONCAT_WS(',',",
 Temp_Func('IF(IFNULL(b.init_a??,"")="",NULL,\'"??":"1"\')',1,100,NULL),
@@ -12264,26 +12545,26 @@ Temp_Func('IF(IFNULL(b.init_b??,"")="",NULL,\'"??":"1"\')',2,49,NULL),
 												"LEFT JOIN " ,db_s, " AS b ON b.expID = ",QUOTE(expid_),"\n", 
 												"AND a.pageId = b.pageId AND a.missionId = b.missionId AND a.seal_id = b.seal_Id \n",
 												"WHERE a.missionId =",QUOTE(missionid_)," AND \n",
-												"a.seal_no =",QUOTE(sealNo_), " AND \n", 
+												CONCAT("a.seal_no ='",sealNo_,"' AND \n"), 
 												"a.pageId =",QUOTE(pageId_) ,"\n", 
 												") AS d \n",
 												"WHERE a.expno =",QUOTE(expid_) 
 				);
 
-
-	PREPARE stmt_initial FROM @initial_body;
-	EXECUTE stmt_initial;
+ 
+--  SELECT  @initial_body;
+	EXECUTE immediate @initial_body;
 
 SET @t  = NULL;
 
 SET @initial_body = 
 IF(mid1 IS NULL ,
 				CONCAT_WS('',	"SELECT \n",
-											"c(column_json(COLUMN_create(",
+											"column_json(COLUMN_create(",
 Temp_Func("'t??',IF(IFNULL(a.t??,'')='',NULL,a.t??)",1,8,null),
-"))) AS t,\n",
+")) AS t,\n",
 "@bio :=",QUOTE(@ai),",\n",
-
+-- c
 "@c := 0,\n",
 'IF(IFNULL(@a := CONCAT_WS(",",',
 Temp_Func('IF(IFNULL(@a := CONCAT_WS(",",
@@ -12299,14 +12580,15 @@ CONCAT("{",@a,"}"))
 											"LEFT JOIN ",db_a," AS b ON b.expid = ",QUOTE(expid_)," AND a1.missionId = b.missionId \n"
 											"WHERE a.missionid = ",QUOTE(`mId`),CONCAT(" AND b.missionid1 = ",quote_d(`mId1`))
 ),
-
+-- 第二种 
 CONCAT_WS('',"SELECT quotj(\n",
 "CONCAT_WS(',',",Temp_Func("qd1(a.a??,??)",1,100,NULL),")) AS a\nFROM acc_a AS a",
 "\nWHERE  a.expID = ",QUOTE(expid_)," AND a.missionId = ",QUOTE(`mId`),
 " AND a.missionId1 = ",QUOTE(`mId1`)));
-
+-- SELECT  @initial_body;-- SELECT @initial_body;
 	PREPARE stmt_initial FROM @initial_body;
 	EXECUTE stmt_initial;
+
 
 IF @t = 	"{0}" THEN 
 
@@ -12317,24 +12599,25 @@ END if;
 
 
 
-	IF DATABASE() = 'qianxue_sjzh' AND `missionid_` IN('qianxue-15123110423612291','qianxue-15123115081130306','qianxue-15123115301023304' )
+	IF DATABASE() = 'qianxue_sjzh' AND `missionid_` IN('qianxue-15123110423612291','q-ianxue-15123115081130306','q-ianxue-15123115301023304'/*,'qianxue-15123115374571222'*/ )
  THEN
 	pd:BEGIN
 			SET @a = CONCAT('{',quote_d('0'),':','{',quote_d("expID"),':',quote_d(`expid_`),',',quote_d('missionId'),':',quote_d(`missionid_`),'}}');
 
 			CASE 
-
+-- 2.1
 					WHEN `missionid_` = 'qianxue-15123110423612291' THEN	CALL m_j('5',@a);
-
+-- 3.1
 					WHEN `missionid_` = 'qianxue-15123115081130306' THEN	CALL m_j('6',@a);
-
+-- 3.2
 					WHEN `missionid_` = 'qianxue-15123115301023304' THEN	CALL m_j('7',@a);
-
-
+-- 3.3
+--
+					WHEN `missionid_` = 'qianxue-15123115374571222' THEN	CALL m_j('8',@a);
 
 					ELSE LEAVE pd;
 			END CASE ;
-			LEAVE initial_label;
+			LEAVE `l`;
 		END;
 	END IF;
 
@@ -12346,7 +12629,7 @@ END if;
 											"IF(IFNULL(a1.rowNo,'') = '',b.rowId ,a1.rowNo) AS rowNo,\n",
 
 "@bio := IF(NOT ",QUOTE(@i),",",QUOTE(@bi),",IF(@bio := preg_capture(QD(a1.rowNo,':{/','/'),@bi) IS NULL ,NULL,je2(@bi,a1.rowNo,NULL))),\n",
-
+-- c
 "@c := 0,\n",
 'IF(IFNULL(@a := CONCAT_WS(",",',
 Temp_Func('IF(IFNULL(@a := CONCAT_WS(",",
@@ -12364,7 +12647,7 @@ qd(a1.rowNo,CONCAT(":{",@a,"}"),""))
 											"WHERE a.missionid = ",QUOTE(`mid`),"\n",
 ') AS a WHERE a.b IS NOT NULL'
 ),
-
+-- 第二种 
 CONCAT_WS('',"SELECT c(quotj(GROUP_CONCAT(qd2(rowId ,@a)))) AS b\n",
 "FROM acc_b AS a",
 "\nWHERE  a.expID = ",QUOTE(expid_)," AND a.missionId = ",QUOTE(`mId`),
@@ -12374,7 +12657,214 @@ CONCAT_WS('',"SELECT c(quotj(GROUP_CONCAT(qd2(rowId ,@a)))) AS b\n",
 )
 
 );
+-- SELECT @initial_body;
+	PREPARE stmt_initial FROM @initial_body;
+	EXECUTE stmt_initial;
 
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+--  Procedure definition for `v3_initial_mission_copy`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `v3_initial_mission_copy`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `v3_initial_mission_copy`(IN `expid_` varchar(20000),IN `missionid_` varchar(60),in sealNo_ Integer(3),in pageId_ varchar(30))
+    READS SQL DATA
+`l`:BEGIN
+	#Routine body goes here...
+
+	DECLARE db_a VARCHAR(100) DEFAULT NULL;
+	DECLARE db_b VARCHAR(100) DEFAULT NULL;
+	DECLARE db_s VARCHAR(100) DEFAULT NULL;
+	DECLARE `mId` VARCHAR(60)  DEFAULT NULL;
+	DECLARE `mId1` VARCHAR(60)  DEFAULT NULL;
+
+
+/*
+START TRANSACTION;
+INSERT INTO plogs (Function_Name,parameter) VALUES ('v3_initial_mission',CONCAT_WS(',',QUOTE(`expid_`),QUOTE(`missionid_`),QUOTE(`sealNo_`),QUOTE(`pageId_`)));
+COMMIT;
+/**/
+
+
+
+	CASE
+			WHEN expid_ IS NULL THEN
+					SELECT NULL;LEAVE `l`;
+			WHEN missionid_ IS NULL THEN
+					SELECT NULL;LEAVE `l`;
+
+			ELSE 
+         SET @initial_body =NULL;
+	END CASE;
+
+
+	SET `mId1` = NewMId(`missionid_`,1),
+			`mId` = NewMId(`missionid_`,0);
+
+
+	SET @ai = NULL,@bi = NULL,
+			db_a = IF(`mId1` IS NULL,'acc_1','acc_a'),
+			db_b = IF(`mId1` IS NULL,expid2b(expid_),'acc_b'),
+			db_s = IF(`mId1` IS NULL,'acc_seal_1','acc_seal_c'),
+			@initial_body =
+					CONCAT_WS('',"SELECT \n",
+												"b.mission_ask,c.line,\n",
+IF(`mId1` IS NULL ,
+CONCAT_WS('',
+"@ai := CONCAT('{',CONCAT_WS(',',",
+Temp_Func('IF(IFNULL(b.init_a??,"")="",NULL,\'"??":"1"\')',1,100,NULL),
+"),'}'),\n",
+"@i := IF(CHAR_LENGTH(IFNULL(b.init_b1,''))>3 AND b.init_b1<>'{}',1,0),\n",
+"@bi := IF(@i,init_b1,CONCAT('{',CONCAT_WS(',',",
+'IF(IFNULL(b.init_b1,"")<>"" AND b.init_b1<>"{}" ,\'"1":"1"\',NULL),',
+Temp_Func('IF(IFNULL(b.init_b??,"")="",NULL,\'"??":"1"\')',2,49,NULL),
+"),'}'))"
+),"@ai :=NULL ,@i:=NULL,@bi:=NULL "),
+												",\na2.redo_size,\n",
+												"a1.classType,\n",
+												"IF(a2.redo_size = 99,a2.redo_size,a2.redo_size - IFNULL(c.log_count,0)) AS number,\n",
+												"IFNULL(c.log_count,0) AS log_count,\n",
+												"c.score,\n",
+												"IF(IFNULL(b.line_type,0)=0, 0, 1) AS is_line,\n",
+												"IF(IFNULL(b.line_type,0)=0, 0, 1) AS ifLineS,\n",
+												"IF(IFNULL(b.line_type,0)=0, 0, IF(IFNULL(c.is_line,0),0,1)) AS ifLineO,\n",
+												"b.line_x1,b.line_y1,b.line_x2,b.line_y2,b.line_color,b.line_type,a12.courseNo, \n",
+												"d.*\n"
+												"FROM exp_experimentclassstudent AS a\n",
+												"INNER JOIN exp_experimentclass AS a1 ON a.classNo = a1.classNo\n",
+ 												"INNER JOIN exp_experimentclass_course AS a12 ON a12.classNo = a1.classNo\n",
+ 												"INNER JOIN exp_courses_node AS a13 ON a12.courseNo = a13.node_courseNo\n",
+ 												"INNER JOIN exp_courses_node_content AS a14 ON a14.missionId = ",QUOTE(`mId`)," AND a14.contentNo = a13.contentNo\n", 
+												"INNER JOIN mysq1_schema.exp_difficulty AS a2 ON a1.difficulty_level = a2.difficulty_level\n",
+												"JOIN acc_mission AS b  ON b.missionId =",QUOTE(`mId`),"\n",
+												"LEFT JOIN " ,db_a, " AS c ON b.missionId = c.missionId AND a.expNo = c.expID",
+								CONCAT(" AND c.missionId1 = ",quote_d(`mId1`)),
+												"\nJOIN (SELECT\n",
+												"MIN(IF(b.expID is NULL,a.seal_id,NULL)) AS rpSealId,\n",
+												"COUNT(a.seal_id) AS shouldSeal,\n",
+												"COUNT(b.expid) AS overSeal,\n",
+												"COUNT(a.seal_id) - COUNT(b.expid) AS unSealed \n",
+												"FROM acc_mission_seal AS a\n",
+												"LEFT JOIN " ,db_s, " AS b ON b.expID = ",QUOTE(expid_),"\n", 
+												"AND a.pageId = b.pageId AND a.missionId = b.missionId AND a.seal_id = b.seal_Id \n",
+												"WHERE a.missionId =",QUOTE(missionid_)," AND \n",
+												CONCAT("a.seal_no ='",sealNo_,"' AND \n"), 
+												"a.pageId =",QUOTE(pageId_) ,"\n", 
+												") AS d \n",
+												"WHERE a.expno =",QUOTE(expid_) 
+				);
+
+ 
+--  SELECT  @initial_body;
+	EXECUTE immediate @initial_body;
+
+SET @t  = NULL;
+
+SET @initial_body = 
+IF(mid1 IS NULL ,
+				CONCAT_WS('',	"SELECT \n",
+											"column_json(COLUMN_create(",
+Temp_Func("'t??',IF(IFNULL(a.t??,'')='',NULL,a.t??)",1,8,null),
+")) AS t,\n",
+"@bio :=",QUOTE(@ai),",\n",
+-- c
+"@c := 0,\n",
+'IF(IFNULL(@a := CONCAT_WS(",",',
+Temp_Func('IF(IFNULL(@a := CONCAT_WS(",",
+IF(@bio+(@c:=@c+1)IS NULL,
+	IF(b.a??="",NULL,QD(b.a??,"","\\\"v\\\":"))
+,IF(preg_capture(QD(@c,":\\\"/","/"),@bio) IS NOT NULL,CONCAT_WS("",CONCAT(QD(a1.a??,"","\\\"v\\\":"),","),"\\\"c\\\":\\\"1\\\""),
+	IF(b.a??="",NULL,QD(b.a??,"","\\\"v\\\":"))
+))),"")="",NULL,qd(@c,CONCAT(":{",@a,"}"),""))\n',1,100,null),'),"")="",NULL,
+CONCAT("{",@a,"}")) 
+ AS a\n'
+											"FROM acc_mission AS a \n",
+											"LEFT JOIN acc_standard_1 AS a1 ON a.missionId = a1.missionId AND a.missionId = a1.missionId \n",
+											"LEFT JOIN ",db_a," AS b ON b.expid = ",QUOTE(expid_)," AND a1.missionId = b.missionId \n"
+											"WHERE a.missionid = ",QUOTE(`mId`),CONCAT(" AND b.missionid1 = ",quote_d(`mId1`))
+),
+-- 第二种 
+CONCAT_WS('',"SELECT quotj(\n",
+"CONCAT_WS(',',",Temp_Func("qd1(a.a??,??)",1,100,NULL),")) AS a\nFROM acc_a AS a",
+"\nWHERE  a.expID = ",QUOTE(expid_)," AND a.missionId = ",QUOTE(`mId`),
+" AND a.missionId1 = ",QUOTE(`mId1`)));
+-- SELECT  @initial_body;-- SELECT @initial_body;
+	PREPARE stmt_initial FROM @initial_body;
+	EXECUTE stmt_initial;
+
+
+IF @t = 	"{0}" THEN 
+
+CALL Audit_1(CONCAT('v3_initial_mission - ',@t),CONCAT_WS(',',QUOTE(`expid_`),QUOTE(`missionid_`),QUOTE(`sealNo_`),QUOTE(`pageId_`)),'ok');
+COMMIT;
+CALL Error("@twenti");
+END if;
+
+
+
+	IF DATABASE() = 'qianxue_sjzh' AND `missionid_` IN('qianxue-15123110423612291','q-ianxue-15123115081130306','q-ianxue-15123115301023304'/*,'qianxue-15123115374571222'*/ )
+ THEN
+	pd:BEGIN
+			SET @a = CONCAT('{',quote_d('0'),':','{',quote_d("expID"),':',quote_d(`expid_`),',',quote_d('missionId'),':',quote_d(`missionid_`),'}}');
+SELECT 'ok';
+			CASE 
+-- 2.1
+					WHEN `missionid_` = 'qianxue-15123110423612291' THEN	CALL m_j('5',@a);
+-- 3.1
+					WHEN `missionid_` = 'qianxue-15123115081130306' THEN	CALL m_j('6',@a);
+-- 3.2
+					WHEN `missionid_` = 'qianxue-15123115301023304' THEN	CALL m_j('7',@a);
+-- 3.3
+--
+					WHEN `missionid_` = 'qianxue-15123115374571222' THEN	CALL m_j('8',@a);
+
+					ELSE LEAVE pd;
+			END CASE ;
+			LEAVE `l`;
+		END;
+	END IF;
+
+SELECT @bi;
+	SET @rowNo = NULL ,
+			@initial_body =
+ IF(mid1 IS NULL ,
+				CONCAT_WS('',	"SELECT CONCAT('{',GROUP_CONCAT(a.b),'}') AS b FROM(\nSELECT \n",
+											"IF(IFNULL(a1.rowNo,'') = '',b.rowId ,a1.rowNo) AS rowNo,\n",
+
+"@bio := IF(NOT ",QUOTE(@i),",",QUOTE(@bi),",IF(@bio := preg_capture(QD(a1.rowNo,':{/','/'),@bi) IS NULL ,NULL,je2(@bi,a1.rowNo,NULL))),\n",
+-- c
+"@c := 0,\n",
+'IF(IFNULL(@a := CONCAT_WS(",",',
+Temp_Func('IF(IFNULL(@a := CONCAT_WS(",",
+IF(@bio+(@c:=@c+1)IS NULL,
+	IF(b.b??="",NULL,QD(b.b??,"","\\\"v\\\":"))
+,IF(preg_capture(QD(@c,":\\\"/","/"),@bio) IS NOT NULL,CONCAT_WS("",CONCAT(QD(a1.b??,"","\\\"v\\\":"),","),"\\\"c\\\":\\\"1\\\""),
+	IF(b.b??="",NULL,QD(b.b??,"","\\\"v\\\":"))
+))),"")="",NULL,qd(@c,CONCAT(":{",@a,"}"),""))\n',1,2,null),
+'),"")="",NULL,
+qd(a1.rowNo,CONCAT(":{",@a,"}"),"")) 
+\n AS b\n'
+											"FROM acc_mission AS a \n",
+											"LEFT JOIN ",db_b," AS b ON b.expid = ",QUOTE(expid_)," AND b.missionId =",QUOTE(`mid`),"\n",
+											"LEFT JOIN acc_standard_n AS a1 ON a.missionId = a1.missionId AND (CASE WHEN  IFNULL(b.rowId,'') <> '' AND IFNULL(b.rowId,'') <> ''THEN a1.rowno = b.rowId WHEN IFNULL(b.rowId,'') <> '' THEN b.rowId ELSE a1.rowno END)",
+											"WHERE a.missionid = ",QUOTE(`mid`),"\n",
+') AS a WHERE a.b IS NOT NULL'
+),
+-- 第二种 
+CONCAT_WS('',"SELECT c(quotj(GROUP_CONCAT(qd2(rowId ,@a)))) AS b\n",
+"FROM acc_b AS a",
+"\nWHERE  a.expID = ",QUOTE(expid_)," AND a.missionId = ",QUOTE(`mId`),
+" AND a.missionId1 = ",QUOTE(`mId1`)," AND \n",
+"(@a := CONCAT_WS(',',",Temp_Func("qd1(a.b??,??)",1,2,NULL),")",
+"\n) IS NOT NULL AND @a <> '' "
+)
+
+);
+-- 
+SELECT @initial_body;
 	PREPARE stmt_initial FROM @initial_body;
 	EXECUTE stmt_initial;
 

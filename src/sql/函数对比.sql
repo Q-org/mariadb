@@ -308,6 +308,6 @@ qd(a1.rowNo,CONCAT(":{",@a,"}"),""))
 
  AS b
 FROM acc_mission AS a 
-LEFT JOIN acc_n_3 AS b ON b.expid = '23042415340608294683' AND b.missionId ='qianxue-15123115374571222'
+LEFT JOIN acc_n_3 AS b ON b.expid = '23030516030936031323' AND b.missionId ='qianxue-15123115374571222'
 LEFT JOIN acc_standard_n AS a1 ON a.missionId = a1.missionId AND (CASE WHEN  IFNULL(b.rowId,'') <> '' AND IFNULL(b.rowId,'') <> ''THEN a1.rowno = b.rowId WHEN IFNULL(b.rowId,'') <> '' THEN b.rowId ELSE a1.rowno END)WHERE a.missionid = 'qianxue-15123115374571222'
 -- ) AS a WHERE a.b IS NOT NULL
