@@ -1,4 +1,7 @@
 {
   "name": "数据库",
-  "packageManager": "yarn@3.4.1"
+  "packageManager": "yarn@3.4.1",
+  "dependencies": {
+    "@doocs/md-cli": "^0.0.5"
+  }
 }
